@@ -120,6 +120,22 @@
     .no-orders p { color:var(--muted); margin-bottom:20px; }
     .primary-button { display:inline-flex; align-items:center; gap:8px; text-decoration:none; background:var(--green); color:white; padding:12px 20px; border-radius:10px; font-weight:800; }
     .error-message { color:#991b1b; background:#fff1f2; border-color:#fecdd3; }
+    .timeline-wrap{margin:20px 0;padding:18px;border:1px solid var(--line);border-radius:16px;background:#fbfdff}
+    .timeline-title{font-weight:800;color:var(--navy);margin-bottom:16px}
+    .timeline{display:grid;gap:13px}
+    .timeline-step{display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:start;position:relative}
+    .timeline-step:not(:last-child)::after{content:"";position:absolute;left:14px;top:29px;width:2px;height:calc(100% + 1px);background:#dbe5ee}
+    .timeline-step.done:not(:last-child)::after{background:var(--green)}
+    .timeline-dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#e8eef4;color:#8291a1;z-index:1}
+    .timeline-step.done .timeline-dot{background:#d9f7e8;color:var(--green)}
+    .timeline-step.active .timeline-dot{background:#e0f1ff;color:var(--navy);box-shadow:0 0 0 5px rgba(0,67,112,.08)}
+    .timeline-copy strong{display:block;font-size:14px}
+    .timeline-copy span{font-size:12px;color:var(--muted)}
+    .customer-update{margin-top:16px;padding:14px;border-left:4px solid var(--navy);background:#eff7fc;border-radius:10px;color:#29465d}
+    .delivery-meta{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+    .delivery-box{padding:13px;border:1px solid var(--line);border-radius:12px;background:#fff}
+    .delivery-box small{display:block;color:var(--muted);margin-bottom:5px}
+    @media(max-width:560px){.delivery-meta{grid-template-columns:1fr}}
     .modal-overlay { position:fixed; inset:0; z-index:4000; display:none; align-items:center; justify-content:center; padding:18px; background:rgba(2,12,27,.72); backdrop-filter:blur(5px); }
     .modal { width:min(640px,100%); max-height:86vh; overflow:auto; background:white; border-radius:20px; box-shadow:0 24px 70px rgba(0,0,0,.28); }
     .modal-header { position:sticky; top:0; z-index:2; display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid var(--line); background:white; }
@@ -252,12 +268,22 @@
       const user = session.user;
       document.getElementById("userEmail").textContent = user.email || "Customer";
       await loadOrders(user.id);
+      supabase.channel(`customer-orders-${user.id}`)
+        .on("postgres_changes", {
+          event: "UPDATE",
+          schema: "public",
+          table: "orders",
+          filter: `user_id=eq.${user.id}`
+        }, async () => {
+          await loadOrders(user.id);
+        })
+        .subscribe();
     }
 
     async function loadOrders(userId) {
       const { data, error } = await supabase
         .from("orders")
-        .select("id, order_id, user_id, client_id, cart, user_input, totals, payment_status, design_status, progress, created_at, updated_at")
+        .select("id, order_id, user_id, client_id, cart, user_input, totals, payment_status, design_status, progress, assigned_designer, estimated_completion_date, customer_update, created_at, updated_at")
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
 
@@ -270,6 +296,8 @@
       }
 
       loadedOrders = Array.isArray(data) ? data : [];
+      els.grid.innerHTML = "";
+      els.noOrders.hidden = true;
       const clientId = loadedOrders.find(order => order.client_id)?.client_id || "N/A";
       document.getElementById("clientIdBadge").innerHTML = `<i class="fas fa-id-card"></i> Client ID: ${escapeHtml(clientId)}`;
 
@@ -335,6 +363,34 @@
         </article>`;
     }
 
+
+    function timelineHtml(order) {
+      const paymentPaid = String(order.payment_status || "").toLowerCase() === "paid";
+      const progress = Number(order.progress || 0);
+      const status = String(order.design_status || "Waiting").toLowerCase();
+      const steps = [
+        { label:"Order received", note:"Your order was saved successfully.", done:true },
+        { label:"Payment confirmed", note:"Your payment has been verified.", done:paymentPaid },
+        { label:"In design queue", note:"Your project is prepared for production.", done:paymentPaid && (progress >= 0 || status !== "waiting") },
+        { label:"Designing", note:"Your designer is actively working on it.", done:progress >= 25 || ["designing","review","ready","completed"].includes(status) },
+        { label:"Quality review", note:"The work is being checked before delivery.", done:progress >= 75 || ["review","ready","completed"].includes(status) },
+        { label:"Ready for delivery", note:"Your completed files are ready.", done:progress >= 100 || ["ready","completed"].includes(status) }
+      ];
+      let lastDone = -1;
+      steps.forEach((step,index)=>{ if(step.done) lastDone=index; });
+      return `<div class="timeline-wrap">
+        <div class="timeline-title">Order timeline</div>
+        <div class="timeline">${steps.map((step,index)=>{
+          const state = step.done ? "done" : (index === lastDone + 1 ? "active" : "");
+          const icon = step.done ? "fa-check" : (state === "active" ? "fa-spinner" : "fa-circle");
+          return `<div class="timeline-step ${state}">
+            <div class="timeline-dot"><i class="fas ${icon}"></i></div>
+            <div class="timeline-copy"><strong>${step.label}</strong><span>${step.note}</span></div>
+          </div>`;
+        }).join("")}</div>
+      </div>`;
+    }
+
     function openModal(orderId) {
       const order = loadedOrders.find(item => item.order_id === orderId);
       if (!order) return;
@@ -356,6 +412,12 @@
         <div class="design-detail-row"><span class="design-detail-label">Description</span><span class="design-detail-value">${escapeHtml(input.designDescription || "No description provided")}</span></div>
         ${input.preferredColors ? `<div class="design-detail-row"><span class="design-detail-label">Preferred colours</span><span class="design-detail-value">${escapeHtml(input.preferredColors)}</span></div>` : ""}
         ${input.sketchImageUrl ? `<div class="design-detail-row"><span class="design-detail-label">Reference</span><span class="design-detail-value"><a href="${escapeHtml(input.sketchImageUrl)}" target="_blank" rel="noopener">View uploaded reference</a></span></div>` : ""}
+        ${timelineHtml(order)}
+        <div class="delivery-meta">
+          <div class="delivery-box"><small>Assigned designer</small><strong>${escapeHtml(order.assigned_designer || "Not assigned yet")}</strong></div>
+          <div class="delivery-box"><small>Estimated completion</small><strong>${order.estimated_completion_date ? escapeHtml(new Date(order.estimated_completion_date + "T00:00:00").toLocaleDateString("en-ZA",{year:"numeric",month:"long",day:"numeric"})) : "To be confirmed"}</strong></div>
+        </div>
+        ${order.customer_update ? `<div class="customer-update"><strong>Latest update</strong><br>${escapeHtml(order.customer_update)}</div>` : ""}
         <div class="design-detail-row"><span class="design-detail-label">Total</span><span class="design-detail-value"><strong>${money(order.totals?.total)}</strong></span></div>`;
       els.modal.style.display = "flex";
       document.body.style.overflow = "hidden";
