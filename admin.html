@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>96 Studios Admin Dashboard</title>
+  <link rel="icon" href="assets/images/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    :root{
+      --navy:#081a2d;
+      --blue:#004370;
+      --blue-2:#08699f;
+      --green:#009b5b;
+      --bg:#f4f7fb;
+      --card:#fff;
+      --text:#102235;
+      --muted:#6d7d8d;
+      --line:#dfe7ef;
+      --danger:#c92b47;
+      --warning:#d69212;
+      --shadow:0 16px 42px rgba(13,36,58,.09);
+      --radius:20px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    button,input,select,textarea{font:inherit}
+    .app{min-height:100vh;display:grid;grid-template-columns:260px minmax(0,1fr)}
+    .sidebar{
+      background:linear-gradient(180deg,var(--navy),#0d2d4a);
+      color:#fff;
+      padding:24px 18px;
+      position:sticky;
+      top:0;
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+      gap:24px;
+    }
+    .brand{display:flex;align-items:center;gap:12px;padding:6px 8px}
+    .brand-mark{
+      width:44px;height:44px;border-radius:14px;
+      display:grid;place-items:center;background:#fff;color:var(--blue);
+      font-weight:800;font-size:18px
+    }
+    .brand strong{display:block;font-size:16px}
+    .brand span{font-size:12px;opacity:.7}
+    .nav-link{
+      display:flex;align-items:center;gap:12px;
+      padding:13px 14px;border-radius:12px;color:#dceaf5;text-decoration:none;
+      background:rgba(255,255,255,.09)
+    }
+    .sidebar-footer{margin-top:auto}
+    .signout-btn{
+      width:100%;border:1px solid rgba(255,255,255,.18);background:transparent;
+      color:#fff;padding:12px;border-radius:12px;cursor:pointer
+    }
+    .main{padding:26px;min-width:0}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px}
+    .topbar h1{margin:0;font-size:28px}
+    .topbar p{margin:6px 0 0;color:var(--muted)}
+    .admin-pill{
+      background:#fff;border:1px solid var(--line);border-radius:999px;
+      padding:10px 14px;box-shadow:var(--shadow);font-size:13px
+    }
+    .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:22px}
+    .stat{
+      background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+      padding:20px;box-shadow:var(--shadow)
+    }
+    .stat-head{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px}
+    .stat-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#edf5fb;color:var(--blue)}
+    .stat-value{font-size:31px;font-weight:800;margin-top:14px}
+    .panel{
+      background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+      box-shadow:var(--shadow);overflow:hidden
+    }
+    .panel-toolbar{
+      padding:18px;display:flex;gap:12px;justify-content:space-between;align-items:center;
+      border-bottom:1px solid var(--line);flex-wrap:wrap
+    }
+    .search-wrap{position:relative;flex:1;min-width:240px}
+    .search-wrap i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#8a98a7}
+    .search-wrap input{
+      width:100%;padding:12px 14px 12px 40px;border:1px solid var(--line);
+      border-radius:12px;outline:none
+    }
+    .filters{display:flex;gap:10px;flex-wrap:wrap}
+    select{
+      padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;outline:none
+    }
+    .table-wrap{overflow:auto}
+    table{width:100%;border-collapse:collapse;min-width:980px}
+    th,td{padding:15px 16px;text-align:left;border-bottom:1px solid #edf1f5}
+    th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:#fafbfd}
+    td{font-size:14px}
+    .order-id{font-weight:700;color:var(--blue)}
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700}
+    .badge-paid,.badge-completed{background:#d9f7e8;color:#087747}
+    .badge-pending,.badge-waiting{background:#fff2cf;color:#8b6100}
+    .badge-failed,.badge-cancelled{background:#fee0e5;color:#a61937}
+    .badge-designing,.badge-review{background:#e7e0ff;color:#5a38b4}
+    .badge-ready{background:#dceeff;color:#075d97}
+    .actions{display:flex;gap:8px}
+    .icon-btn{
+      width:36px;height:36px;border:none;border-radius:10px;cursor:pointer;
+      display:grid;place-items:center;background:#edf5fb;color:var(--blue)
+    }
+    .empty,.loading,.error{padding:48px;text-align:center;color:var(--muted)}
+    .error{color:var(--danger)}
+    .modal-overlay{
+      position:fixed;inset:0;background:rgba(3,14,24,.72);display:none;
+      align-items:center;justify-content:center;padding:20px;z-index:50
+    }
+    .modal{
+      width:min(860px,100%);max-height:90vh;overflow:auto;background:#fff;
+      border-radius:22px;box-shadow:0 30px 80px rgba(0,0,0,.28)
+    }
+    .modal-head{
+      padding:20px 22px;border-bottom:1px solid var(--line);
+      display:flex;justify-content:space-between;align-items:center
+    }
+    .modal-head h2{margin:0;font-size:20px}
+    .close-btn{border:none;background:#eef3f7;width:38px;height:38px;border-radius:12px;cursor:pointer}
+    .modal-body{padding:22px}
+    .detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .detail-card{border:1px solid var(--line);border-radius:14px;padding:15px;background:#fbfcfe}
+    .detail-card small{display:block;color:var(--muted);margin-bottom:6px}
+    .detail-card strong{word-break:break-word}
+    .full{grid-column:1/-1}
+    .items{display:grid;gap:10px}
+    .item-row{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding-bottom:10px}
+    .item-row:last-child{border-bottom:none;padding-bottom:0}
+    .status-editor{
+      margin-top:20px;padding-top:20px;border-top:1px solid var(--line);
+      display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end
+    }
+    .field label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:7px}
+    .field select{width:100%}
+    .save-btn{
+      border:none;border-radius:12px;background:linear-gradient(135deg,var(--green),#007944);
+      color:#fff;padding:12px 18px;font-weight:700;cursor:pointer
+    }
+    .toast{
+      position:fixed;right:20px;bottom:20px;background:#11283d;color:#fff;
+      padding:14px 18px;border-radius:12px;box-shadow:var(--shadow);
+      opacity:0;transform:translateY(15px);pointer-events:none;transition:.25s;z-index:90
+    }
+    .toast.show{opacity:1;transform:translateY(0)}
+    .mobile-menu{display:none}
+    @media(max-width:1000px){
+      .app{grid-template-columns:1fr}
+      .sidebar{display:none}
+      .main{padding:18px}
+      .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .mobile-menu{display:inline-grid}
+    }
+    @media(max-width:620px){
+      .stats{grid-template-columns:1fr}
+      .topbar{align-items:flex-start}
+      .admin-pill{display:none}
+      .detail-grid{grid-template-columns:1fr}
+      .status-editor{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">96</div>
+        <div><strong>96 Studios</strong><span>Admin Console</span></div>
+      </div>
+      <a class="nav-link" href="#"><i class="fa-solid fa-grid-2"></i> Orders Dashboard</a>
+      <div class="sidebar-footer">
+        <button class="signout-btn" id="signOutBtn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</button>
+      </div>
+    </aside>
+
+    <section class="main">
+      <header class="topbar">
+        <div>
+          <h1>Orders Dashboard</h1>
+          <p>Manage payments and design progress.</p>
+        </div>
+        <div class="admin-pill" id="adminEmail">Checking access...</div>
+      </header>
+
+      <section class="stats">
+        <article class="stat"><div class="stat-head"><span>Total Orders</span><span class="stat-icon"><i class="fa-solid fa-receipt"></i></span></div><div class="stat-value" id="totalOrders">0</div></article>
+        <article class="stat"><div class="stat-head"><span>Paid Orders</span><span class="stat-icon"><i class="fa-solid fa-circle-check"></i></span></div><div class="stat-value" id="paidOrders">0</div></article>
+        <article class="stat"><div class="stat-head"><span>In Design</span><span class="stat-icon"><i class="fa-solid fa-pen-ruler"></i></span></div><div class="stat-value" id="designingOrders">0</div></article>
+        <article class="stat"><div class="stat-head"><span>Revenue Paid</span><span class="stat-icon"><i class="fa-solid fa-coins"></i></span></div><div class="stat-value" id="paidRevenue">R0.00</div></article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-toolbar">
+          <div class="search-wrap"><i class="fa-solid fa-magnifying-glass"></i><input id="searchInput" placeholder="Search order ID, client ID or service..."></div>
+          <div class="filters">
+            <select id="paymentFilter">
+              <option value="">All payments</option>
+              <option>Pending</option><option>Paid</option><option>Failed</option><option>Cancelled</option>
+            </select>
+            <select id="designFilter">
+              <option value="">All design statuses</option>
+              <option>Waiting</option><option>Designing</option><option>Review</option><option>Ready</option><option>Completed</option>
+            </select>
+          </div>
+        </div>
+        <div id="tableState" class="loading">Loading orders...</div>
+        <div class="table-wrap" id="tableWrap" hidden>
+          <table>
+            <thead><tr><th>Order</th><th>Client</th><th>Service</th><th>Total</th><th>Payment</th><th>Design</th><th>Progress</th><th>Date</th><th></th></tr></thead>
+            <tbody id="ordersBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div class="modal-overlay" id="orderModal">
+    <div class="modal">
+      <div class="modal-head"><h2 id="modalTitle">Order Details</h2><button class="close-btn" id="closeModal"><i class="fa-solid fa-xmark"></i></button></div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const SUPABASE_URL = "https://pebkryplphawjlmvcfma.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBlYmtyeXBscGhhd2psbXZjZm1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2ODg2NjEsImV4cCI6MjA5NzI2NDY2MX0.Sn1IPlLKhJG5u6gTXpB_tUbSr4PThWrWVpHUNDG1zdU";
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let allOrders = [];
+    let activeOrder = null;
+
+    const $ = id => document.getElementById(id);
+    const money = value => new Intl.NumberFormat("en-ZA",{style:"currency",currency:"ZAR"}).format(Number(value || 0));
+    const dateText = value => value ? new Date(value).toLocaleString("en-ZA",{dateStyle:"medium",timeStyle:"short"}) : "—";
+    const safe = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+    const slug = value => String(value || "").toLowerCase().replace(/\s+/g,"-");
+
+    function showToast(message){
+      $("toast").textContent = message;
+      $("toast").classList.add("show");
+      setTimeout(()=>$("toast").classList.remove("show"),2400);
+    }
+
+    async function guardAdmin(){
+      const { data:{ session } } = await supabase.auth.getSession();
+      if(!session){
+        window.location.href = "index.html";
+        return null;
+      }
+      $("adminEmail").textContent = session.user.email || "Administrator";
+
+      const { data, error } = await supabase
+        .from("admins")
+        .select("user_id")
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+
+      if(error || !data){
+        document.body.innerHTML = `<div class="error"><h2>Access denied</h2><p>This account is not registered as a 96 Studios administrator.</p><a href="index.html">Return home</a></div>`;
+        return null;
+      }
+      return session.user;
+    }
+
+    async function loadOrders(){
+      const { data, error } = await supabase
+        .from("orders")
+        .select("*")
+        .order("created_at",{ascending:false});
+
+      if(error){
+        $("tableState").className = "error";
+        $("tableState").textContent = error.message;
+        return;
+      }
+      allOrders = data || [];
+      updateStats();
+      renderOrders();
+    }
+
+    function updateStats(){
+      const paid = allOrders.filter(o => (o.payment_status || "").toLowerCase() === "paid");
+      const designing = allOrders.filter(o => ["designing","review","ready"].includes((o.design_status || "").toLowerCase()));
+      const revenue = paid.reduce((sum,o)=>sum + Number(o.totals?.total || 0),0);
+      $("totalOrders").textContent = allOrders.length;
+      $("paidOrders").textContent = paid.length;
+      $("designingOrders").textContent = designing.length;
+      $("paidRevenue").textContent = money(revenue);
+    }
+
+    function serviceNames(order){
+      return (order.cart || []).map(i=>i.serviceTitle || i.serviceId || "Design Service").join(", ");
+    }
+
+    function filteredOrders(){
+      const query = $("searchInput").value.trim().toLowerCase();
+      const payment = $("paymentFilter").value.toLowerCase();
+      const design = $("designFilter").value.toLowerCase();
+
+      return allOrders.filter(order=>{
+        const haystack = [order.order_id,order.client_id,serviceNames(order)].join(" ").toLowerCase();
+        return (!query || haystack.includes(query))
+          && (!payment || (order.payment_status || "").toLowerCase() === payment)
+          && (!design || (order.design_status || "").toLowerCase() === design);
+      });
+    }
+
+    function renderOrders(){
+      const orders = filteredOrders();
+      $("tableState").hidden = orders.length > 0;
+      $("tableWrap").hidden = orders.length === 0;
+      if(!orders.length){
+        $("tableState").className = "empty";
+        $("tableState").textContent = allOrders.length ? "No orders match your filters." : "No orders yet.";
+        return;
+      }
+
+      $("ordersBody").innerHTML = orders.map(order=>{
+        const payment = order.payment_status || "Pending";
+        const design = order.design_status || "Waiting";
+        return `<tr>
+          <td><span class="order-id">${safe(order.order_id)}</span></td>
+          <td>${safe(order.client_id || "—")}</td>
+          <td>${safe(serviceNames(order) || "—")}</td>
+          <td>${money(order.totals?.total)}</td>
+          <td><span class="badge badge-${slug(payment)}">${safe(payment)}</span></td>
+          <td><span class="badge badge-${slug(design)}">${safe(design)}</span></td>
+          <td>${Number(order.progress || 0)}%</td>
+          <td>${safe(dateText(order.created_at))}</td>
+          <td><div class="actions"><button class="icon-btn" data-open="${safe(order.id)}" title="Open order"><i class="fa-solid fa-eye"></i></button></div></td>
+        </tr>`;
+      }).join("");
+
+      document.querySelectorAll("[data-open]").forEach(btn=>btn.addEventListener("click",()=>openOrder(btn.dataset.open)));
+    }
+
+    function openOrder(id){
+      activeOrder = allOrders.find(o=>o.id===id);
+      if(!activeOrder) return;
+      $("modalTitle").textContent = activeOrder.order_id;
+      const items = (activeOrder.cart || []).map(item=>`
+        <div class="item-row">
+          <span>${safe(item.serviceTitle || "Design Service")} · ${safe(item.tierName || "Standard")} × ${Number(item.quantity || 1)}</span>
+          <strong>${money(Number(item.price || 0) * Number(item.quantity || 1))}</strong>
+        </div>`).join("") || "No cart items";
+
+      $("modalBody").innerHTML = `
+        <div class="detail-grid">
+          <div class="detail-card"><small>Client ID</small><strong>${safe(activeOrder.client_id || "—")}</strong></div>
+          <div class="detail-card"><small>Created</small><strong>${safe(dateText(activeOrder.created_at))}</strong></div>
+          <div class="detail-card"><small>Payment Status</small><strong>${safe(activeOrder.payment_status || "Pending")}</strong></div>
+          <div class="detail-card"><small>Total</small><strong>${money(activeOrder.totals?.total)}</strong></div>
+          <div class="detail-card full"><small>Items</small><div class="items">${items}</div></div>
+          <div class="detail-card full"><small>Design Description</small><strong>${safe(activeOrder.user_input?.designDescription || "No description provided")}</strong></div>
+          <div class="detail-card"><small>Preferred Colours</small><strong>${safe(activeOrder.user_input?.preferredColors || "Not provided")}</strong></div>
+          <div class="detail-card"><small>Reference</small><strong>${activeOrder.user_input?.sketchImageUrl ? `<a target="_blank" rel="noopener" href="${safe(activeOrder.user_input.sketchImageUrl)}">Open image</a>` : "Not provided"}</strong></div>
+        </div>
+        <div class="status-editor">
+          <div class="field"><label>Payment status</label>
+            <select id="editPayment"><option>Pending</option><option>Paid</option><option>Failed</option><option>Cancelled</option></select>
+          </div>
+          <div class="field"><label>Design status</label>
+            <select id="editDesign"><option>Waiting</option><option>Designing</option><option>Review</option><option>Ready</option><option>Completed</option></select>
+          </div>
+          <div class="field"><label>Progress</label>
+            <select id="editProgress"><option value="0">0%</option><option value="25">25%</option><option value="50">50%</option><option value="75">75%</option><option value="100">100%</option></select>
+          </div>
+          <button class="save-btn" id="saveOrder"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+        </div>`;
+
+      $("editPayment").value = activeOrder.payment_status || "Pending";
+      $("editDesign").value = activeOrder.design_status || "Waiting";
+      $("editProgress").value = String(activeOrder.progress || 0);
+      $("saveOrder").addEventListener("click",saveOrderChanges);
+      $("orderModal").style.display = "flex";
+      document.body.style.overflow = "hidden";
+    }
+
+    async function saveOrderChanges(){
+      if(!activeOrder) return;
+      const button = $("saveOrder");
+      button.disabled = true;
+      button.textContent = "Saving...";
+
+      const updates = {
+        payment_status:$("editPayment").value,
+        design_status:$("editDesign").value,
+        progress:Number($("editProgress").value),
+        updated_at:new Date().toISOString()
+      };
+
+      const { error } = await supabase.from("orders").update(updates).eq("id",activeOrder.id);
+      button.disabled = false;
+      button.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
+
+      if(error){
+        showToast(error.message);
+        return;
+      }
+
+      Object.assign(activeOrder,updates);
+      closeModal();
+      updateStats();
+      renderOrders();
+      showToast("Order updated successfully");
+    }
+
+    function closeModal(){
+      $("orderModal").style.display = "none";
+      document.body.style.overflow = "";
+      activeOrder = null;
+    }
+
+    $("closeModal").addEventListener("click",closeModal);
+    $("orderModal").addEventListener("click",e=>{if(e.target===$("orderModal")) closeModal()});
+    ["searchInput","paymentFilter","designFilter"].forEach(id=>$("searchInput") && $(id).addEventListener(id==="searchInput"?"input":"change",renderOrders));
+    $("signOutBtn").addEventListener("click",async()=>{await supabase.auth.signOut();window.location.href="index.html"});
+
+    const admin = await guardAdmin();
+    if(admin) await loadOrders();
+  </script>
+</body>
+</html>
