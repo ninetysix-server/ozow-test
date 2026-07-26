@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="assets/images/icon.svg" />
+    <title>96 Studios</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/header.css" />
+    <link rel="stylesheet" href="css/hero.css" />
+    <link rel="stylesheet" href="css/services.css" />
+    <link rel="stylesheet" href="css/features.css" />
+    <link rel="stylesheet" href="css/footer.css" />
+    <link rel="stylesheet" href="css/auth.css" />
+    <link rel="stylesheet" href="css/cart.css" />
+    <link rel="stylesheet" href="css/wishlist.css" />
+    <link rel="stylesheet" href="css/toast.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body oncontextmenu="return false;">
+
+    <!-- HEADER -->
+    <header id="header">
+        <div class="header-container">
+            <!-- Offer Bar -->
+            <div class="offer-bar" id="offerBar">
+                <div class="offer-content">
+                    <span class="offer-tag">SALE</span>
+                    <span class="offer-text">50% off on all Graphic Design services</span>
+                    <div class="countdown">
+                        <span class="time-unit">02d</span>
+                        <span class="time-unit">14h</span>
+                        <span class="time-unit">30m</span>
+                        <span class="time-unit">45s</span>
+                    </div>
+                </div>
+                <div class="mobile-contact-offer">
+                    <div class="mobile-contact-info">
+                        <div class="phone-icon"><i class="fas fa-phone-alt"></i></div>
+                        <div class="mobile-contact-text">
+                            <div>Need help?</div>
+                            <div class="phone-number">+27 (81) 792-5033</div>
+                        </div>
+                    </div>
+                    <div class="social-icons">
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-tiktok"></i></a>
+                        <button class="close-offer" id="closeOffer"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div class="social-icons desktop-social">
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-tiktok"></i></a>
+                    <button class="close-offer" id="closeOfferDesktop"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+
+            <!-- Main Header -->
+            <div class="main-header">
+                <div class="logo">
+                    <img src="assets/images/logo.svg" alt="96 Studios Logo" class="logo-img" />
+                </div>
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" id="mainSearchInput" placeholder="Search services..." autocomplete="off" />
+                </div>
+                <div class="contact-info">
+                    <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+                    <div>
+                        <div style="font-size:12px;color:#64748b;">Need help?</div>
+                        <div>+27 (81) 792-5033</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desktop Nav -->
+            <nav class="desktop-nav">
+                <ul class="nav-menu">
+                    <li class="nav-item"><a href="#" class="nav-link active" id="nav-services">Services</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link" id="nav-branding">Branding</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link" id="nav-pricing">Pricing</a></li>
+                    <li class="nav-item"><a href="#footer" class="nav-link">Support</a></li>
+                </ul>
+                <div class="nav-icons">
+                    <button class="get-quote-btn" id="desktopQuoteBtn"><i class="fas fa-file-alt"></i> Get Quote</button>
+                    <a href="#" class="nav-icon cart-icon"><i class="fas fa-shopping-cart"></i><span class="badge cart-badge">0</span></a>
+                    <button class="nav-icon profile-icon" id="desktopProfileBtn"><i class="fas fa-user-circle"></i></button>
+                </div>
+            </nav>
+
+            <!-- Mobile Header -->
+            <div class="mobile-header">
+                <div class="mobile-top">
+                    <div class="mobile-logo">
+                        <img src="assets/images/logo.svg" alt="96 Studios Logo" class="mobile-logo-img" />
+                    </div>
+                    <div class="mobile-icons">
+                        <button class="mobile-get-quote-btn" id="mobileQuoteBtn"><i class="fas fa-file-alt"></i> Get Quote</button>
+                        <a href="#" class="nav-icon cart-icon-mobile"><i class="fas fa-shopping-cart"></i><span class="badge cart-badge">0</span></a>
+                        <button class="nav-icon" id="mobileMenuButton"><i class="fas fa-bars"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MOBILE MENU -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <div class="mobile-logo"><img src="assets/images/logo.svg" alt="96 Studios Logo" class="mobile-logo-img" /></div>
+            <button class="close-offer" id="closeMobileMenu"><i class="fas fa-times"></i></button>
+        </div>
+        <ul class="mobile-menu-items">
+            <li class="mobile-menu-item"><a href="#" id="mobile-services"><i class="fas fa-paint-brush"></i> Services</a></li>
+            <li class="mobile-menu-item"><a href="#" id="mobile-branding"><i class="fas fa-tag"></i> Branding</a></li>
+            <li class="mobile-menu-item"><a href="#" id="mobile-pricing"><i class="fas fa-tags"></i> Pricing</a></li>
+            <li class="mobile-menu-item"><a href="#footer"><i class="fas fa-headset"></i> Support</a></li>
+        </ul>
+    </div>
+
+    <!-- MOBILE BOTTOM NAV -->
+    <nav class="mobile-bottom-nav">
+        <ul class="nav-items">
+            <li><div class="nav-item-mobile" id="mobile-shop"><div class="nav-icon-mobile"><i class="fas fa-store"></i></div><span>Shop</span></div></li>
+            <li><div class="nav-item-mobile" id="mobileSearchBtn"><div class="nav-icon-mobile"><i class="fas fa-search"></i></div><span>Search</span></div></li>
+            <li><div class="nav-item-mobile" id="bottomNavQuoteBtn"><div class="nav-icon-mobile" style="background:linear-gradient(135deg,#009B5B,#007a48);color:white;"><i class="fas fa-file-alt"></i></div><span style="color:#009B5B;font-weight:600;">Quote</span></div></li>
+            <li><div class="nav-item-mobile" id="mobileWishlistBtn"><div class="nav-icon-mobile"><i class="fas fa-heart"></i></div><span>Wishlist</span></div></li>
+            <li><div class="nav-item-mobile" id="mobileProfileBtn"><div class="nav-icon-mobile"><i class="fas fa-user"></i></div><span>Account</span></div></li>
+        </ul>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+        <div class="swiper heroSwiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    <div class="slide-image-container"><img src="assets/images/slide-01.png" alt="Slide 1" class="slide-image" /></div>
+                    <div class="slide-overlay">
+                        <div class="slide-content">
+                            <h1 class="slide-title">Transform Your Vision Into Reality</h1>
+                            <p class="slide-description">Our award-winning design team creates stunning visuals that elevate your brand.</p>
+                            <a href="#" class="slide-cta">Get started <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="slide-image-container"><img src="assets/images/slide-03.png" alt="Slide 2" class="slide-image" /></div>
+                    <div class="slide-overlay">
+                        <div class="slide-content">
+                            <h1 class="slide-title">Quality Design Services</h1>
+                            <p class="slide-description">Get premium graphic design services tailored to your brand's identity.</p>
+                            <a href="#" class="slide-cta">Explore Services <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </section>
+
+    <!-- WHATSAPP BUTTON -->
+    <a id="whatsappBtn" class="whatsapp-btn" href="https://wa.me/27817925033" target="_blank" aria-label="Chat on WhatsApp">
+        <img src="assets/icons/whatsapp.png" alt="WhatsApp" class="icon" />
+        <span id="wishlistCounter" class="wishlist-counter">0</span>
+    </a>
+
+    <!-- SERVICES SECTION -->
+<section class="services-section" id="services">
+    <div class="container">
+        <!-- Category Toolbar -->
+        <div class="category-toolbar">
+            <div class="category-info">
+                <h2>Design Services</h2>
+                <div class="count" id="serviceCount">Loading...</div>
+            </div>
+            <div class="toolbar-controls">
+                <select id="sortSelect" onchange="sortServices(this.value)">
+                    <option value="featured">Sort by: Featured</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="rating">Customer Rating</option>
+                    <option value="sale">On Sale</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Category Layout -->
+        <div class="category-layout">
+            <!-- Filter Sidebar -->
+            <aside class="filter-sidebar">
+                <div class="filter-group">
+                    <h4>Service Type</h4>
+                    <label><input type="checkbox" class="category-filter" value="logo-design" onchange="toggleCategory('logo-design')" /> Logo Design</label>
+                    <label><input type="checkbox" class="category-filter" value="poster-design" onchange="toggleCategory('poster-design')" /> Poster Design</label>
+                    <label><input type="checkbox" class="category-filter" value="business-card" onchange="toggleCategory('business-card')" /> Business Card</label>
+                    <label><input type="checkbox" class="category-filter" value="board-design" onchange="toggleCategory('board-design')" /> Board Design</label>
+                    <label><input type="checkbox" class="category-filter" value="branding" onchange="toggleCategory('branding')" /> Branding</label>
+                </div>
+
+                <div class="filter-group">
+                    <h4>Tier</h4>
+                    <label><input type="checkbox" class="tier-filter" value="starter" checked /> Starter</label>
+                    <label><input type="checkbox" class="tier-filter" value="premium" /> Premium</label>
+                    <label><input type="checkbox" class="tier-filter" value="pro" /> Pro</label>
+                </div>
+
+                <div class="filter-group">
+                    <h4>Price Range</h4>
+                    <div class="price-range">
+                        <input type="range" min="0" max="5000" value="5000" id="priceRangeInput" />
+                        <div class="values">
+                            <span>R0</span>
+                            <span id="priceDisplay">R0 - R5000+</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="reset-filters" onclick="resetFilters()">Reset Filters</button>
+            </aside>
+
+            <!-- Product Grid -->
+            <div class="product-grid" id="servicesGrid">
+                <div style="grid-column:1/-1;text-align:center;padding:60px 20px;">
+                    <div class="spinner"></div>
+                    <p style="color:#6b6b6b;margin-top:16px;">Loading services...</p>
+                </div>
+            </div>
+        </div>
+         <!-- Pagination -->
+            <div class="pagination-container" id="paginationContainer"></div>
+    </div>
+
+</section>
+
+    <!-- FEATURES SECTION -->
+    <section class="features-section">
+        <div class="features-container">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-wallet"></i></div>
+                    <h3 class="feature-title">Great Savings</h3>
+                    <p class="feature-text">Save big with our exclusive offers and discounts.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3 class="feature-title">Track Design</h3>
+                    <p class="feature-text">Monitor your design progress in real-time.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3 class="feature-title">Secure Payments</h3>
+                    <p class="feature-text">Pay safe, anywhere with our secure payment system.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-paint-brush"></i></div>
+                    <h3 class="feature-title">Online Design</h3>
+                    <p class="feature-text">Create and customize designs online with ease.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer-section" id="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="assets/images/logo.svg" alt="96 Studios Logo" class="footer-logo-img" />
+                    <p>We are Graphic design based, offering Computer and Software Maintenance, Photography and Wall Art & deco.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Quick Links</h4>
+                        <ul>
+                            <li><a href="#" id="openWishlistModal">Wishlist</a></li>
+                            <li><a href="#" id="footer-portal">My Orders</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Company</h4>
+                        <ul>
+                            <li><a href="https://wa.me/27817925033" target="_blank">Contact Us</a></li>
+                            <li><a href="privacy-policy.html" target="_blank">Privacy & Policy</a></li>
+                            <li><a href="terms-of-service.html" target="_blank">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Contact</h4>
+                        <ul>
+                            <li><i class="fas fa-phone"></i> +27 (81) 792-5033</li>
+                            <li><i class="fas fa-envelope"></i> Support@96studios.co.za</li>
+                            <li><i class="fas fa-map-marker-alt"></i> 462 Sebayeng unit d, Limpopo, Polokwane</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="ozow-logo-container">
+                    <div class="ozow-logo-wrapper">
+                        <img src="assets/images/ozow-image.png" alt="Ozow Payment" class="ozow-logo" />
+                    </div>
+                </div>
+                <div class="social-icons">
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-tiktok"></i></a>
+                </div>
+                <p class="copyright">© 2026 96 Studios. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCROLL TOP -->
+    <a href="#" id="scroll-top" class="scroll-top"><i class="bi bi-arrow-up-short"></i></a>
+
+    <!-- AUTH OVERLAY (Desktop) -->
+    <div class="auth-overlay" id="desktopAuthOverlay">
+        <div class="auth-container-desktop">
+            <div class="auth-left-side">
+                <button class="close-auth" id="closeDesktopAuth"><i class="fas fa-times"></i></button>
+                <div class="auth-left-content">
+                    <h1>Welcome Back</h1>
+                    <p>Sign in to your account to continue</p>
+                </div>
+            </div>
+            <div class="auth-right-side">
+                <div class="auth-body">
+                    <div class="auth-tabs">
+                        <button class="auth-tab active" data-tab="login">Login</button>
+                        <button class="auth-tab" data-tab="register">Register</button>
+                    </div>
+                    <div id="desktopAuthMessages"></div>
+                    <!-- Login Form -->
+                    <form id="desktopLoginForm" class="auth-form active">
+                        <div class="form-group">
+                            <label class="form-label" for="desktopLoginEmail">Email Address</label>
+                            <input type="email" id="desktopLoginEmail" class="form-input" placeholder="your@email.com" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="desktopLoginPassword">Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="desktopLoginPassword" class="form-input" placeholder="••••••••" required />
+                                <button type="button" class="password-toggle" data-target="desktopLoginPassword"><i class="fas fa-eye"></i></button>
+                            </div>
+                            <div style="text-align:right;margin-top:5px;">
+                                <a href="#" id="desktopForgotPassword" class="auth-link" style="font-size:13px;">Forgot Password?</a>
+                            </div>
+                        </div>
+                        <button type="submit" class="auth-button" id="desktopLoginButton"><span>Sign In</span><i class="fas fa-spinner fa-spin" style="display:none;"></i></button>
+                        <div class="divider">Or continue with</div>
+                        <button type="button" class="google-button" id="desktopGoogleLoginButton"><i class="fab fa-google"></i><span>Sign in with Google</span></button>
+                        <div class="auth-footer">Don't have an account? <a href="#" class="auth-link" id="desktopSwitchToRegister">Sign up</a></div>
+                    </form>
+                    <!-- Register Form -->
+                    <form id="desktopRegisterForm" class="auth-form">
+                        <div class="form-group">
+                            <label class="form-label" for="desktopRegisterEmail">Email Address</label>
+                            <input type="email" id="desktopRegisterEmail" class="form-input" placeholder="your@email.com" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="desktopRegisterPassword">Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="desktopRegisterPassword" class="form-input" placeholder="••••••••" required />
+                                <button type="button" class="password-toggle" data-target="desktopRegisterPassword"><i class="fas fa-eye"></i></button>
+                            </div>
+                            <div style="font-size:12px;color:#64748b;margin-top:5px;">Password must be at least 6 characters</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="desktopConfirmPassword">Confirm Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="desktopConfirmPassword" class="form-input" placeholder="••••••••" required />
+                                <button type="button" class="password-toggle" data-target="desktopConfirmPassword"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+                        <button type="submit" class="auth-button" id="desktopRegisterButton"><span>Create Account</span><i class="fas fa-spinner fa-spin" style="display:none;"></i></button>
+                        <div class="divider">Or sign up with</div>
+                        <button type="button" class="google-button" id="desktopGoogleRegisterButton"><i class="fab fa-google"></i><span>Sign up with Google</span></button>
+                        <div class="auth-footer">Already have an account? <a href="#" class="auth-link" id="desktopSwitchToLogin">Sign in</a></div>
+                    </form>
+                    <!-- Forgot Password -->
+                    <form id="desktopForgotPasswordForm" class="auth-form">
+                        <div class="form-group">
+                            <label class="form-label" for="desktopResetEmail">Email Address</label>
+                            <input type="email" id="desktopResetEmail" class="form-input" placeholder="your@email.com" required />
+                        </div>
+                        <button type="submit" class="auth-button" id="desktopResetButton"><span>Send Reset Link</span><i class="fas fa-spinner fa-spin" style="display:none;"></i></button>
+                        <div class="auth-footer"><a href="#" class="auth-link" id="desktopBackToLogin">Back to Login</a></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUTH OVERLAY (Mobile) -->
+    <div class="auth-container-mobile" id="mobileAuthContainer">
+        <div class="auth-header">
+            <button class="close-auth" id="closeMobileAuth"><i class="fas fa-times"></i></button>
+            <h1>Welcome Back</h1>
+            <p>Sign in to your account to continue</p>
+        </div>
+        <div class="auth-body">
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Login</button>
+                <button class="auth-tab" data-tab="register">Register</button>
+            </div>
+            <div id="mobileAuthMessages"></div>
+            <!-- Login Form -->
+            <form id="mobileLoginForm" class="auth-form active">
+                <div class="form-group">
+                    <label class="form-label" for="mobileLoginEmail">Email Address</label>
+                    <input type="email" id="mobileLoginEmail" class="form-input" placeholder="your@email.com" required />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="mobileLoginPassword">Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="mobileLoginPassword" class="form-input" placeholder="••••••••" required />
+                        <button type="button" class="password-toggle" data-target="mobileLoginPassword"><i class="fas fa-eye"></i></button>
+                    </div>
+                    <div style="text-align:right;margin-top:5px;">
+                        <a href="#" id="mobileForgotPassword" class="auth-link" style="font-size:13px;">Forgot Password?</a>
+                    </div>
+                </div>
+                <button type="submit" class="auth-button" id="mobileLoginButton"><span>Sign In</span><i class="fas fa-spinner fa-spin" style="display:none;"></i></button>
+                <div class="divider">Or continue with</div>
+                <button type="button" class="google-button" id="mobileGoogleLoginButton"><i class="fab fa-google"></i><span>Sign in with Google</span></button>
+                <div class="auth-footer">Don't have an account? <a href="#" class="auth-link" id="mobileSwitchToRegister">Sign up</a></div>
+            </form>
+            <!-- Register Form -->
+            <form id="mobileRegisterForm" class="auth-form">
+                <div class="form-group">
+                    <label class="form-label" for="mobileRegisterEmail">Email Address</label>
+                    <input type="email" id="mobileRegisterEmail" class="form-input" placeholder="your@email.com" required />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="mobileRegisterPassword">Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="mobileRegisterPassword" class="form-input" placeholder="••••••••" required />
+                        <button type="button" class="password-toggle" data-target="mobileRegisterPassword"><i class="fas fa-eye"></i></button>
+                    </div>
+                    <div style="font-size:12px;color:#64748b;margin-top:5px;">Password must be at least 6 characters</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="mobileConfirmPassword">Confirm Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="mobileConfirmPassword" class="form-input" placeholder="••••••••" required />
+                        <button type="button" class="password-toggle" data-target="mobileConfirmPassword"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+                <button type="submit" class="auth-button" id="mobileRegisterButton"><span>Create Account</span><i class="fas fa-spinner fa-spin" style="display:none;"></i></button>
+                <div class="divider">Or sign up with</div>
+                <button type="button" class="google-button" id="mobileGoogleRegisterButton"><i class="fab fa-google"></i><span>Sign up with Google</span></button>
+                <div class="auth-footer">Already have an account? <a href="#" class="auth-link" id="mobileSwitchToLogin">Sign in</a></div>
+            </form>
+            <!-- Forgot Password -->
+            <form id="mobileForgotPasswordForm" class="auth-form">
+                <div class="form-group">
+                    <label class="form-label" for="mobileResetEmail">Email Address</label>
+                    <input type="email" id="mobileResetEmail" class="form-input" placeholder="your@email.com" required />
+                </div>
+                <button type="submit" class="auth-button" id="mobileResetButton"><span>Send Reset Link</span><i class="fas fa-spinner fa-spin" style="display:none;"></i></button>
+                <div class="auth-footer"><a href="#" class="auth-link" id="mobileBackToLogin">Back to Login</a></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ACCOUNT SECTION -->
+    <div class="account-section" id="accountSection">
+        <div class="account-header">
+            <button class="close-auth" id="closeAccountSection"><i class="fas fa-times"></i></button>
+            <h1>Account Settings</h1>
+            <p>Manage your account preferences and security</p>
+        </div>
+        <div class="account-body">
+            <div id="accountMessages"></div>
+            <div class="user-info-card">
+                <div class="user-info-row"><div class="info-label">Email:</div><div class="info-value" id="userEmail">Loading...</div></div>
+                <div class="user-info-row"><div class="info-label">Email Status:</div><div class="info-value" id="emailStatus"><span class="unverified-badge"><i class="fas fa-exclamation-circle"></i> Loading...</span></div></div>
+                <div class="user-info-row"><div class="info-label">Client ID:</div><div class="info-value"><span class="client-id-badge" id="clientId">Loading...</span></div></div>
+            </div>
+            <h2 class="section-title">Email Verification</h2>
+            <div class="settings-card" id="verificationSection">
+                <h3>Verify Your Email Address</h3>
+                <p id="verificationMessage">Email verification helps secure your account.</p>
+                <div class="buttons-group">
+                    <button class="action-button primary" id="resendVerificationBtn"><i class="fas fa-paper-plane"></i> Resend Verification</button>
+                    <button class="action-button secondary" id="refreshStatusBtn"><i class="fas fa-sync-alt"></i> Refresh Status</button>
+                </div>
+            </div>
+            <h2 class="section-title">Security</h2>
+            <div class="settings-card">
+                <h3>Change Password</h3>
+                <p>Update your password to keep your account secure.</p>
+                <form id="changePasswordForm">
+                    <div class="form-group">
+                        <label class="form-label" for="currentPassword">Current Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="currentPassword" class="form-input" placeholder="Enter current password" required />
+                            <button type="button" class="password-toggle" data-target="currentPassword"><i class="fas fa-eye"></i></button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="newPassword">New Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="newPassword" class="form-input" placeholder="Enter new password" required />
+                            <button type="button" class="password-toggle" data-target="newPassword"><i class="fas fa-eye"></i></button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="confirmNewPassword">Confirm New Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="confirmNewPassword" class="form-input" placeholder="Confirm new password" required />
+                            <button type="button" class="password-toggle" data-target="confirmNewPassword"><i class="fas fa-eye"></i></button>
+                        </div>
+                    </div>
+                    <div class="buttons-group">
+                        <button type="submit" class="action-button primary" id="changePasswordBtn"><span>Update Password</span><i class="fas fa-spinner fa-spin" style="display:none;"></i></button>
+                        <button type="reset" class="action-button secondary">Clear</button>
+                    </div>
+                </form>
+            </div>
+            <div class="settings-card">
+                <h3>Delete Account</h3>
+                <p style="color:#dc2626;font-weight:600;">Warning: This action is permanent and cannot be undone.</p>
+                <div class="buttons-group">
+                    <button class="action-button danger" id="deleteAccountBtn"><i class="fas fa-trash-alt"></i> Delete My Account</button>
+                </div>
+            </div>
+            <div class="signout-section">
+                <button class="action-button secondary" id="signOutBtn"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE MODAL -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal">
+            <h3>Confirm Account Deletion</h3>
+            <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+            <form id="deleteAccountForm">
+                <div class="form-group">
+                    <label class="form-label" for="deletePassword">Enter your password to confirm:</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="deletePassword" class="form-input" placeholder="Your password" required />
+                        <button type="button" class="password-toggle" data-target="deletePassword"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="action-button secondary" id="cancelDeleteBtn">Cancel</button>
+                    <button type="submit" class="action-button danger" id="confirmDeleteBtn"><span>Delete Account</span><i class="fas fa-spinner fa-spin" style="display:none;"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CART POPUP -->
+    <div class="cart-popup-overlay" id="cartPopup">
+        <div class="cart-popup-container">
+            <div class="cart-header">
+                <button class="close-cart" id="closeCart"><i class="fas fa-times"></i></button>
+                <h2><i class="fas fa-shopping-cart"></i> Your Design Cart</h2>
+                <p>Review and manage your selected designs</p>
+            </div>
+            <div class="cart-body">
+                <div class="cart-empty" id="cartEmptyState">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3>Your cart is empty</h3>
+                    <p>Add design services to get started with your project</p>
+                    <button class="design-btn" id="cartBrowseServices">Browse Services</button>
+                </div>
+                <div class="cart-items-container" id="cartItemsContainer">
+                    <ul class="cart-items-list" id="cartItemsList"></ul>
+                    <div class="cart-total-section">
+                        <div class="cart-total-row"><span class="cart-total-label">Subtotal</span><span class="cart-total-value" id="cartSubtotal">R0</span></div>
+                        <div class="cart-total-row cart-grand-total"><span class="cart-total-label">Total Amount</span><span class="cart-total-value" id="cartGrandTotal">R0</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="cart-footer" id="cartFooter">
+                <div class="cart-actions">
+                    <button class="cart-btn secondary" id="continueShopping"><i class="fas fa-arrow-left"></i> Continue Shopping</button>
+                    <button class="cart-btn primary" id="proceedToConfirmation" disabled><i class="fas fa-check-circle"></i> Proceed to Confirmation</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIRMATION POPUP -->
+    <div class="confirmation-overlay" id="confirmationPopup">
+        <div class="confirmation-container">
+            <div class="confirmation-header">
+                <button class="close-confirmation" id="closeConfirmation"><i class="fas fa-times"></i></button>
+                <div class="confirmation-header-content">
+                    <div class="confirmation-header-desktop">
+                        <img src="assets/images/cart-title-image.png" alt="Special Offer" class="confirmation-advert-image" />
+                        <div class="confirmation-header-text">
+                            <div class="confirmation-deals-message">Unlimited Time Special Deals!</div>
+                            <div class="confirmation-discount-text">Unlock up to 30% discount on your designs!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="confirmation-body">
+                <div class="confirmation-items-section">
+                    <h3><i class="fas fa-shopping-cart"></i> Your Selected Designs</h3>
+                    <ul class="confirmation-items-list" id="confirmationItemsList"></ul>
+                </div>
+                <div class="confirmation-input-section">
+                    <h3><i class="fas fa-info-circle"></i> Project Details</h3>
+                    <div class="confirmation-input-grid">
+                        <div class="confirmation-form-group">
+                            <label>Sketch Image URL (optional)</label>
+                            <input type="url" id="sketchImageUrl" placeholder="https://example.com/your-sketch-image.jpg" />
+                            <div class="hint"><i class="fas fa-link"></i> Paste a link to your sketch or reference image</div>
+                        </div>
+                        <div class="confirmation-form-group">
+                            <label>Design Description <span class="required">*</span></label>
+                            <textarea id="designDescription" placeholder="Please describe your design requirements..."></textarea>
+                            <div class="hint"><i class="fas fa-lightbulb"></i> Be as detailed as possible</div>
+                        </div>
+                        <div class="confirmation-form-group">
+                            <label>Preferred Colors</label>
+                            <input type="text" id="preferredColors" placeholder="e.g., Blue & White, Earth tones" />
+                            <div class="hint"><i class="fas fa-palette"></i> Mention specific color codes if you have them</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="confirmation-summary">
+                    <h4><i class="fas fa-receipt"></i> Order Summary</h4>
+                    <div class="confirmation-summary-row"><span class="confirmation-summary-label">Subtotal</span><span class="confirmation-summary-value" id="confirmationSubtotal">R0</span></div>
+                    <div class="confirmation-summary-row final"><span class="confirmation-summary-label">Total Amount</span><span class="confirmation-summary-value" id="confirmationTotal">R0</span></div>
+                </div>
+            </div>
+            <div class="confirmation-footer">
+                <div class="confirmation-actions">
+                    <button class="confirmation-btn secondary" id="backToCart"><i class="fas fa-arrow-left"></i> Back to Cart</button>
+                    <button class="confirmation-btn primary" id="proceedToCheckout"><i class="fas fa-lock"></i> Proceed to Checkout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WISHLIST POPUP -->
+    <div class="wishlist-overlay" id="wishlistModal">
+        <div class="wishlist-container">
+            <div class="wishlist-header">
+                <button class="close-wishlist" id="closeWishlist"><i class="fas fa-times"></i></button>
+                <h2>My Wishlist</h2>
+                <p>Save designs you love and submit them later</p>
+            </div>
+            <div class="wishlist-body">
+                <div class="wishlist-empty" id="wishlistEmptyState">
+                    <i class="fas fa-heart"></i>
+                    <h3>Your wishlist is empty</h3>
+                    <p>Click the heart icon on designs to add them here</p>
+                    <button class="design-btn" id="wishlistBrowseDesigns">Browse Designs</button>
+                </div>
+                <div class="wishlist-items-container" id="wishlistItemsContainer">
+                    <ul class="wishlist-items-list" id="wishlistItemsList"></ul>
+                </div>
+            </div>
+            <div class="wishlist-footer" id="wishlistFooter">
+                <div class="wishlist-actions">
+                    <button class="wishlist-btn secondary" id="continueBrowsing"><i class="fas fa-arrow-left"></i> Continue Browsing</button>
+                    <button class="wishlist-btn primary" id="submitWishlist" disabled><i class="fab fa-whatsapp"></i> Submit via WhatsApp</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script type="module" src="js/supabase.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/cart.js"></script>
+    <script type="module" src="js/services.js"></script>
+    <script type="module" src="js/hero.js"></script>
+    <script type="module" src="js/search.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
