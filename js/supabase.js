@@ -1,0 +1,486 @@
+// js/supabase.js
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/+esm';
+
+const SUPABASE_URL = 'https://pebkryplphawjlmvcfma.supabase.co';
+
+const SUPABASE_ANON_KEY =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBlYmtyeXBscGhhd2psbXZjZm1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2ODg2NjEsImV4cCI6MjA5NzI2NDY2MX0.Sn1IPlLKhJG5u6gTXpB_tUbSr4PThWrWVpHUNDG1zdU';
+
+export const supabase = createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+);
+
+
+// ======================================================
+// AUTHENTICATION
+// ======================================================
+
+export async function signUp(email, password) {
+    return await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+            emailRedirectTo: window.location.origin
+        }
+    });
+}
+
+
+export async function signIn(email, password) {
+    return await supabase.auth.signInWithPassword({
+        email,
+        password
+    });
+}
+
+
+export async function signInWithGoogle() {
+    return await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo: window.location.origin,
+            queryParams: {
+                access_type: 'offline',
+                prompt: 'consent'
+            }
+        }
+    });
+}
+
+
+export async function signOut() {
+    return await supabase.auth.signOut();
+}
+
+
+export async function resetPassword(email) {
+    return await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password.html`
+    });
+}
+
+
+export async function getCurrentUser() {
+    const {
+        data: { user },
+        error
+    } = await supabase.auth.getUser();
+
+    if (error) {
+        console.error('Error getting current user:', error);
+        return null;
+    }
+
+    return user;
+}
+
+
+export function onAuthStateChange(callback) {
+    return supabase.auth.onAuthStateChange(callback);
+}
+
+
+// ======================================================
+// USERS
+// ======================================================
+
+export async function getOrCreateClientId(userId) {
+    if (!userId) {
+        return null;
+    }
+
+    const { data, error } = await supabase
+        .from('users')
+        .select('client_id')
+        .eq('id', userId)
+        .single();
+
+    if (!error && data?.client_id) {
+        return data.client_id;
+    }
+
+    const clientId = `CL${userId.substring(0, 4).toUpperCase()}`;
+
+    const { error: upsertError } = await supabase
+        .from('users')
+        .upsert({
+            id: userId,
+            client_id: clientId,
+            updated_at: new Date().toISOString()
+        });
+
+    if (upsertError) {
+        console.error('Error creating client ID:', upsertError);
+    }
+
+    return clientId;
+}
+
+
+// ======================================================
+// SERVICES
+// ======================================================
+
+export async function getServices() {
+    const { data, error } = await supabase
+        .from('services')
+        .select('*')
+        .order('created_at', {
+            ascending: true
+        });
+
+    if (error) {
+        console.error('Error fetching services:', error);
+        return [];
+    }
+
+    return data || [];
+}
+
+
+export async function searchServices(searchTerm) {
+    if (!searchTerm || searchTerm.trim() === '') {
+        return getServices();
+    }
+
+    const term = searchTerm.trim();
+
+    const { data, error } = await supabase
+        .from('services')
+        .select('*')
+        .or(
+            `title.ilike.%${term}%,description.ilike.%${term}%,category.ilike.%${term}%`
+        )
+        .order('created_at', {
+            ascending: true
+        });
+
+    if (error) {
+        console.error('Search error:', error);
+        return [];
+    }
+
+    return data || [];
+}
+
+
+// ======================================================
+// ORDERS
+// ======================================================
+
+export async function saveOrder(orderData) {
+    const user = await getCurrentUser();
+
+    if (!user) {
+        return {
+            data: null,
+            error: 'User not authenticated'
+        };
+    }
+
+    const clientId = await getOrCreateClientId(user.id);
+
+    const { data, error } = await supabase
+        .from('orders')
+        .insert({
+            order_id: orderData.order_id,
+            user_id: user.id,
+            client_id: clientId,
+            cart: orderData.cart,
+            user_input: orderData.userInput,
+            totals: orderData.totals,
+            payment_status: orderData.paymentStatus || 'Pending',
+            design_status: orderData.designStatus || 'Waiting',
+            progress: orderData.progress || 0,
+            created_at:
+                orderData.created_at || new Date().toISOString(),
+            updated_at:
+                orderData.updated_at || new Date().toISOString()
+        })
+        .select()
+        .single();
+
+    return {
+        data,
+        error
+    };
+}
+
+
+export async function getUserOrders(userId) {
+    const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', {
+            ascending: false
+        });
+
+    return {
+        data,
+        error
+    };
+}
+
+
+// ======================================================
+// OZOW PAYMENT
+// ======================================================
+
+/**
+ * Creates an Ozow payment request securely through the
+ * deployed Supabase Edge Function.
+ *
+ * The Ozow private key and HashCheck are never handled
+ * inside the browser.
+ */
+export async function createOzowPayment(
+    orderId,
+    amount,
+    description,
+    email,
+    clientId
+) {
+    try {
+        console.log('Creating secure Ozow payment:', orderId);
+
+        if (!orderId) {
+            throw new Error('Order ID is required.');
+        }
+
+        const numericAmount = Number(amount);
+
+        if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+            throw new Error('A valid payment amount is required.');
+        }
+
+        if (!email || !email.includes('@')) {
+            throw new Error('A valid customer email address is required.');
+        }
+
+        const {
+            data: { session },
+            error: sessionError
+        } = await supabase.auth.getSession();
+
+        if (sessionError) {
+            console.error('Session error:', sessionError);
+            throw new Error('Unable to verify your login session.');
+        }
+
+        if (!session?.access_token) {
+            throw new Error(
+                'You must be signed in before starting payment.'
+            );
+        }
+
+        const { data, error } = await supabase.functions.invoke(
+            'create-ozow-payment',
+            {
+                body: {
+                    orderId: String(orderId),
+                    amount: numericAmount,
+                    description:
+                        description || 'Design Services',
+                    email: String(email).trim(),
+                    clientId: clientId
+                        ? String(clientId)
+                        : ''
+                }
+            }
+        );
+
+        if (error) {
+            console.error('Ozow Edge Function error:', error);
+
+            let message =
+                error.message ||
+                'Unable to create the Ozow payment request.';
+
+            if (error.context) {
+                try {
+                    const responseBody =
+                        await error.context.json();
+
+                    if (responseBody?.error) {
+                        message = responseBody.error;
+                    }
+                } catch (responseReadError) {
+                    console.error(
+                        'Could not read function error response:',
+                        responseReadError
+                    );
+                }
+            }
+
+            throw new Error(message);
+        }
+
+        if (!data) {
+            throw new Error(
+                'The payment server returned an empty response.'
+            );
+        }
+
+        if (data.success === false) {
+            throw new Error(
+                data.error ||
+                'The payment server rejected the request.'
+            );
+        }
+
+        if (!data.paymentUrl) {
+            throw new Error(
+                'The payment response does not contain an Ozow payment URL.'
+            );
+        }
+
+        if (!data.params || typeof data.params !== 'object') {
+            throw new Error(
+                'The payment response does not contain the required Ozow fields.'
+            );
+        }
+
+        if (!data.params.HashCheck) {
+            throw new Error(
+                'The payment response does not contain a HashCheck.'
+            );
+        }
+
+        console.log(
+            'Ozow payment request created successfully:',
+            data.transactionReference
+        );
+
+        return {
+            success: true,
+            paymentUrl: data.paymentUrl,
+            params: data.params,
+            transactionReference:
+                data.transactionReference || null,
+            bankReference:
+                data.bankReference || null
+        };
+    } catch (error) {
+        console.error('Error creating Ozow payment:', error);
+        throw error;
+    }
+}
+
+
+// ======================================================
+// PAYMENT STATUS
+// ======================================================
+
+export async function checkPaymentStatus(orderId) {
+    try {
+        if (!orderId) {
+            return null;
+        }
+
+        console.log(
+            'Checking payment status for order:',
+            orderId
+        );
+
+        const { data, error } = await supabase
+            .from('payment_transactions')
+            .select('*')
+            .eq('order_id', orderId)
+            .order('created_at', {
+                ascending: false
+            })
+            .limit(1);
+
+        if (error) {
+            console.error(
+                'Error checking payment status:',
+                error
+            );
+
+            return null;
+        }
+
+        if (!data || data.length === 0) {
+            console.log(
+                'No payment transaction found for order:',
+                orderId
+            );
+
+            return null;
+        }
+
+        console.log(
+            'Payment status:',
+            data[0].status
+        );
+
+        return data[0];
+    } catch (error) {
+        console.error(
+            'Error in checkPaymentStatus:',
+            error
+        );
+
+        return null;
+    }
+}
+
+
+export async function updateOrderPaymentStatus(
+    orderId,
+    status
+) {
+    try {
+        if (!orderId) {
+            throw new Error('Order ID is required.');
+        }
+
+        if (!status) {
+            throw new Error('Payment status is required.');
+        }
+
+        const { data, error } = await supabase
+            .from('orders')
+            .update({
+                payment_status: status,
+                updated_at: new Date().toISOString()
+            })
+            .eq('order_id', orderId)
+            .select()
+            .single();
+
+        if (error) {
+            console.error(
+                'Error updating order status:',
+                error
+            );
+
+            return {
+                data: null,
+                error
+            };
+        }
+
+        console.log(
+            'Order payment status updated:',
+            status
+        );
+
+        return {
+            data,
+            error: null
+        };
+    } catch (error) {
+        console.error(
+            'Error in updateOrderPaymentStatus:',
+            error
+        );
+
+        return {
+            data: null,
+            error
+        };
+    }
+}
