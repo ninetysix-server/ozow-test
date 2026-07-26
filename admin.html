@@ -149,6 +149,18 @@
     .management-grid{margin-top:20px;padding-top:20px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:12px}
     .management-grid .full{grid-column:1/-1}
     .meta-note{margin-top:8px;font-size:12px;color:var(--muted)}
+    .delivery-manager{margin-top:20px;padding-top:20px;border-top:1px solid var(--line)}
+    .delivery-manager h3{margin:0 0 12px;font-size:16px}
+    .upload-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
+    .upload-btn{border:none;border-radius:12px;background:var(--blue);color:#fff;padding:12px 16px;font-weight:700;cursor:pointer}
+    .upload-btn:disabled{opacity:.55;cursor:not-allowed}
+    .file-list{display:grid;gap:9px;margin-top:14px}
+    .file-entry{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fbfcfe}
+    .file-entry strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .file-entry small{color:var(--muted)}
+    .file-actions{display:flex;gap:8px}
+    .file-action{border:none;border-radius:9px;padding:8px 10px;cursor:pointer;background:#edf5fb;color:var(--blue)}
+    .file-action.delete{background:#fee7eb;color:var(--danger)}
     .quick-progress{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
     .progress-chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;cursor:pointer;font-size:12px}
     .progress-chip:hover{border-color:var(--blue);color:var(--blue)}
@@ -398,6 +410,18 @@
             <textarea id="editCustomerUpdate" maxlength="1000" placeholder="A short progress message the customer can see">${safe(activeOrder.customer_update || "")}</textarea>
           </div>
         </div>
+        <div class="delivery-manager">
+          <h3>Customer file delivery</h3>
+          <div class="upload-row">
+            <div class="field">
+              <label>Select completed files</label>
+              <input id="deliveryFiles" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.zip,.svg,.webp,.ai,.eps">
+              <div class="meta-note">PDF, images, ZIP, SVG, AI and EPS files are supported.</div>
+            </div>
+            <button type="button" class="upload-btn" id="uploadFiles"><i class="fa-solid fa-cloud-arrow-up"></i> Upload</button>
+          </div>
+          <div class="file-list" id="adminFileList"><div class="meta-note">Loading delivery files...</div></div>
+        </div>
         <div class="status-editor">
           <div class="field"><label>Payment status</label>
             <select id="editPayment"><option>Pending</option><option>Paid</option><option>Failed</option><option>Cancelled</option></select>
@@ -425,8 +449,153 @@
         chip.addEventListener("click",()=>{$("editProgress").value = chip.dataset.progress;});
       });
       $("saveOrder").addEventListener("click",saveOrderChanges);
+      $("uploadFiles").addEventListener("click", uploadDeliveryFiles);
+      loadAdminDeliveryFiles();
       $("orderModal").style.display = "flex";
       document.body.style.overflow = "hidden";
+    }
+
+
+    async function loadAdminDeliveryFiles(){
+      if(!activeOrder) return;
+      const list = $("adminFileList");
+      list.innerHTML = '<div class="meta-note">Loading delivery files...</div>';
+
+      const { data, error } = await supabase
+        .from("order_files")
+        .select("*")
+        .eq("order_id", activeOrder.id)
+        .order("created_at", { ascending:false });
+
+      if(error){
+        list.innerHTML = `<div class="meta-note">${safe(error.message)}</div>`;
+        return;
+      }
+      if(!data?.length){
+        list.innerHTML = '<div class="meta-note">No completed files uploaded yet.</div>';
+        return;
+      }
+
+      list.innerHTML = data.map(file => `
+        <div class="file-entry">
+          <div>
+            <strong title="${safe(file.file_name)}">${safe(file.file_name)}</strong>
+            <small>${formatFileSize(file.size_bytes)} · ${safe(dateText(file.created_at))}</small>
+          </div>
+          <div class="file-actions">
+            <button type="button" class="file-action" data-admin-download="${safe(file.id)}"><i class="fa-solid fa-download"></i></button>
+            <button type="button" class="file-action delete" data-admin-delete="${safe(file.id)}"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>`).join("");
+
+      document.querySelectorAll("[data-admin-download]").forEach(btn=>{
+        btn.addEventListener("click",()=>downloadAdminFile(btn.dataset.adminDownload, data));
+      });
+      document.querySelectorAll("[data-admin-delete]").forEach(btn=>{
+        btn.addEventListener("click",()=>deleteDeliveryFile(btn.dataset.adminDelete, data));
+      });
+    }
+
+    function formatFileSize(bytes){
+      const value = Number(bytes || 0);
+      if(value < 1024) return `${value} B`;
+      if(value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`;
+      return `${(value / (1024 * 1024)).toFixed(1)} MB`;
+    }
+
+    async function uploadDeliveryFiles(){
+      if(!activeOrder) return;
+      const input = $("deliveryFiles");
+      const files = Array.from(input.files || []);
+      if(!files.length){
+        showToast("Choose at least one file");
+        return;
+      }
+
+      const button = $("uploadFiles");
+      button.disabled = true;
+      button.textContent = "Uploading...";
+
+      try{
+        for(const file of files){
+          const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+          const storagePath = `${activeOrder.user_id}/${activeOrder.order_id}/${crypto.randomUUID()}-${cleanName}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from("design-files")
+            .upload(storagePath, file, {
+              cacheControl:"3600",
+              upsert:false,
+              contentType:file.type || undefined
+            });
+          if(uploadError) throw uploadError;
+
+          const { error: rowError } = await supabase.from("order_files").insert({
+            order_id:activeOrder.id,
+            user_id:activeOrder.user_id,
+            storage_path:storagePath,
+            file_name:file.name,
+            mime_type:file.type || null,
+            size_bytes:file.size
+          });
+
+          if(rowError){
+            await supabase.storage.from("design-files").remove([storagePath]);
+            throw rowError;
+          }
+        }
+
+        input.value = "";
+        await supabase.from("orders").update({
+          design_status:"Ready",
+          progress:100,
+          customer_update:"Your completed design files are ready for download.",
+          updated_at:new Date().toISOString()
+        }).eq("id",activeOrder.id);
+
+        activeOrder.design_status = "Ready";
+        activeOrder.progress = 100;
+        activeOrder.customer_update = "Your completed design files are ready for download.";
+        $("editDesign").value = "Ready";
+        $("editProgress").value = "100";
+        $("editCustomerUpdate").value = activeOrder.customer_update;
+
+        await loadAdminDeliveryFiles();
+        updateStats();
+        renderOrders();
+        showToast("Files uploaded and customer notified");
+      }catch(error){
+        showToast(error.message || "File upload failed");
+      }finally{
+        button.disabled = false;
+        button.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Upload';
+      }
+    }
+
+    async function downloadAdminFile(fileId, files){
+      const file = files.find(item=>item.id===fileId);
+      if(!file) return;
+      const { data, error } = await supabase.storage
+        .from("design-files")
+        .createSignedUrl(file.storage_path, 120, { download:file.file_name });
+      if(error){ showToast(error.message); return; }
+      window.open(data.signedUrl, "_blank", "noopener");
+    }
+
+    async function deleteDeliveryFile(fileId, files){
+      const file = files.find(item=>item.id===fileId);
+      if(!file) return;
+      if(!confirm(`Remove ${file.file_name}?`)) return;
+
+      const { error: storageError } = await supabase.storage
+        .from("design-files")
+        .remove([file.storage_path]);
+      if(storageError){ showToast(storageError.message); return; }
+
+      const { error } = await supabase.from("order_files").delete().eq("id",file.id);
+      if(error){ showToast(error.message); return; }
+      await loadAdminDeliveryFiles();
+      showToast("File removed");
     }
 
     async function saveOrderChanges(){
