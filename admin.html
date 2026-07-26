@@ -277,6 +277,33 @@
       setTimeout(()=>$("toast").classList.remove("show"),2400);
     }
 
+    async function sendOrderUpdateEmail(
+  orderRecordId,
+  previousDesignStatus
+){
+  const { data, error } = await supabase.functions.invoke(
+    "send-order-update-email",
+    {
+      body:{
+        orderRecordId,
+        previousDesignStatus
+      }
+    }
+  );
+
+  if(error){
+    throw error;
+  }
+
+  if(!data?.success){
+    throw new Error(
+      data?.error || "Unable to send customer email"
+    );
+  }
+
+  return data;
+}
+
     async function guardAdmin(){
       const { data:{ session } } = await supabase.auth.getSession();
       if(!session){
@@ -517,6 +544,9 @@
       button.textContent = "Uploading...";
 
       try{
+        const previousDesignStatus =
+        activeOrder.design_status || "Waiting";
+
         for(const file of files){
           const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
           const storagePath = `${activeOrder.user_id}/${activeOrder.order_id}/${crypto.randomUUID()}-${cleanName}`;
@@ -546,12 +576,41 @@
         }
 
         input.value = "";
-        await supabase.from("orders").update({
-          design_status:"Ready",
-          progress:100,
-          customer_update:"Your completed design files are ready for download.",
-          updated_at:new Date().toISOString()
-        }).eq("id",activeOrder.id);
+        const { error: readyUpdateError } = await supabase
+  .from("orders")
+  .update({
+    design_status:"Ready",
+    progress:100,
+    customer_update:
+      "Your completed design files are ready for download.",
+    updated_at:new Date().toISOString()
+  })
+  .eq("id",activeOrder.id);
+
+if(readyUpdateError){
+  throw readyUpdateError;
+}
+
+let readyEmailSent = false;
+
+if(
+  previousDesignStatus.toLowerCase() !== "ready"
+){
+  try{
+    const emailResult = await sendOrderUpdateEmail(
+      activeOrder.id,
+      previousDesignStatus
+    );
+
+    readyEmailSent =
+      emailResult.emailSent === true;
+  }catch(emailError){
+    console.error(
+      "Files uploaded, but ready email failed:",
+      emailError
+    );
+  }
+}
 
         activeOrder.design_status = "Ready";
         activeOrder.progress = 100;
@@ -563,7 +622,11 @@
         await loadAdminDeliveryFiles();
         updateStats();
         renderOrders();
-        showToast("Files uploaded and customer notified");
+        showToast(
+        readyEmailSent
+          ? "Files uploaded and customer emailed"
+          : "Files uploaded successfully"
+      );
       }catch(error){
         showToast(error.message || "File upload failed");
       }finally{
@@ -599,37 +662,93 @@
     }
 
     async function saveOrderChanges(){
-      if(!activeOrder) return;
-      const button = $("saveOrder");
-      button.disabled = true;
-      button.textContent = "Saving...";
+  if(!activeOrder) return;
 
-      const updates = {
-        payment_status:$("editPayment").value,
-        design_status:$("editDesign").value,
-        progress:Number($("editProgress").value),
-        assigned_designer:$("editDesigner").value.trim() || null,
-        estimated_completion_date:$("editDueDate").value || null,
-        admin_notes:$("editAdminNotes").value.trim() || null,
-        customer_update:$("editCustomerUpdate").value.trim() || null,
-        updated_at:new Date().toISOString()
-      };
+  const button = $("saveOrder");
+  button.disabled = true;
+  button.textContent = "Saving...";
 
-      const { error } = await supabase.from("orders").update(updates).eq("id",activeOrder.id);
-      button.disabled = false;
-      button.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
+  const previousDesignStatus =
+    activeOrder.design_status || "Waiting";
 
-      if(error){
-        showToast(error.message);
-        return;
-      }
+  const updates = {
+    payment_status:$("editPayment").value,
+    design_status:$("editDesign").value,
+    progress:Number($("editProgress").value),
+    assigned_designer:
+      $("editDesigner").value.trim() || null,
+    estimated_completion_date:
+      $("editDueDate").value || null,
+    admin_notes:
+      $("editAdminNotes").value.trim() || null,
+    customer_update:
+      $("editCustomerUpdate").value.trim() || null,
+    updated_at:new Date().toISOString()
+  };
 
-      Object.assign(activeOrder,updates);
-      closeModal();
-      updateStats();
-      renderOrders();
-      showToast("Order updated successfully");
+  const designStatusChanged =
+    previousDesignStatus.toLowerCase() !==
+    updates.design_status.toLowerCase();
+
+  const { error } = await supabase
+    .from("orders")
+    .update(updates)
+    .eq("id",activeOrder.id);
+
+  if(error){
+    button.disabled = false;
+    button.innerHTML =
+      '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
+
+    showToast(error.message);
+    return;
+  }
+
+  let emailSent = false;
+  let emailFailed = false;
+
+  if(designStatusChanged){
+    button.textContent = "Sending email...";
+
+    try{
+      const result = await sendOrderUpdateEmail(
+        activeOrder.id,
+        previousDesignStatus
+      );
+
+      emailSent = result.emailSent === true;
+    }catch(error){
+      emailFailed = true;
+
+      console.error(
+        "Order saved, but customer email failed:",
+        error
+      );
     }
+  }
+
+  Object.assign(activeOrder,updates);
+
+  button.disabled = false;
+  button.innerHTML =
+    '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
+
+  closeModal();
+  updateStats();
+  renderOrders();
+
+  if(emailFailed){
+    showToast(
+      "Order saved, but customer email failed"
+    );
+  }else if(emailSent){
+    showToast(
+      "Order updated and customer emailed"
+    );
+  }else{
+    showToast("Order updated successfully");
+  }
+}
 
     function closeModal(){
       $("orderModal").style.display = "none";
