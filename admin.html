@@ -489,24 +489,7 @@
       document.body.style.overflow = "hidden";
     }
 
-    function getFileIcon(mimeType, fileName) {
-    const name = (fileName || "").toLowerCase();
-
-    if (mimeType?.startsWith("image/"))
-        return '<i class="fa-solid fa-image"></i>';
-
-    if (mimeType === "application/pdf" || name.endsWith(".pdf"))
-        return '<i class="fa-solid fa-file-pdf"></i>';
-
-    if (name.endsWith(".zip") || name.endsWith(".rar") || name.endsWith(".7z"))
-        return '<i class="fa-solid fa-file-zipper"></i>';
-
-    if (name.endsWith(".ai") || name.endsWith(".eps") || name.endsWith(".svg"))
-        return '<i class="fa-solid fa-pen-ruler"></i>';
-
-    return '${getFileIcon(file.mime_type, file.file_name)}';
-}
-
+  
 function getFileIcon(mimeType, fileName) {
 
     const name = (fileName || "").toLowerCase();
