@@ -926,6 +926,61 @@
       }
     }
 
+    #filePreviewModal{
+  position:fixed;
+  inset:0;
+  z-index:2000;
+  display:grid;
+  place-items:center;
+  padding:20px;
+}
+
+#filePreviewModal[hidden]{
+  display:none !important;
+}
+
+.preview-overlay{
+  position:absolute;
+  inset:0;
+  background:rgba(5,18,32,.78);
+  backdrop-filter:blur(5px);
+}
+
+.preview-window{
+  position:relative;
+  z-index:1;
+  width:min(1000px,96vw);
+  max-height:90vh;
+  padding:18px;
+  border-radius:20px;
+  background:#fff;
+  box-shadow:0 28px 80px rgba(0,0,0,.35);
+  display:grid;
+  place-items:center;
+  overflow:auto;
+}
+
+#closeFilePreview{
+  position:absolute;
+  top:12px;
+  right:12px;
+  z-index:2;
+  width:40px;
+  height:40px;
+  border:0;
+  border-radius:12px;
+  background:var(--navy);
+  color:#fff;
+  cursor:pointer;
+  display:grid;
+  place-items:center;
+}
+
+#filePreviewFrame,
+#filePreviewImage{
+  margin-top:34px;
+}
+
     @media(max-width:760px){
       .journey{
         grid-template-columns:1fr;
@@ -1187,6 +1242,26 @@
     </main>
 
     <div class="toast-message" id="toastMessage"></div>
+
+    <div id="filePreviewModal" hidden>
+  <div class="preview-overlay"></div>
+
+  <div class="preview-window">
+    <button id="closeFilePreview" type="button">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <iframe
+      id="filePreviewFrame"
+      style="display:none;width:100%;height:75vh;border:none;border-radius:12px;"
+    ></iframe>
+
+    <img
+      id="filePreviewImage"
+      style="display:none;max-width:100%;max-height:75vh;border-radius:12px;"
+    >
+  </div>
+</div>
 
     <footer class="footer">
       © <span id="year"></span> 96 Studios. Your order information is private and linked to your account.
@@ -1488,30 +1563,52 @@
     }
 
     async function downloadFile(fileId, files, button){
-      const file = files.find(item => item.id === fileId);
-      if(!file) return;
+  const file = files.find(item => item.id === fileId);
+  if(!file) return;
 
-      button.disabled = true;
-      button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+  button.disabled = true;
+  button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
 
-      try{
-        const { data, error } = await supabase.storage
-          .from("design-files")
-          .createSignedUrl(file.storage_path, 120, {
-            download: file.file_name
-          });
+  try{
+    const { data, error } = await supabase.storage
+      .from("design-files")
+      .createSignedUrl(file.storage_path, 120);
 
-        if(error) throw error;
+    if(error) throw error;
 
-        window.open(data.signedUrl, "_blank", "noopener");
-      }catch(error){
-        console.error("Download failed:", error);
-        alert(error.message || "Unable to download this file.");
-      }finally{
-        button.disabled = false;
-        button.innerHTML = '<i class="fa-solid fa-download"></i>';
-      }
+    const url = data.signedUrl;
+
+    const name = (file.file_name || "").toLowerCase();
+    const mime = (file.mime_type || "").toLowerCase();
+
+    const frame = $("filePreviewFrame");
+    const image = $("filePreviewImage");
+
+    frame.style.display = "none";
+    image.style.display = "none";
+
+    if(mime.startsWith("image/") || /\.(png|jpe?g|gif|webp|svg)$/i.test(name)){
+      image.src = url;
+      image.style.display = "block";
+      $("filePreviewModal").hidden = false;
     }
+    else if(mime.includes("pdf") || name.endsWith(".pdf")){
+      frame.src = url;
+      frame.style.display = "block";
+      $("filePreviewModal").hidden = false;
+    }
+    else{
+      window.open(url, "_blank", "noopener");
+    }
+
+  }catch(error){
+    console.error(error);
+    alert(error.message || "Unable to open file.");
+  }finally{
+    button.disabled = false;
+    button.innerHTML = '<i class="fa-solid fa-download"></i>';
+  }
+}
 
     async function loadTrackingPage(){
       const params = new URLSearchParams(window.location.search);
@@ -1682,6 +1779,16 @@
     window.addEventListener("resize", () => {
       updateJourney($("designStatus").textContent);
     });
+
+    function closeFilePreview(){
+  $("filePreviewModal").hidden = true;
+  $("filePreviewFrame").src = "";
+  $("filePreviewImage").src = "";
+}
+
+$("closeFilePreview").addEventListener("click", closeFilePreview);
+
+document.querySelector(".preview-overlay").addEventListener("click", closeFilePreview);
 
     $("signOutBtn").addEventListener("click", async () => {
       await supabase.auth.signOut();
