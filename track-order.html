@@ -704,6 +704,271 @@
         height:40px;
       }
     }
+
+    .journey-panel{
+      margin-top:18px;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:24px;
+    }
+
+    .journey-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:26px;
+    }
+
+    .journey-head h2{
+      margin:0;
+      font-size:19px;
+    }
+
+    .journey-head p{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    .live-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      padding:8px 11px;
+      border-radius:999px;
+      background:#edf9f4;
+      color:var(--green);
+      font-size:11px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .live-pill::before{
+      content:"";
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:currentColor;
+      box-shadow:0 0 0 5px rgba(0,155,91,.10);
+      animation:livePulse 1.8s ease-in-out infinite;
+    }
+
+    @keyframes livePulse{
+      0%,100%{transform:scale(.9);opacity:.7}
+      50%{transform:scale(1.15);opacity:1}
+    }
+
+    .journey{
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      position:relative;
+      gap:0;
+    }
+
+    .journey::before{
+      content:"";
+      position:absolute;
+      top:23px;
+      left:10%;
+      right:10%;
+      height:4px;
+      background:#e3eaf0;
+      border-radius:999px;
+    }
+
+    .journey-line{
+      position:absolute;
+      top:23px;
+      left:10%;
+      width:0;
+      height:4px;
+      background:linear-gradient(90deg,var(--green),#52d99f);
+      border-radius:999px;
+      transition:width .9s cubic-bezier(.2,.8,.2,1);
+      z-index:1;
+    }
+
+    .journey-step{
+      position:relative;
+      z-index:2;
+      text-align:center;
+      padding:0 6px;
+    }
+
+    .journey-dot{
+      width:48px;
+      height:48px;
+      margin:0 auto 11px;
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      border:2px solid #dbe4eb;
+      background:#fff;
+      color:#91a0ae;
+      transition:.3s ease;
+    }
+
+    .journey-step.completed .journey-dot{
+      background:var(--green);
+      border-color:var(--green);
+      color:#fff;
+      box-shadow:0 8px 20px rgba(0,155,91,.18);
+    }
+
+    .journey-step.current .journey-dot{
+      background:#eaf5fb;
+      border-color:var(--blue-2);
+      color:var(--blue);
+      box-shadow:0 0 0 8px rgba(8,105,159,.09);
+      animation:currentGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes currentGlow{
+      0%,100%{box-shadow:0 0 0 7px rgba(8,105,159,.07)}
+      50%{box-shadow:0 0 0 12px rgba(8,105,159,.13)}
+    }
+
+    .journey-step strong{
+      display:block;
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    .journey-step small{
+      display:block;
+      margin-top:4px;
+      color:var(--muted);
+      font-size:10px;
+    }
+
+    .designer-profile{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .designer-avatar{
+      width:46px;
+      height:46px;
+      border-radius:15px;
+      display:grid;
+      place-items:center;
+      flex:none;
+      font-weight:800;
+      color:#fff;
+      background:linear-gradient(135deg,var(--blue),var(--blue-2));
+      box-shadow:0 9px 22px rgba(0,67,112,.18);
+    }
+
+    .countdown-text{
+      margin-top:5px;
+      color:var(--green);
+      font-size:11px;
+      font-weight:700;
+    }
+
+    .file-type-badge{
+      display:inline-flex;
+      align-items:center;
+      margin-top:6px;
+      padding:4px 7px;
+      border-radius:999px;
+      background:#edf3f7;
+      color:#607283;
+      font-size:9px;
+      font-weight:800;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+
+    .toast-message{
+      position:fixed;
+      right:18px;
+      bottom:18px;
+      z-index:999;
+      max-width:min(360px,calc(100% - 36px));
+      padding:13px 16px;
+      border-radius:14px;
+      background:var(--navy);
+      color:#fff;
+      box-shadow:0 16px 38px rgba(8,26,45,.25);
+      font-size:13px;
+      transform:translateY(30px);
+      opacity:0;
+      pointer-events:none;
+      transition:.25s ease;
+    }
+
+    .toast-message.show{
+      transform:translateY(0);
+      opacity:1;
+    }
+
+    .confetti-piece{
+      position:fixed;
+      top:-20px;
+      z-index:1000;
+      width:10px;
+      height:16px;
+      border-radius:3px;
+      pointer-events:none;
+      animation:confettiFall linear forwards;
+    }
+
+    @keyframes confettiFall{
+      to{
+        transform:translate3d(var(--drift),110vh,0) rotate(760deg);
+        opacity:.8;
+      }
+    }
+
+    @media(max-width:760px){
+      .journey{
+        grid-template-columns:1fr;
+        gap:16px;
+      }
+
+      .journey::before,
+      .journey-line{
+        left:23px;
+        top:24px;
+        bottom:24px;
+        width:4px;
+        height:auto;
+        right:auto;
+      }
+
+      .journey-line{
+        height:0;
+        transition:height .9s cubic-bezier(.2,.8,.2,1);
+      }
+
+      .journey-step{
+        display:grid;
+        grid-template-columns:48px 1fr;
+        gap:13px;
+        text-align:left;
+        align-items:center;
+        padding:0;
+      }
+
+      .journey-dot{
+        margin:0;
+      }
+
+      .journey-step small{
+        margin-top:3px;
+      }
+
+      .journey-head{
+        align-items:center;
+      }
+    }
+
   </style>
 </head>
 
@@ -782,12 +1047,54 @@
           </div>
         </section>
 
+        <section class="journey-panel">
+          <div class="journey-head">
+            <div>
+              <h2>Your design journey</h2>
+              <p>Follow your project from the waiting list through to final delivery.</p>
+            </div>
+            <span class="live-pill">Live updates</span>
+          </div>
+
+          <div class="journey" id="journey">
+            <div class="journey-line" id="journeyLine"></div>
+
+            <div class="journey-step" data-status="waiting">
+              <div class="journey-dot"><i class="fa-solid fa-clock"></i></div>
+              <div><strong>Waiting</strong><small>Order received</small></div>
+            </div>
+
+            <div class="journey-step" data-status="designing">
+              <div class="journey-dot"><i class="fa-solid fa-pen-ruler"></i></div>
+              <div><strong>Designing</strong><small>Creative work</small></div>
+            </div>
+
+            <div class="journey-step" data-status="review">
+              <div class="journey-dot"><i class="fa-solid fa-magnifying-glass"></i></div>
+              <div><strong>Review</strong><small>Quality check</small></div>
+            </div>
+
+            <div class="journey-step" data-status="ready">
+              <div class="journey-dot"><i class="fa-solid fa-box-open"></i></div>
+              <div><strong>Ready</strong><small>Files prepared</small></div>
+            </div>
+
+            <div class="journey-step" data-status="completed">
+              <div class="journey-dot"><i class="fa-solid fa-flag-checkered"></i></div>
+              <div><strong>Completed</strong><small>Delivered</small></div>
+            </div>
+          </div>
+        </section>
+
         <section class="summary-grid">
           <article class="summary-card">
             <div class="summary-icon"><i class="fa-solid fa-user-pen"></i></div>
-            <div>
-              <small>Assigned designer</small>
-              <strong id="assignedDesigner">Not assigned yet</strong>
+            <div class="designer-profile">
+              <div class="designer-avatar" id="designerAvatar">96</div>
+              <div>
+                <small>Assigned designer</small>
+                <strong id="assignedDesigner">Not assigned yet</strong>
+              </div>
             </div>
           </article>
 
@@ -796,6 +1103,7 @@
             <div>
               <small>Estimated completion</small>
               <strong id="estimatedDate">To be confirmed</strong>
+              <div class="countdown-text" id="countdownText"></div>
             </div>
           </article>
 
@@ -877,6 +1185,8 @@
         </section>
       </section>
     </main>
+
+    <div class="toast-message" id="toastMessage"></div>
 
     <footer class="footer">
       © <span id="year"></span> 96 Studios. Your order information is private and linked to your account.
@@ -974,6 +1284,107 @@
       return `${(value / (1024 * 1024)).toFixed(1)} MB`;
     }
 
+
+    const STATUS_FLOW = ["waiting","designing","review","ready","completed"];
+
+    function normalizedStatus(value){
+      const status = String(value || "waiting").trim().toLowerCase();
+      return STATUS_FLOW.includes(status) ? status : "waiting";
+    }
+
+    function updateJourney(status){
+      const currentStatus = normalizedStatus(status);
+      const currentIndex = STATUS_FLOW.indexOf(currentStatus);
+      const steps = [...document.querySelectorAll(".journey-step")];
+
+      steps.forEach((step,index) => {
+        step.classList.toggle("completed", index < currentIndex || currentStatus === "completed");
+        step.classList.toggle("current", index === currentIndex && currentStatus !== "completed");
+      });
+
+      const percent = currentIndex <= 0 ? 0 : (currentIndex / (STATUS_FLOW.length - 1)) * 80;
+
+      if(window.innerWidth <= 760){
+        $("journeyLine").style.width = "4px";
+        $("journeyLine").style.height = `${percent}%`;
+      }else{
+        $("journeyLine").style.height = "4px";
+        $("journeyLine").style.width = `${percent}%`;
+      }
+    }
+
+    function designerInitials(name){
+      if(!name || name === "Not assigned yet") return "96";
+      return String(name)
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0,2)
+        .map(part => part[0])
+        .join("")
+        .toUpperCase();
+    }
+
+    function updateCountdown(value,status){
+      if(!value){
+        $("countdownText").textContent = "";
+        return;
+      }
+
+      if(normalizedStatus(status) === "completed"){
+        $("countdownText").textContent = "Project completed";
+        return;
+      }
+
+      const due = new Date(`${value}T23:59:59`);
+      const today = new Date();
+      const difference = Math.ceil((due - today) / 86400000);
+
+      if(difference > 1){
+        $("countdownText").textContent = `${difference} days remaining`;
+      }else if(difference === 1){
+        $("countdownText").textContent = "Due tomorrow";
+      }else if(difference === 0){
+        $("countdownText").textContent = "Due today";
+      }else{
+        $("countdownText").textContent = `${Math.abs(difference)} day${Math.abs(difference) === 1 ? "" : "s"} overdue`;
+      }
+    }
+
+    function fileExtension(name){
+      const match = String(name || "").match(/\.([a-z0-9]+)$/i);
+      return match ? match[1] : "FILE";
+    }
+
+    function showToast(message){
+      $("toastMessage").textContent = message;
+      $("toastMessage").classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => {
+        $("toastMessage").classList.remove("show");
+      }, 3200);
+    }
+
+    function celebrateCompletion(){
+      if(sessionStorage.getItem("completionCelebrated") === "yes") return;
+      sessionStorage.setItem("completionCelebrated","yes");
+
+      const palette = ["#009b5b","#08699f","#f4bd2a","#e85d75","#7d5fff"];
+
+      for(let index = 0; index < 70; index++){
+        const piece = document.createElement("span");
+        piece.className = "confetti-piece";
+        piece.style.left = `${Math.random() * 100}vw`;
+        piece.style.background = palette[Math.floor(Math.random() * palette.length)];
+        piece.style.setProperty("--drift", `${(Math.random() - .5) * 240}px`);
+        piece.style.animationDuration = `${2.8 + Math.random() * 2.2}s`;
+        piece.style.animationDelay = `${Math.random() * .7}s`;
+        document.body.appendChild(piece);
+        setTimeout(() => piece.remove(), 6000);
+      }
+
+      showToast("Your design is complete and ready 🎉");
+    }
+
     function renderTimeline(activities){
       const visible = (activities || []).filter(item =>
         item.visible_to_customer !== false
@@ -1018,6 +1429,7 @@
           <div class="file-info">
             <strong title="${safe(file.file_name)}">${safe(file.file_name)}</strong>
             <small>${safe(fileSize(file.size_bytes))}</small>
+            <span class="file-type-badge">${safe(fileExtension(file.file_name))}</span>
           </div>
           <button
             class="download-btn"
@@ -1176,12 +1588,22 @@
       $("designStatus").textContent = order.design_status || "Waiting";
       $("progressValue").textContent = `${progress}%`;
       $("updatedTime").textContent = `Last updated ${dateTime(order.updated_at || order.created_at)}`;
-      $("assignedDesigner").textContent = order.assigned_designer || "Not assigned yet";
+      const designerName = order.assigned_designer || "Not assigned yet";
+
+      $("assignedDesigner").textContent = designerName;
+      $("designerAvatar").textContent = designerInitials(designerName);
       $("estimatedDate").textContent = dateOnly(order.estimated_completion_date);
       $("orderTotal").textContent = money(order.totals?.total);
       $("latestUpdate").textContent =
         order.customer_update ||
         "Your order has been received and is waiting to be started.";
+
+      updateJourney(order.design_status);
+      updateCountdown(order.estimated_completion_date, order.design_status);
+
+      if(normalizedStatus(order.design_status) === "completed"){
+        setTimeout(celebrateCompletion, 500);
+      }
 
       $("paymentBadge").classList.toggle(
         "paid",
@@ -1209,7 +1631,47 @@
       requestAnimationFrame(() => {
         $("progressFill").style.width = `${progress}%`;
       });
+
+      subscribeToOrderUpdates(order.id);
     }
+
+    let realtimeChannel = null;
+    let refreshTimer = null;
+
+    function subscribeToOrderUpdates(orderId){
+      if(realtimeChannel) supabase.removeChannel(realtimeChannel);
+
+      realtimeChannel = supabase
+        .channel(`track-order-${orderId}`)
+        .on(
+          "postgres_changes",
+          { event:"*", schema:"public", table:"orders", filter:`id=eq.${orderId}` },
+          scheduleLiveRefresh
+        )
+        .on(
+          "postgres_changes",
+          { event:"*", schema:"public", table:"order_activity", filter:`order_id=eq.${orderId}` },
+          scheduleLiveRefresh
+        )
+        .on(
+          "postgres_changes",
+          { event:"*", schema:"public", table:"order_files", filter:`order_id=eq.${orderId}` },
+          scheduleLiveRefresh
+        )
+        .subscribe();
+    }
+
+    function scheduleLiveRefresh(){
+      clearTimeout(refreshTimer);
+      refreshTimer = setTimeout(async () => {
+        showToast("New order update received");
+        await loadTrackingPage();
+      }, 650);
+    }
+
+    window.addEventListener("resize", () => {
+      updateJourney($("designStatus").textContent);
+    });
 
     $("signOutBtn").addEventListener("click", async () => {
       await supabase.auth.signOut();
