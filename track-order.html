@@ -1195,6 +1195,61 @@
               </div>
             </article>
 
+            <article class="panel" id="approvalPanel" style="margin-top:18px">
+  <div class="panel-head">
+    <div>
+      <h2 class="panel-title">Design approval</h2>
+      <p class="panel-subtitle">
+        Review the delivered design and approve it or request changes.
+      </p>
+    </div>
+  </div>
+
+  <div id="approvalActions">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <button
+        type="button"
+        id="approveDesignBtn"
+        class="help-btn"
+        style="border:0;background:var(--green);color:#fff;cursor:pointer;"
+      >
+        <i class="fa-solid fa-circle-check"></i>
+        Approve design
+      </button>
+
+      <button
+        type="button"
+        id="requestChangesBtn"
+        class="help-btn"
+        style="border:0;background:var(--danger);color:#fff;cursor:pointer;"
+      >
+        <i class="fa-solid fa-rotate-left"></i>
+        Request changes
+      </button>
+    </div>
+
+    <div id="feedbackSection" hidden style="margin-top:14px;">
+      <textarea
+        id="approvalFeedback"
+        rows="5"
+        placeholder="Describe the changes you need..."
+        style="width:100%;resize:vertical;padding:13px;border:1px solid var(--line);border-radius:14px;font:inherit;"
+      ></textarea>
+
+      <button
+        type="button"
+        id="submitChangesBtn"
+        class="help-btn"
+        style="width:100%;margin-top:10px;border:0;background:var(--blue);color:#fff;cursor:pointer;"
+      >
+        Submit revision request
+      </button>
+    </div>
+  </div>
+
+  <div id="approvalResult" class="empty-state" hidden></div>
+</article>
+
             <article class="panel" style="margin-top:18px">
               <div class="panel-head">
                 <div>
@@ -1573,6 +1628,130 @@ $("filesList").innerHTML = filesWithThumbnails.map(file => `
       });
     }
 
+    function setupApprovalActions(orderId, userId){
+  const approveBtn = $("approveDesignBtn");
+  const requestBtn = $("requestChangesBtn");
+  const submitBtn = $("submitChangesBtn");
+  const feedbackSection = $("feedbackSection");
+  const feedbackInput = $("approvalFeedback");
+
+  requestBtn.onclick = () => {
+    feedbackSection.hidden = false;
+    feedbackInput.focus();
+  };
+
+  approveBtn.onclick = async () => {
+    approveBtn.disabled = true;
+    approveBtn.innerHTML = `
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      Submitting...
+    `;
+
+    const { error } = await supabase
+      .from("order_approvals")
+      .insert({
+        order_id: orderId,
+        user_id: userId,
+        decision: "approved",
+        feedback: null
+      });
+
+    if(error){
+      console.error("Approval submission failed:", error);
+
+      approveBtn.disabled = false;
+      approveBtn.innerHTML = `
+        <i class="fa-solid fa-circle-check"></i>
+        Approve design
+      `;
+
+      alert("The approval could not be submitted.");
+      return;
+    }
+
+    await loadApproval(orderId, userId);
+  };
+
+  submitBtn.onclick = async () => {
+    const feedback = feedbackInput.value.trim();
+
+    if(!feedback){
+      alert("Please describe the changes you need.");
+      feedbackInput.focus();
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      Submitting...
+    `;
+
+    const { error } = await supabase
+      .from("order_approvals")
+      .insert({
+        order_id: orderId,
+        user_id: userId,
+        decision: "changes_requested",
+        feedback
+      });
+
+    if(error){
+      console.error("Revision request failed:", error);
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit revision request";
+
+      alert("The revision request could not be submitted.");
+      return;
+    }
+
+    await loadApproval(orderId, userId);
+  };
+}
+
+    async function loadApproval(orderId, userId){
+  const { data, error } = await supabase
+    .from("order_approvals")
+    .select("*")
+    .eq("order_id", orderId)
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if(error){
+    console.error("Approval load failed:", error);
+    return;
+  }
+
+  if(!data) return;
+
+  $("approvalActions").hidden = true;
+  $("approvalResult").hidden = false;
+
+  if(data.decision === "approved"){
+    $("approvalResult").innerHTML = `
+      <strong style="display:block;color:var(--green);margin-bottom:6px;">
+        <i class="fa-solid fa-circle-check"></i>
+        Design approved
+      </strong>
+      <span>Your approval was submitted ${safe(dateTime(data.created_at))}.</span>
+    `;
+  }else{
+    $("approvalResult").innerHTML = `
+      <strong style="display:block;color:var(--danger);margin-bottom:6px;">
+        <i class="fa-solid fa-rotate-left"></i>
+        Changes requested
+      </strong>
+      <span>${safe(data.feedback || "No feedback was provided.")}</span>
+      <small style="display:block;margin-top:8px;">
+        Submitted ${safe(dateTime(data.created_at))}
+      </small>
+    `;
+  }
+}
+
     function renderItems(order){
       const items = Array.isArray(order.cart) ? order.cart : [];
 
@@ -1767,6 +1946,8 @@ $("filesList").innerHTML = filesWithThumbnails.map(file => `
       renderTimeline(activityResult.data || []);
       renderFiles(filesResult.data || []);
       renderItems(order);
+      setupApprovalActions(order.id, session.user.id);
+      await loadApproval(order.id, session.user.id);
 
       $("loadingScreen").hidden = true;
       $("loadingScreen").style.display = "none";
