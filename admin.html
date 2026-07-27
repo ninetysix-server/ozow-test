@@ -443,6 +443,13 @@
             <div class="field">
               <label>Select completed files</label>
               <input id="deliveryFiles" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.zip,.svg,.webp,.ai,.eps">
+              <label style="margin-top:10px;display:block;">File label</label>
+              <select id="deliveryLabel">
+                <option value="Concept">Concept</option>
+                <option value="Revision">Revision</option>
+                <option value="Final Files">Final Files</option>
+              </select>
+              <div class="meta-note">Choose how this file should appear in the customer gallery.</div>
               <div class="meta-note">PDF, images, ZIP, SVG, AI and EPS files are supported.</div>
             </div>
             <button type="button" class="upload-btn" id="uploadFiles"><i class="fa-solid fa-cloud-arrow-up"></i> Upload</button>
@@ -534,6 +541,7 @@
       if(!activeOrder) return;
       const input = $("deliveryFiles");
       const files = Array.from(input.files || []);
+      const label = $("deliveryLabel").value;
       if(!files.length){
         showToast("Choose at least one file");
         return;
@@ -566,7 +574,8 @@
             storage_path:storagePath,
             file_name:file.name,
             mime_type:file.type || null,
-            size_bytes:file.size
+            size_bytes:file.size,
+            label
           });
 
           if(rowError){
