@@ -1510,10 +1510,9 @@
     <small>${safe(file.file_name)}</small>
 
     <small>
-        ${formatFileSize(file.size_bytes)} · ${safe(dateText(file.created_at))}
-    </small>
+  ${safe(fileSize(file.size_bytes))} · ${safe(dateTime(file.created_at))}
+</small>
 </div>
-            <small>${safe(fileSize(file.size_bytes))}</small>
             <span class="file-type-badge">${safe(fileExtension(file.file_name))}</span>
           </div>
           <button
