@@ -489,6 +489,54 @@
       document.body.style.overflow = "hidden";
     }
 
+    function getFileIcon(mimeType, fileName) {
+    const name = (fileName || "").toLowerCase();
+
+    if (mimeType?.startsWith("image/"))
+        return '<i class="fa-solid fa-image"></i>';
+
+    if (mimeType === "application/pdf" || name.endsWith(".pdf"))
+        return '<i class="fa-solid fa-file-pdf"></i>';
+
+    if (name.endsWith(".zip") || name.endsWith(".rar") || name.endsWith(".7z"))
+        return '<i class="fa-solid fa-file-zipper"></i>';
+
+    if (name.endsWith(".ai") || name.endsWith(".eps") || name.endsWith(".svg"))
+        return '<i class="fa-solid fa-pen-ruler"></i>';
+
+    return '${getFileIcon(file.mime_type, file.file_name)}';
+}
+
+function getFileIcon(mimeType, fileName) {
+
+    const name = (fileName || "").toLowerCase();
+
+    if (mimeType?.startsWith("image/")) {
+        return '<i class="fa-solid fa-image"></i>';
+    }
+
+    if (name.endsWith(".pdf")) {
+        return '<i class="fa-solid fa-file-pdf"></i>';
+    }
+
+    if (
+        name.endsWith(".zip") ||
+        name.endsWith(".rar") ||
+        name.endsWith(".7z")
+    ) {
+        return '<i class="fa-solid fa-file-zipper"></i>';
+    }
+
+    if (
+        name.endsWith(".ai") ||
+        name.endsWith(".eps") ||
+        name.endsWith(".svg")
+    ) {
+        return '<i class="fa-solid fa-pen-ruler"></i>';
+    }
+
+    return '<i class="fa-solid fa-file"></i>';
+}
 
     async function loadAdminDeliveryFiles(){
       if(!activeOrder) return;
@@ -511,7 +559,41 @@
       }
 
       list.innerHTML = data.map(file => `
-        <div class="file-entry">
+        <div class="file-entry" style="display:flex;align-items:center;gap:15px;">
+          ${file.mime_type?.startsWith("image/")
+? `
+<div style="
+    width:50px;
+    height:50px;
+    border-radius:12px;
+    overflow:hidden;
+    background:#edf5fb;
+">
+    <img
+        src="#"
+        data-thumbnail="${safe(file.id)}"
+        style="
+            width:100%;
+            height:100%;
+            object-fit:cover;
+        ">
+    </div>
+    `
+    : `
+    <div style="
+        width:50px;
+        height:50px;
+        border-radius:12px;
+        background:#edf5fb;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        color:#004370;
+        font-size:22px;
+    ">
+        ${getFileIcon(file.mime_type, file.file_name)}
+    </div>
+    `}
           <div>
             <strong title="${safe(file.file_name)}">${safe(file.file_name)}</strong>
             <small>${formatFileSize(file.size_bytes)} · ${safe(dateText(file.created_at))}</small>
@@ -521,6 +603,25 @@
             <button type="button" class="file-action delete" data-admin-delete="${safe(file.id)}"><i class="fa-solid fa-trash"></i></button>
           </div>
         </div>`).join("");
+
+        for (const file of data) {
+
+    if (!file.mime_type?.startsWith("image/")) continue;
+
+    const { data: signed } = await supabase.storage
+        .from("design-files")
+        .createSignedUrl(file.storage_path, 120);
+
+    if (!signed) continue;
+
+    const img = document.querySelector(
+        `[data-thumbnail="${file.id}"]`
+    );
+
+    if (img) {
+        img.src = signed.signedUrl;
+    }
+}
 
       document.querySelectorAll("[data-admin-download]").forEach(btn=>{
         btn.addEventListener("click",()=>downloadAdminFile(btn.dataset.adminDownload, data));
