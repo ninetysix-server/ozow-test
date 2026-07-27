@@ -253,6 +253,25 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="filePreviewModal">
+  <div class="modal" style="width:min(1000px,100%);height:90vh;">
+    <div class="modal-head">
+      <h2 id="filePreviewTitle">File Preview</h2>
+
+      <button class="close-btn" id="closeFilePreview">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div style="height:calc(90vh - 80px);padding:15px;">
+      <iframe
+        id="filePreviewFrame"
+        style="width:100%;height:100%;border:none;border-radius:12px;">
+      </iframe>
+    </div>
+  </div>
+</div>
+
   <div class="toast" id="toast"></div>
 
   <script type="module">
@@ -775,14 +794,35 @@ if(
     }
 
     async function downloadAdminFile(fileId, files){
-      const file = files.find(item=>item.id===fileId);
-      if(!file) return;
-      const { data, error } = await supabase.storage
+    const file = files.find(item => item.id === fileId);
+    if(!file) return;
+
+    const { data, error } = await supabase.storage
         .from("design-files")
-        .createSignedUrl(file.storage_path, 120, { download:file.file_name });
-      if(error){ showToast(error.message); return; }
-      window.open(data.signedUrl, "_blank", "noopener");
+        .createSignedUrl(file.storage_path, 120);
+
+    if(error){
+        showToast(error.message);
+        return;
     }
+
+    const canPreview =
+        file.mime_type?.startsWith("image/") ||
+        file.mime_type === "application/pdf" ||
+        file.file_name?.toLowerCase().endsWith(".pdf");
+
+    if(canPreview){
+        $("filePreviewTitle").textContent =
+            file.label || file.file_name;
+
+        $("filePreviewFrame").src = data.signedUrl;
+        $("filePreviewModal").style.display = "flex";
+        document.body.style.overflow = "hidden";
+        return;
+    }
+
+    window.open(data.signedUrl, "_blank", "noopener");
+}
 
     async function deleteDeliveryFile(fileId, files){
       const file = files.find(item=>item.id===fileId);
@@ -1037,6 +1077,20 @@ if(
       activeOrder = null;
     }
 
+    $("closeFilePreview").addEventListener("click", () => {
+    $("filePreviewModal").style.display = "none";
+    $("filePreviewFrame").src = "";
+
+    if($("orderModal").style.display !== "flex"){
+        document.body.style.overflow = "";
+    }
+});
+
+    $("filePreviewModal").addEventListener("click", event => {
+        if(event.target === $("filePreviewModal")){
+            $("closeFilePreview").click();
+        }
+    });
     $("closeModal").addEventListener("click",closeModal);
     $("orderModal").addEventListener("click",e=>{if(e.target===$("orderModal")) closeModal()});
     ["searchInput","paymentFilter","designFilter"].forEach(id=>$("searchInput") && $(id).addEventListener(id==="searchInput"?"input":"change",renderOrders));
