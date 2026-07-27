@@ -591,6 +591,27 @@ if(readyUpdateError){
   throw readyUpdateError;
 }
 
+let uploadActivityCreated = false;
+
+try {
+  await createOrderActivity({
+    orderId: activeOrder.id,
+    activityType: "files_uploaded",
+    title: "Design files uploaded",
+    description:
+      "Your completed design files are now available for download.",
+    designStatus: "Ready",
+    visibleToCustomer: true
+  });
+
+  uploadActivityCreated = true;
+} catch(activityError) {
+  console.error(
+    "Files uploaded, but timeline activity failed:",
+    activityError
+  );
+}
+
 let readyEmailSent = false;
 
 if(
@@ -622,11 +643,21 @@ if(
         await loadAdminDeliveryFiles();
         updateStats();
         renderOrders();
-        showToast(
-        readyEmailSent
-          ? "Files uploaded and customer emailed"
-          : "Files uploaded successfully"
-      );
+        if(uploadActivityCreated && readyEmailSent){
+  showToast(
+    "Files uploaded, timeline created and customer emailed"
+  );
+} else if(uploadActivityCreated){
+  showToast(
+    "Files uploaded and timeline created"
+  );
+} else if(readyEmailSent){
+  showToast(
+    "Files uploaded and customer emailed"
+  );
+} else {
+  showToast("Files uploaded successfully");
+}
       }catch(error){
         showToast(error.message || "File upload failed");
       }finally{
