@@ -529,6 +529,14 @@
       color:var(--blue);
       background:#eaf3f9;
       font-size:18px;
+      overflow:hidden;
+    }
+
+    .file-thumbnail{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
     }
 
     .file-info{
@@ -1487,7 +1495,7 @@
       `).join("");
     }
 
-    function renderFiles(files){
+    async function renderFiles(files){
       if(!files?.length){
         $("filesList").innerHTML = `
           <div class="empty-state">
@@ -1496,11 +1504,43 @@
         return;
       }
 
-      $("filesList").innerHTML = files.map(file => `
+      const filesWithThumbnails = await Promise.all(
+  files.map(async file => {
+    const name = String(file.file_name || "").toLowerCase();
+    const mime = String(file.mime_type || "").toLowerCase();
+
+    const isImage =
+      mime.startsWith("image/") ||
+      /\.(png|jpe?g|gif|webp|svg)$/i.test(name);
+
+    if(!isImage){
+      return file;
+    }
+
+    const { data, error } = await supabase.storage
+      .from("design-files")
+      .createSignedUrl(file.storage_path, 3600);
+
+    return {
+      ...file,
+      thumbnailUrl: error ? "" : data.signedUrl
+    };
+  })
+);
+
+$("filesList").innerHTML = filesWithThumbnails.map(file => `
         <article class="file-card">
-          <div class="file-icon">
-            <i class="fa-solid ${fileIcon(file)}"></i>
-          </div>
+<div class="file-icon">
+  ${
+    file.thumbnailUrl
+      ? `<img
+            class="file-thumbnail"
+            src="${file.thumbnailUrl}"
+            alt="${safe(file.file_name)}"
+         >`
+      : `<i class="fa-solid ${fileIcon(file)}"></i>`
+  }
+</div>
           <div class="file-info">
             <div>
     <strong title="${safe(file.label || file.file_name)}">
