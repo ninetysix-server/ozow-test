@@ -1427,7 +1427,17 @@
             <i class="fa-solid ${fileIcon(file)}"></i>
           </div>
           <div class="file-info">
-            <strong title="${safe(file.file_name)}">${safe(file.file_name)}</strong>
+            <div>
+    <strong title="${safe(file.label || file.file_name)}">
+        ${safe(file.label || file.file_name)}
+    </strong>
+
+    <small>${safe(file.file_name)}</small>
+
+    <small>
+        ${formatFileSize(file.size_bytes)} · ${safe(dateText(file.created_at))}
+    </small>
+</div>
             <small>${safe(fileSize(file.size_bytes))}</small>
             <span class="file-type-badge">${safe(fileExtension(file.file_name))}</span>
           </div>
