@@ -661,6 +661,44 @@ if(
       showToast("File removed");
     }
 
+    async function createOrderActivity({
+    orderId,
+    activityType,
+    title,
+    description,
+    designStatus,
+    visibleToCustomer = true
+}) {
+    const {
+        data: { user },
+        error: userError
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+        console.error("Could not identify admin:", userError);
+        throw new Error("Admin authentication could not be verified.");
+    }
+
+    const { error } = await supabase
+        .from("order_activity")
+        .insert({
+            order_id: orderId,
+            activity_type: activityType,
+            title,
+            description,
+            design_status: designStatus,
+            visible_to_customer: visibleToCustomer,
+            created_by: user.id
+        });
+
+    if (error) {
+        console.error("Order activity insert failed:", error);
+        throw error;
+    }
+
+    console.log("Order activity created:", title);
+}
+
     async function saveOrderChanges(){
   if(!activeOrder) return;
 
@@ -747,6 +785,61 @@ if(
     );
   }else{
     showToast("Order updated successfully");
+if (designStatusChanged) {
+    const newStatus = updates.design_status;
+
+    const activityDetails = {
+        waiting: {
+            title: "Order added to the waiting list",
+            description:
+                "Your order is currently waiting to be assigned and started."
+        },
+
+        designing: {
+            title: "Design work has started",
+            description:
+                "Your designer is now working on your project."
+        },
+
+        review: {
+            title: "Design under review",
+            description:
+                "Your design is currently being reviewed before delivery."
+        },
+
+        ready: {
+            title: "Design files ready",
+            description:
+                "Your completed design files are ready for download."
+        },
+
+        completed: {
+            title: "Order completed",
+            description:
+                "Your design order has been marked as completed."
+        }
+    };
+
+    const normalizedStatus = newStatus.toLowerCase();
+
+    const details =
+        activityDetails[normalizedStatus] || {
+            title: `Order moved to ${newStatus}`,
+            description:
+                updates.customer_update ||
+                `Your order status has changed to ${newStatus}.`
+        };
+
+    await createOrderActivity({
+        orderId: orderRecordId,
+        activityType: "status_change",
+        title: details.title,
+        description:
+            updates.customer_update?.trim() || details.description,
+        designStatus: newStatus,
+        visibleToCustomer: true
+    });
+}
   }
 }
 
