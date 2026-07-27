@@ -594,6 +594,13 @@ if(readyUpdateError){
 let uploadActivityCreated = false;
 
 try {
+  showToast("Creating upload timeline...");
+  console.log("CREATING FILE UPLOAD ACTIVITY", {
+    orderId: activeOrder.id,
+    userId: activeOrder.user_id,
+    orderNumber: activeOrder.order_id
+  });
+
   await createOrderActivity({
     orderId: activeOrder.id,
     activityType: "files_uploaded",
@@ -605,10 +612,18 @@ try {
   });
 
   uploadActivityCreated = true;
+
+  console.log("FILE UPLOAD ACTIVITY CREATED");
 } catch(activityError) {
   console.error(
-    "Files uploaded, but timeline activity failed:",
+    "FILE UPLOAD ACTIVITY FAILED:",
     activityError
+  );
+
+  throw new Error(
+    `Files uploaded, but timeline failed: ${
+      activityError.message || "Unknown timeline error"
+    }`
   );
 }
 
