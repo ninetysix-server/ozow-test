@@ -434,8 +434,16 @@
           <div class="detail-card"><small>Total</small><strong>${money(activeOrder.totals?.total)}</strong></div>
           <div class="detail-card full"><small>Items</small><div class="items">${items}</div></div>
           <div class="detail-card full"><small>Design Description</small><strong>${safe(activeOrder.user_input?.designDescription || "No description provided")}</strong></div>
-          <div class="detail-card"><small>Preferred Colours</small><strong>${safe(activeOrder.user_input?.preferredColors || "Not provided")}</strong></div>
-          <div class="detail-card"><small>Reference</small><strong>${activeOrder.user_input?.sketchImageUrl ? `<a target="_blank" rel="noopener" href="${safe(activeOrder.user_input.sketchImageUrl)}">Open image</a>` : "Not provided"}</strong></div>
+
+<div class="detail-card full" id="adminApprovalCard">
+  <small>Customer approval</small>
+  <div id="adminApprovalResult" class="meta-note">
+    Loading customer response...
+  </div>
+</div>
+
+<div class="detail-card"><small>Preferred Colours</small><strong>${safe(activeOrder.user_input?.preferredColors || "Not provided")}</strong></div>
+<div class="detail-card"><small>Reference</small><strong>${activeOrder.user_input?.sketchImageUrl ? `<a target="_blank" rel="noopener" href="${safe(activeOrder.user_input.sketchImageUrl)}">Open image</a>` : "Not provided"}</strong></div>
         </div>
         <div class="management-grid">
           <div class="field">
@@ -503,6 +511,7 @@
       });
       $("saveOrder").addEventListener("click",saveOrderChanges);
       $("uploadFiles").addEventListener("click", uploadDeliveryFiles);
+      loadAdminApproval();
       loadAdminDeliveryFiles();
       $("orderModal").style.display = "flex";
       document.body.style.overflow = "hidden";
@@ -538,6 +547,68 @@ function getFileIcon(mimeType, fileName) {
     }
 
     return '<i class="fa-solid fa-file"></i>';
+}
+
+async function loadAdminApproval(){
+  if(!activeOrder) return;
+
+  const result = $("adminApprovalResult");
+
+  const { data, error } = await supabase
+    .from("order_approvals")
+    .select("*")
+    .eq("order_id", activeOrder.id)
+    .order("created_at", { ascending:false })
+    .limit(1)
+    .maybeSingle();
+
+  if(error){
+    console.error("Admin approval load failed:", error);
+    result.innerHTML = `
+      <span style="color:var(--danger);">
+        Unable to load customer approval.
+      </span>
+    `;
+    return;
+  }
+
+  if(!data){
+    result.innerHTML = `
+      <span style="color:var(--muted);">
+        The customer has not responded yet.
+      </span>
+    `;
+    return;
+  }
+
+  if(data.decision === "approved"){
+    result.innerHTML = `
+      <strong style="display:block;color:var(--green);margin-bottom:6px;">
+        <i class="fa-solid fa-circle-check"></i>
+        Design approved
+      </strong>
+
+      <span>
+        Submitted ${safe(dateText(data.created_at))}
+      </span>
+    `;
+    return;
+  }
+
+  result.innerHTML = `
+    <strong style="display:block;color:var(--danger);margin-bottom:6px;">
+      <i class="fa-solid fa-rotate-left"></i>
+      Changes requested
+    </strong>
+
+    <div style="margin-bottom:8px;white-space:pre-wrap;">
+      ${safe(data.feedback || "No feedback was provided.")}
+    </div>
+
+    <small>
+      Submitted ${safe(dateText(data.created_at))}
+    </small>
+  `;
 }
 
     async function loadAdminDeliveryFiles(){
