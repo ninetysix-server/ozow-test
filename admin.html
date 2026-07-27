@@ -699,7 +699,7 @@ if(
     console.log("Order activity created:", title);
 }
 
-    async function saveOrderChanges(){
+   async function saveOrderChanges(){
   if(!activeOrder) return;
 
   const button = $("saveOrder");
@@ -710,136 +710,185 @@ if(
     activeOrder.design_status || "Waiting";
 
   const updates = {
-    payment_status:$("editPayment").value,
-    design_status:$("editDesign").value,
-    progress:Number($("editProgress").value),
+    payment_status: $("editPayment").value,
+    design_status: $("editDesign").value,
+    progress: Number($("editProgress").value),
+
     assigned_designer:
       $("editDesigner").value.trim() || null,
+
     estimated_completion_date:
       $("editDueDate").value || null,
+
     admin_notes:
       $("editAdminNotes").value.trim() || null,
+
     customer_update:
       $("editCustomerUpdate").value.trim() || null,
-    updated_at:new Date().toISOString()
+
+    updated_at: new Date().toISOString()
   };
 
   const designStatusChanged =
     previousDesignStatus.toLowerCase() !==
     updates.design_status.toLowerCase();
 
-  const { error } = await supabase
-    .from("orders")
-    .update(updates)
-    .eq("id",activeOrder.id);
+  try {
+    const { error: updateError } = await supabase
+      .from("orders")
+      .update(updates)
+      .eq("id", activeOrder.id);
 
-  if(error){
+    if(updateError){
+      throw updateError;
+    }
+
+    let activityCreated = false;
+    let activityFailed = false;
+    let emailSent = false;
+    let emailFailed = false;
+
+    // Create timeline activity before closing the modal
+    if(designStatusChanged){
+      button.textContent = "Creating timeline...";
+
+      const newStatus = updates.design_status;
+      const normalizedStatus = newStatus.toLowerCase();
+
+      const activityDetails = {
+        waiting: {
+          title: "Order added to the waiting list",
+          description:
+            "Your order is currently waiting to be assigned and started."
+        },
+
+        designing: {
+          title: "Design work has started",
+          description:
+            "Your designer is now working on your project."
+        },
+
+        review: {
+          title: "Design under review",
+          description:
+            "Your design is currently being reviewed before delivery."
+        },
+
+        ready: {
+          title: "Design files ready",
+          description:
+            "Your completed design files are ready for download."
+        },
+
+        completed: {
+          title: "Order completed",
+          description:
+            "Your design order has been marked as completed."
+        }
+      };
+
+      const details =
+        activityDetails[normalizedStatus] || {
+          title: `Order moved to ${newStatus}`,
+          description:
+            updates.customer_update ||
+            `Your order status has changed to ${newStatus}.`
+        };
+
+      try {
+        await createOrderActivity({
+          orderId: activeOrder.id,
+          activityType: "status_change",
+          title: details.title,
+          description:
+            updates.customer_update?.trim() ||
+            details.description,
+          designStatus: newStatus,
+          visibleToCustomer: true
+        });
+
+        activityCreated = true;
+      } catch(activityError) {
+        activityFailed = true;
+
+        console.error(
+          "Order saved, but timeline activity failed:",
+          activityError
+        );
+      }
+    }
+
+    // Send status email
+    if(designStatusChanged){
+      button.textContent = "Sending email...";
+
+      try {
+        const result = await sendOrderUpdateEmail(
+          activeOrder.id,
+          previousDesignStatus
+        );
+
+        emailSent = result.emailSent === true;
+      } catch(emailError) {
+        emailFailed = true;
+
+        console.error(
+          "Order saved, but customer email failed:",
+          emailError
+        );
+      }
+    }
+
+    Object.assign(activeOrder, updates);
+
     button.disabled = false;
     button.innerHTML =
       '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
 
-    showToast(error.message);
-    return;
-  }
+    closeModal();
+    updateStats();
+    renderOrders();
 
-  let emailSent = false;
-  let emailFailed = false;
-
-  if(designStatusChanged){
-    button.textContent = "Sending email...";
-
-    try{
-      const result = await sendOrderUpdateEmail(
-        activeOrder.id,
-        previousDesignStatus
+    if(activityFailed && emailFailed){
+      showToast(
+        "Order saved, but timeline and email failed"
       );
-
-      emailSent = result.emailSent === true;
-    }catch(error){
-      emailFailed = true;
-
-      console.error(
-        "Order saved, but customer email failed:",
-        error
+    } else if(activityFailed){
+      showToast(
+        emailSent
+          ? "Customer emailed, but timeline failed"
+          : "Order saved, but timeline failed"
       );
+    } else if(emailFailed){
+      showToast(
+        activityCreated
+          ? "Timeline created, but customer email failed"
+          : "Order saved, but customer email failed"
+      );
+    } else if(activityCreated && emailSent){
+      showToast(
+        "Order updated, timeline created and customer emailed"
+      );
+    } else if(activityCreated){
+      showToast(
+        "Order updated and timeline created"
+      );
+    } else if(emailSent){
+      showToast(
+        "Order updated and customer emailed"
+      );
+    } else {
+      showToast("Order updated successfully");
     }
-  }
 
-  Object.assign(activeOrder,updates);
+  } catch(error) {
+    console.error("Order update failed:", error);
 
-  button.disabled = false;
-  button.innerHTML =
-    '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
+    button.disabled = false;
+    button.innerHTML =
+      '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
 
-  closeModal();
-  updateStats();
-  renderOrders();
-
-  if(emailFailed){
-    showToast(
-      "Order saved, but customer email failed"
-    );
-  }else if(emailSent){
-    showToast(
-      "Order updated and customer emailed"
-    );
-  }else{
-    showToast("Order updated successfully");
-if (designStatusChanged) {
-    const newStatus = updates.design_status;
-
-    const activityDetails = {
-        waiting: {
-            title: "Order added to the waiting list",
-            description:
-                "Your order is currently waiting to be assigned and started."
-        },
-
-        designing: {
-            title: "Design work has started",
-            description:
-                "Your designer is now working on your project."
-        },
-
-        review: {
-            title: "Design under review",
-            description:
-                "Your design is currently being reviewed before delivery."
-        },
-
-        ready: {
-            title: "Design files ready",
-            description:
-                "Your completed design files are ready for download."
-        },
-
-        completed: {
-            title: "Order completed",
-            description:
-                "Your design order has been marked as completed."
-        }
-    };
-
-    const normalizedStatus = newStatus.toLowerCase();
-
-    const details =
-        activityDetails[normalizedStatus] || {
-            title: `Order moved to ${newStatus}`,
-            description:
-                updates.customer_update ||
-                `Your order status has changed to ${newStatus}.`
-        };
-
-    await createOrderActivity({
-        orderId: orderRecordId,
-        activityType: "status_change",
-        title: details.title,
-        description:
-            updates.customer_update?.trim() || details.description,
-        designStatus: newStatus,
-        visibleToCustomer: true
-    });
-}
+    showToast(error.message || "Unable to update order");
   }
 }
 
