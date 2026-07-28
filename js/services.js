@@ -340,6 +340,127 @@ function generateCategoryFilters(services) {
     container.innerHTML = html;
 }
 
+function getSelectedAddonTier() {
+    if (selectedTiers.includes('starter')) return 'starter';
+    if (selectedTiers.includes('premium')) return 'premium';
+    if (selectedTiers.includes('pro')) return 'pro';
+
+    return 'starter';
+}
+
+function renderSpecialServiceControls(service) {
+    if (service.has_page_quantity === true) {
+        return renderPageQuantityControls(service);
+    }
+
+    if (service.is_addon_service === true) {
+        return renderWebsiteAddonControls(service);
+    }
+
+    return '';
+}
+
+function renderPageQuantityControls(service) {
+    const basePrice = Number(service.base_price || 0);
+    const pricePerPage = Number(service.price_per_page || 0);
+    const maxPages = Number(service.max_pages || 1);
+
+    return `
+        <div class="special-service-options page-service-options">
+            <label>
+                Number of pages
+            </label>
+
+            <div class="page-quantity-selector">
+                <button
+                    type="button"
+                    onclick="changeServicePages('${service.id}', -1)"
+                >
+                    −
+                </button>
+
+                <input
+                    type="number"
+                    id="service-pages-${service.id}"
+                    value="1"
+                    min="1"
+                    max="${maxPages}"
+                    oninput="updatePageServiceTotal('${service.id}')"
+                >
+
+                <button
+                    type="button"
+                    onclick="changeServicePages('${service.id}', 1)"
+                >
+                    +
+                </button>
+            </div>
+
+            <div class="page-price-information">
+                <span>
+                    First page: R${basePrice.toFixed(2)}
+                </span>
+
+                <span>
+                    Additional pages: R${pricePerPage.toFixed(2)} each
+                </span>
+            </div>
+
+            <strong id="page-service-total-${service.id}">
+                Total: R${basePrice.toFixed(2)}
+            </strong>
+        </div>
+    `;
+}
+
+function renderWebsiteAddonControls(service) {
+    const tier = getSelectedAddonTier();
+
+    const addons = Array.isArray(service.website_addons?.[tier])
+        ? service.website_addons[tier]
+        : [];
+
+    if (addons.length === 0) {
+        return `
+            <div class="special-service-options">
+                <p>No website add-ons are available.</p>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="special-service-options website-addon-options">
+            <strong>Select website add-ons</strong>
+
+            <div class="website-addon-list">
+                ${addons.map(addon => `
+                    <label class="website-addon-option">
+                        <input
+                            type="checkbox"
+                            class="website-addon-checkbox"
+                            data-service-id="${service.id}"
+                            data-addon-id="${addon.id}"
+                            data-addon-name="${addon.name}"
+                            data-addon-price="${Number(addon.price)}"
+                            onchange="updateWebsiteAddonTotal('${service.id}')"
+                        >
+
+                        <span>${addon.name}</span>
+
+                        <strong>
+                            R${Number(addon.price).toFixed(2)}
+                        </strong>
+                    </label>
+                `).join('')}
+            </div>
+
+            <strong id="website-addon-total-${service.id}">
+                Total: R0.00
+            </strong>
+        </div>
+    `;
+}
+
 function renderServices() {
     const grid = document.getElementById('servicesGrid');
     
@@ -380,7 +501,9 @@ function renderServices() {
         }
         if (!tierData) tierData = service.tiers[0];
         
-        const price = tierData?.price || 'Contact';
+        const price = service.is_addon_service === true
+    ? 'Select add-ons'
+    : tierData?.price || 'Contact';
 const originalPrice = tierData?.originalPrice || null;
 const desc = tierData?.description || service.description || '';
 const features = Array.isArray(tierData?.features)
@@ -446,7 +569,8 @@ const savingPercentage = isOnSale
                     : ''
                 }
             </div>
-                <div class="product-rating"><span>★★★★☆</span><span>4.8 (120)</span></div>
+            ${renderSpecialServiceControls(service)}
+            <div class="product-rating"><span>★★★★☆</span><span>4.8 (120)</span></div>
                 <div class="product-price">
                     ${isOnSale ? `
                 <span class="price-current" style="color:#ef4444;">
@@ -518,12 +642,203 @@ window.goToPage = function(page) {
     document.getElementById('services')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
+window.changeServicePages = function(serviceId, amount) {
+    const service = allServices.find(
+        item => item.id === serviceId
+    );
+
+    const input = document.getElementById(
+        `service-pages-${serviceId}`
+    );
+
+    if (!service || !input) {
+        return;
+    }
+
+    const maxPages = Number(service.max_pages || 1);
+
+    let pages = Number(input.value || 1);
+
+    pages += amount;
+    pages = Math.max(1, Math.min(maxPages, pages));
+
+    input.value = pages;
+
+    updatePageServiceTotal(serviceId);
+};
+
+window.updatePageServiceTotal = function(serviceId) {
+    const service = allServices.find(
+        item => item.id === serviceId
+    );
+
+    const input = document.getElementById(
+        `service-pages-${serviceId}`
+    );
+
+    const totalElement = document.getElementById(
+        `page-service-total-${serviceId}`
+    );
+
+    if (!service || !input || !totalElement) {
+        return;
+    }
+
+    const maxPages = Number(service.max_pages || 1);
+
+    let pages = Number(input.value || 1);
+
+    pages = Math.max(1, Math.min(maxPages, pages));
+
+    input.value = pages;
+
+    const basePrice = Number(service.base_price || 0);
+    const pricePerPage = Number(service.price_per_page || 0);
+    const additionalPages = Math.max(0, pages - 1);
+
+    const total =
+        basePrice +
+        additionalPages * pricePerPage;
+
+    totalElement.textContent =
+        `Total: R${total.toFixed(2)}`;
+};
+
+window.updateWebsiteAddonTotal = function(serviceId) {
+    const selectedAddons = document.querySelectorAll(
+        `.website-addon-checkbox[data-service-id="${serviceId}"]:checked`
+    );
+
+    const total = Array.from(selectedAddons).reduce(
+        (sum, checkbox) => {
+            return sum + Number(
+                checkbox.dataset.addonPrice || 0
+            );
+        },
+        0
+    );
+
+    const totalElement = document.getElementById(
+        `website-addon-total-${serviceId}`
+    );
+
+    if (totalElement) {
+        totalElement.textContent =
+            `Total: R${total.toFixed(2)}`;
+    }
+};
+
+function openCartPopup() {
+    document
+        .getElementById('cartPopup')
+        ?.classList.add('active');
+
+    document.body.style.overflow = 'hidden';
+
+    cartManager.updateUI();
+}
+
+function addPageServiceToCart(service) {
+    const input = document.getElementById(
+        `service-pages-${service.id}`
+    );
+
+    const maxPages = Number(service.max_pages || 1);
+
+    let pages = Number(input?.value || 1);
+
+    pages = Math.max(1, Math.min(maxPages, pages));
+
+    const basePrice = Number(service.base_price || 0);
+    const pricePerPage = Number(service.price_per_page || 0);
+    const additionalPages = Math.max(0, pages - 1);
+
+    const total =
+        basePrice +
+        additionalPages * pricePerPage;
+
+    cartManager.addItem(
+        service.id,
+        'Standard',
+        service.title,
+        `R${total.toFixed(2)}`,
+        1,
+        {
+            tier: 'Standard',
+            slug: service.slug,
+            category: service.category,
+            pages,
+            basePrice,
+            additionalPages,
+            pricePerPage,
+            calculatedTotal: total
+        }
+    );
+
+    openCartPopup();
+}
+
+function addWebsiteAddonsToCart(service) {
+    const checkedAddons = document.querySelectorAll(
+        `.website-addon-checkbox[data-service-id="${service.id}"]:checked`
+    );
+
+    const selectedAddons = Array.from(checkedAddons).map(
+        checkbox => ({
+            id: checkbox.dataset.addonId,
+            name: checkbox.dataset.addonName,
+            price: Number(
+                checkbox.dataset.addonPrice || 0
+            )
+        })
+    );
+
+    if (selectedAddons.length === 0) {
+        showToast(
+            'Select at least one website add-on.',
+            'info'
+        );
+
+        return;
+    }
+
+    selectedAddons.forEach(addon => {
+        cartManager.addItem(
+            `${service.id}-${addon.id}`,
+            'Website Add-on',
+            addon.name,
+            `R${addon.price.toFixed(2)}`,
+            1,
+            {
+                tier: 'Website Add-on',
+                parentServiceId: service.id,
+                parentServiceTitle: service.title,
+                addonId: addon.id,
+                addonName: addon.name,
+                addonPrice: addon.price
+            }
+        );
+    });
+
+    openCartPopup();
+}
+
 window.addToCart = function(serviceId) {
     const service = allServices.find(
         item => item.id === serviceId
     );
 
     if (!service) {
+        return;
+    }
+
+    if (service.has_page_quantity === true) {
+        addPageServiceToCart(service);
+        return;
+    }
+
+    if (service.is_addon_service === true) {
+        addWebsiteAddonsToCart(service);
         return;
     }
 
@@ -544,14 +859,23 @@ window.addToCart = function(serviceId) {
         tierData = service.tiers[0];
     }
 
+    if (!tierData) {
+        showToast(
+            'No price is available for this service.',
+            'info'
+        );
+
+        return;
+    }
+
     const tierName =
-        tierData?.name || 'Starter';
+        tierData.name || 'Starter';
 
     const cartPrice =
-        tierData?.price || 'R0.00';
+        tierData.price || 'R0.00';
 
     const originalPrice =
-        tierData?.originalPrice || null;
+        tierData.originalPrice || null;
 
     const currentAmount = Number(
         String(cartPrice).replace(/[^\d.]/g, '')
@@ -591,13 +915,7 @@ window.addToCart = function(serviceId) {
         }
     );
 
-    document
-        .getElementById('cartPopup')
-        ?.classList.add('active');
-
-    document.body.style.overflow = 'hidden';
-
-    cartManager.updateUI();
+    openCartPopup();
 };
 
     window.quickView = function(serviceId) {
@@ -630,11 +948,25 @@ window.applyFilters = function() {
             results = results.filter(s => selectedCategories.includes(s.category));
         }
         if (selectedTiers.length > 0 && selectedTiers.length < 3) {
-            results = results.filter(s => {
-                const serviceTiers = s.tiers.map(t => t.name.toLowerCase());
-                return selectedTiers.some(t => serviceTiers.includes(t));
-            });
+    results = results.filter(service => {
+        if (service.is_addon_service === true) {
+            return selectedTiers.some(tier =>
+                Array.isArray(
+                    service.website_addons?.[tier]
+                ) &&
+                service.website_addons[tier].length > 0
+            );
         }
+
+        const serviceTiers = service.tiers.map(
+            tier => tier.name.toLowerCase()
+        );
+
+        return selectedTiers.some(
+            tier => serviceTiers.includes(tier)
+        );
+    });
+}
         results = results.filter(s => {
             return s.tiers.some(t => {
                 const match = t.price?.match(/R\s*(\d+(\.\d+)?)/);
