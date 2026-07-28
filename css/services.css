@@ -452,3 +452,79 @@
     gap: 24px;
     width: 100%;
 }
+
+.special-service-options {
+    margin: 16px 0;
+    padding: 16px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+}
+
+.page-service-options > label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.page-quantity-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.page-quantity-selector button {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.page-quantity-selector input {
+    width: 70px;
+    height: 38px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.page-price-information {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.website-addon-options > strong {
+    display: block;
+    margin-bottom: 12px;
+}
+
+.website-addon-list {
+    margin-bottom: 12px;
+}
+
+.website-addon-option {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #e2e8f0;
+    cursor: pointer;
+}
+
+.website-addon-option input {
+    width: 18px;
+    height: 18px;
+}
+
+.website-addon-option:last-child {
+    border-bottom: none;
+}
