@@ -1,4 +1,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+    loadServices,
+    initialiseServiceManager
+} from "./admin-services.js";
 
     const SUPABASE_URL = "https://pebkryplphawjlmvcfma.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBlYmtyeXBscGhhd2psbXZjZm1hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2ODg2NjEsImV4cCI6MjA5NzI2NDY2MX0.Sn1IPlLKhJG5u6gTXpB_tUbSr4PThWrWVpHUNDG1zdU";
@@ -891,4 +895,40 @@ if(
     $("signOutBtn").addEventListener("click",async()=>{await supabase.auth.signOut();window.location.href="index.html"});
 
     const admin = await guardAdmin();
-    if(admin) await loadOrders();
+
+if (admin) {
+    initialiseServiceManager();
+    await loadOrders();
+}
+
+    const ordersNav = $("ordersNav");
+    const servicesNav = $("servicesNav");
+
+const ordersPanel = $("ordersPanel");
+const servicesPanel = $("servicesPanel");
+
+ordersNav.addEventListener("click", e => {
+
+    e.preventDefault();
+
+    ordersNav.classList.add("active");
+    servicesNav.classList.remove("active");
+
+    ordersPanel.style.display = "";
+    servicesPanel.style.display = "none";
+
+});
+
+servicesNav.addEventListener("click", async e => {
+
+    e.preventDefault();
+
+    servicesNav.classList.add("active");
+    ordersNav.classList.remove("active");
+
+    ordersPanel.style.display = "none";
+    servicesPanel.style.display = "";
+
+    await loadServices();
+
+});
