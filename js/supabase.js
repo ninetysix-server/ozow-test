@@ -133,13 +133,11 @@ export async function getServices() {
         });
 
     if (error) {
-    console.error("Error loading services:", error);
-    return [];
-}
+        console.error("Error loading services:", error);
+        return [];
+    }
 
-console.log("Services loaded from Supabase:", data);
-
-return data ?? [];
+    return data ?? [];
 }
 
 

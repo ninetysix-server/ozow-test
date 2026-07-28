@@ -11,7 +11,17 @@ let priceRange = { min: 0, max: 5000 };
 let wishlistItems = [];
 
 let currentPage = 1;
-const itemsPerPage = 6;
+function getItemsPerPage() {
+    const width = window.innerWidth;
+
+    if (width >= 1400) return 8;
+    if (width >= 1100) return 6;
+    if (width >= 768) return 4;
+
+    return 2;
+}
+
+let itemsPerPage = getItemsPerPage();
 let totalPages = 1;
 let isLoading = true; 
 
@@ -183,12 +193,15 @@ function showToast(message, type = 'success') {
 }
 
 function getCategories(services) {
-    const cats = new Set();
-    services.forEach(s => {
-        if (s.category) cats.add(s.category);
-        if (s.id) cats.add(s.id);
+    const categories = new Set();
+
+    services.forEach(service => {
+        if (service.category) {
+            categories.add(service.category);
+        }
     });
-    return Array.from(cats);
+
+    return Array.from(categories).sort();
 }
 
 async function loadServices() {
@@ -290,23 +303,40 @@ async function loadServices() {
 }
 
 function generateCategoryFilters(services) {
-    const container = document.querySelector('.filter-group:first-child');
+    const container = document.querySelector(
+        '.filter-group:first-child'
+    );
+
     if (!container) return;
+
     const categories = getCategories(services);
+
     const labels = {
-        'logo-design': 'Logo Design',
-        'poster-design': 'Poster Design',
-        'business-card': 'Business Card',
-        'board-design': 'Board Design',
-        'branding': 'Branding',
-        'website-design': 'Website Design',
-        'flyer-design': 'Flyer Design'
+        'Branding': 'Branding',
+        'Graphic Design': 'Graphic Design',
+        'Multi-page Design': 'Documents & Publications',
+        'Website': 'Development',
+        'Events': 'Event Design'
     };
+
     let html = '<h4>Service Type</h4>';
-    categories.forEach(cat => {
-        const label = labels[cat] || cat.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
-        html += `<label><input type="checkbox" class="category-filter" value="${cat}" onchange="toggleCategory('${cat}')" /> ${label}</label>`;
+
+    categories.forEach(category => {
+        const label = labels[category] || category;
+
+        html += `
+            <label>
+                <input
+                    type="checkbox"
+                    class="category-filter"
+                    value="${category}"
+                    onchange="toggleCategory('${category}')"
+                >
+                ${label}
+            </label>
+        `;
     });
+
     container.innerHTML = html;
 }
 
@@ -742,6 +772,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     loadServices();
+});
+
+window.addEventListener('resize', () => {
+    const newItemsPerPage = getItemsPerPage();
+
+    if (newItemsPerPage !== itemsPerPage) {
+        itemsPerPage = newItemsPerPage;
+        currentPage = 1;
+        renderServices();
+    }
 });
 
 
