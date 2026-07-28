@@ -19,7 +19,15 @@
         <div class="brand-mark">96</div>
         <div><strong>96 Studios</strong><span>Admin Console</span></div>
       </div>
-      <a class="nav-link" href="#"><i class="fa-solid fa-grid-2"></i> Orders Dashboard</a>
+      <a class="nav-link active" id="ordersNav" href="#">
+    <i class="fa-solid fa-grid-2"></i>
+      Orders
+    </a>
+
+    <a class="nav-link" id="servicesNav" href="#">
+        <i class="fa-solid fa-layer-group"></i>
+        Services
+    </a>
       <div class="sidebar-footer">
         <button class="signout-btn" id="signOutBtn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</button>
       </div>
@@ -41,7 +49,7 @@
         <article class="stat"><div class="stat-head"><span>Revenue Paid</span><span class="stat-icon"><i class="fa-solid fa-coins"></i></span></div><div class="stat-value" id="paidRevenue">R0.00</div></article>
       </section>
 
-      <section class="panel">
+      <section class="panel" id="ordersPanel">
         <div class="panel-toolbar">
           <div class="search-wrap"><i class="fa-solid fa-magnifying-glass"></i><input id="searchInput" placeholder="Search order ID, client ID or service..."></div>
           <div class="filters">
@@ -63,6 +71,29 @@
           </table>
         </div>
       </section>
+
+      <section class="panel" id="servicesPanel" style="display:none;">
+
+    <div class="panel-toolbar">
+
+        <h2>Services</h2>
+
+        <button class="save-btn" id="addServiceBtn">
+            <i class="fa-solid fa-plus"></i>
+            Add Service
+        </button>
+
+    </div>
+
+    <div id="servicesTable">
+
+        <div class="loading">
+            Loading services...
+        </div>
+
+    </div>
+
+</section>
     </section>
   </main>
 
@@ -92,6 +123,244 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="serviceModal">
+    <div class="modal">
+        <div class="modal-head">
+            <h2 id="serviceModalTitle">Add Service</h2>
+
+            <button
+                type="button"
+                class="close-btn"
+                id="closeServiceModal"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <form class="modal-body" id="serviceForm">
+
+            <input type="hidden" id="serviceId">
+
+            <div class="management-grid">
+
+                <div class="field">
+                    <label for="serviceTitle">Service title</label>
+                    <input
+                        type="text"
+                        id="serviceTitle"
+                        maxlength="150"
+                        required
+                        placeholder="Example: Logo Design"
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="serviceSlug">Slug</label>
+                    <input
+                        type="text"
+                        id="serviceSlug"
+                        maxlength="150"
+                        required
+                        placeholder="logo-design"
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="serviceCategory">Category</label>
+                    <input
+                        type="text"
+                        id="serviceCategory"
+                        maxlength="100"
+                        placeholder="Graphic Design"
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="serviceDisplayOrder">
+                        Display order
+                    </label>
+
+                    <input
+                        type="number"
+                        id="serviceDisplayOrder"
+                        min="0"
+                        value="0"
+                    >
+                </div>
+
+                <div class="field full">
+                    <label for="serviceDescription">
+                        Description
+                    </label>
+
+                    <textarea
+                        id="serviceDescription"
+                        maxlength="2000"
+                        placeholder="Describe this service"
+                    ></textarea>
+                </div>
+
+                <div class="field full">
+                    <label for="serviceImageUrl">
+                        Image URL
+                    </label>
+
+                    <input
+                        type="url"
+                        id="serviceImageUrl"
+                        placeholder="https://..."
+                    >
+                </div>
+
+            </div>
+
+            <h3>Current prices</h3>
+
+            <div class="management-grid">
+
+                <div class="field">
+                    <label for="starterPrice">Starter price</label>
+                    <input
+                        type="number"
+                        id="starterPrice"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="premiumPrice">Premium price</label>
+                    <input
+                        type="number"
+                        id="premiumPrice"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="proPrice">Pro price</label>
+                    <input
+                        type="number"
+                        id="proPrice"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                    >
+                </div>
+
+            </div>
+
+            <h3>Original prices</h3>
+
+            <div class="meta-note">
+                Leave these empty when the service is not on sale.
+            </div>
+
+            <div class="management-grid">
+
+                <div class="field">
+                    <label for="starterOriginalPrice">
+                        Starter original price
+                    </label>
+
+                    <input
+                        type="number"
+                        id="starterOriginalPrice"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="premiumOriginalPrice">
+                        Premium original price
+                    </label>
+
+                    <input
+                        type="number"
+                        id="premiumOriginalPrice"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="proOriginalPrice">
+                        Pro original price
+                    </label>
+
+                    <input
+                        type="number"
+                        id="proOriginalPrice"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                    >
+                </div>
+
+            </div>
+
+            <h3>Printing</h3>
+
+            <div class="management-grid">
+
+                <div class="field">
+                    <label for="printingEnabled">
+                        Printing available
+                    </label>
+
+                    <select id="printingEnabled">
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="printingPrice">
+                        Printing price
+                    </label>
+
+                    <input
+                        type="number"
+                        id="printingPrice"
+                        min="0"
+                        step="0.01"
+                        value="0"
+                    >
+                </div>
+
+                <div class="field">
+                    <label for="serviceActive">
+                        Service status
+                    </label>
+
+                    <select id="serviceActive">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="status-editor">
+                <button
+                    type="submit"
+                    class="save-btn"
+                    id="saveServiceBtn"
+                >
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Save Service
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
   <div class="toast" id="toast"></div>
 
  <script type="module" src="js/admin.js"></script>
