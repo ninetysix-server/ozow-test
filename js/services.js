@@ -205,15 +205,71 @@ async function loadServices() {
         
         loadWishlistItems();
         const services = await getServices();
-        allServices = services.map(s => ({
-            ...s,
-            category: s.category || s.id || 'uncategorized',
-            tiers: s.tiers || [
-                { name: 'Starter', price: 'R299', description: 'Basic package', features: ['2 concepts', '3 revisions'] },
-                { name: 'Premium', price: 'R599', description: 'Standard package', features: ['5 concepts', '10 revisions'] },
-                { name: 'Pro', price: 'R999', description: 'Full package', features: ['10 concepts', 'Unlimited revisions'] }
-            ]
-        }));
+        allServices = services.map(service => {
+    const serviceFeatures =
+        service.features &&
+        typeof service.features === 'object'
+            ? service.features
+            : {};
+
+    const createTier = (name, price, originalPrice, features) => ({
+        name,
+        price:
+            price !== null && price !== undefined
+                ? `R${Number(price).toFixed(2)}`
+                : 'Contact',
+
+        originalPrice:
+            originalPrice !== null &&
+            originalPrice !== undefined
+                ? `R${Number(originalPrice).toFixed(2)}`
+                : null,
+
+        description: service.description || '',
+        features: Array.isArray(features) ? features : []
+    });
+
+    return {
+        ...service,
+
+        id: service.id,
+        title: service.title || 'Design Service',
+        category: service.category || 'Uncategorised',
+        description: service.description || '',
+
+        icon: 'fas fa-paint-brush',
+
+        tiers: [
+            createTier(
+                'Starter',
+                service.starter_price,
+                service.starter_original_price,
+                serviceFeatures.starter
+            ),
+
+            createTier(
+                'Premium',
+                service.premium_price,
+                service.premium_original_price,
+                serviceFeatures.premium
+            ),
+
+            createTier(
+                'Pro',
+                service.pro_price,
+                service.pro_original_price,
+                serviceFeatures.pro
+            )
+        ],
+
+        printingEnabled: service.printing_enabled === true,
+        printingPrice:
+            service.printing_price !== null &&
+            service.printing_price !== undefined
+                ? `R${Number(service.printing_price).toFixed(2)}`
+                : null
+    };
+});
         generateCategoryFilters(allServices);
         filteredServices = [...allServices];
         isLoading = false;
@@ -295,18 +351,29 @@ function renderServices() {
         if (!tierData) tierData = service.tiers[0];
         
         const price = tierData?.price || 'Contact';
-        const desc = tierData?.description || service.description || '';
-        const features = tierData?.features || service.features || [];
-        const isOnSale = service.discount_active && service.discount_percentage > 0;
-        
-        let salePrice = null;
-        if (isOnSale) {
-            const match = price.match(/R\s*(\d+(\.\d+)?)/);
-            if (match) {
-                const original = parseFloat(match[1]);
-                salePrice = original * (1 - service.discount_percentage / 100);
-            }
-        }
+const originalPrice = tierData?.originalPrice || null;
+const desc = tierData?.description || service.description || '';
+const features = Array.isArray(tierData?.features)
+    ? tierData.features
+    : [];
+
+const currentAmount = Number(
+    String(price).replace(/[^\d.]/g, '')
+);
+
+const originalAmount = Number(
+    String(originalPrice || '').replace(/[^\d.]/g, '')
+);
+
+const isOnSale =
+    originalPrice &&
+    originalAmount > currentAmount;
+
+const savingPercentage = isOnSale
+    ? Math.round(
+        ((originalAmount - currentAmount) / originalAmount) * 100
+    )
+    : 0;
         
         const isInWishlist = wishlistItems.some(item => item.id === service.id);
         
@@ -314,7 +381,7 @@ function renderServices() {
             <div class="product-card" data-service="${service.id}">
                 <div class="card-top">
                     <div class="card-top-right">
-                        ${isOnSale ? `<span class="sale-badge">-${service.discount_percentage}%</span>` : ''}
+                        ${isOnSale ? `<span class="sale-badge">-${savingPercentage}%</span>` : ''}
                         <button class="wishlist-btn" data-service-id="${service.id}" onclick="toggleWishlist('${service.id}')">
                             <i class="${isInWishlist ? 'fas' : 'far'} fa-heart"></i>
                         </button>
@@ -325,18 +392,47 @@ function renderServices() {
                 <div class="product-name">${service.title}</div>
                 <div class="product-desc">${desc}</div>
                 <div class="product-features">
-                    ${features.slice(0, 3).map(f => `<span class="feature-tag">${f}</span>`).join('')}
-                    ${features.length > 3 ? `<span class="feature-tag">+${features.length - 3} more</span>` : ''}
-                </div>
+                ${features
+                    .slice(0, 3)
+                    .map(feature => `
+                        <span class="feature-tag">${feature}</span>
+                    `)
+                    .join('')}
+
+                ${features.length > 3
+                    ? `<span class="feature-tag">
+                        +${features.length - 3} more
+                    </span>`
+                    : ''
+                }
+
+                ${service.printingEnabled
+                    ? `<span class="feature-tag">
+                        Printing available${service.printingPrice
+                            ? ` from ${service.printingPrice}`
+                            : ''
+                        }
+                    </span>`
+                    : ''
+                }
+            </div>
                 <div class="product-rating"><span>★★★★☆</span><span>4.8 (120)</span></div>
                 <div class="product-price">
-                    ${isOnSale && salePrice ? `
-                        <span class="price-current" style="color:#ef4444;">R${salePrice.toFixed(2)}</span>
-                        <span class="price-original">${price}</span>
-                        <span class="price-save">Save ${service.discount_percentage}%</span>
-                    ` : `
-                        <span class="price-current">${price}</span>
-                    `}
+                    ${isOnSale ? `
+                <span class="price-current" style="color:#ef4444;">
+                    ${price}
+                </span>
+
+                <span class="price-original">
+                    ${originalPrice}
+                </span>
+
+                <span class="price-save">
+                    Save ${savingPercentage}%
+                </span>
+            ` : `
+                <span class="price-current">${price}</span>
+            `}
                 </div>
                 <div class="card-actions">
                     <button class="btn-primary" onclick="addToCart('${service.id}')"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
@@ -393,56 +489,86 @@ window.goToPage = function(page) {
 };
 
 window.addToCart = function(serviceId) {
-    const service = allServices.find(s => s.id === serviceId);
-    if (!service) return;
+    const service = allServices.find(
+        item => item.id === serviceId
+    );
+
+    if (!service) {
+        return;
+    }
+
     let tierData = null;
+
     for (const tier of service.tiers) {
-        if (selectedTiers.includes(tier.name.toLowerCase())) {
+        if (
+            selectedTiers.includes(
+                tier.name.toLowerCase()
+            )
+        ) {
             tierData = tier;
             break;
         }
     }
-    if (!tierData) tierData = service.tiers[0];
-    const originalPrice = tierData?.price || 'R0';
-    const tierName = tierData?.name || 'Starter';
 
-    let cartPrice = originalPrice;
-
-    const isOnSale =
-        service.discount_active === true &&
-        Number(service.discount_percentage) > 0;
-
-    if (isOnSale) {
-        const match = String(originalPrice).match(/R\s*(\d+(\.\d+)?)/);
-
-        if (match) {
-            const originalAmount = parseFloat(match[1]);
-            const saleAmount =
-                originalAmount *
-                (1 - Number(service.discount_percentage) / 100);
-
-            cartPrice = `R${saleAmount.toFixed(2)}`;
-        }
+    if (!tierData) {
+        tierData = service.tiers[0];
     }
 
+    const tierName =
+        tierData?.name || 'Starter';
+
+    const cartPrice =
+        tierData?.price || 'R0.00';
+
+    const originalPrice =
+        tierData?.originalPrice || null;
+
+    const currentAmount = Number(
+        String(cartPrice).replace(/[^\d.]/g, '')
+    );
+
+    const originalAmount = Number(
+        String(originalPrice || '').replace(/[^\d.]/g, '')
+    );
+
+    const isOnSale =
+        originalPrice &&
+        originalAmount > currentAmount;
+
+    const discountPercentage = isOnSale
+        ? Math.round(
+            (
+                (originalAmount - currentAmount) /
+                originalAmount
+            ) * 100
+        )
+        : 0;
+
     cartManager.addItem(
-        serviceId,
+        service.id,
         tierName,
         service.title,
         cartPrice,
         1,
         {
             tier: tierName,
+            slug: service.slug,
+            category: service.category,
             originalPrice,
-            discountPercentage: isOnSale
-                ? Number(service.discount_percentage)
-                : 0
+            discountPercentage,
+            printingEnabled: service.printingEnabled,
+            printingPrice: service.printingPrice
         }
     );
-        document.getElementById('cartPopup').classList.add('active');
-        document.body.style.overflow = 'hidden';
-        cartManager.updateUI();
-    };
+
+    document
+        .getElementById('cartPopup')
+        ?.classList.add('active');
+
+    document.body.style.overflow = 'hidden';
+
+    cartManager.updateUI();
+};
 
     window.quickView = function(serviceId) {
         const service = allServices.find(s => s.id === serviceId);

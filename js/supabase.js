@@ -123,19 +123,21 @@ export async function getOrCreateClientId(userId) {
 // ======================================================
 
 export async function getServices() {
+
     const { data, error } = await supabase
-        .from('services')
-        .select('*')
-        .order('created_at', {
+        .from("services")
+        .select("*")
+        .eq("active", true)
+        .order("display_order", {
             ascending: true
         });
 
     if (error) {
-        console.error('Error fetching services:', error);
+        console.error("Error loading services:", error);
         return [];
     }
 
-    return data || [];
+    return data ?? [];
 }
 
 

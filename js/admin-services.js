@@ -306,9 +306,6 @@ function openEditServiceModal(serviceId) {
     document.getElementById("serviceDescription").value =
         service.description || "";
 
-    document.getElementById("serviceImageUrl").value =
-        service.image_url || "";
-
     document.getElementById("starterPrice").value =
         service.starter_price ?? "";
 
@@ -385,10 +382,6 @@ async function saveService(event) {
 
         description:
             document.getElementById("serviceDescription").value.trim()
-            || null,
-
-        image_url:
-            document.getElementById("serviceImageUrl").value.trim()
             || null,
 
         display_order:
