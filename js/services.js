@@ -403,25 +403,58 @@ window.addToCart = function(serviceId) {
         }
     }
     if (!tierData) tierData = service.tiers[0];
-    const price = tierData?.price || 'R0';
+    const originalPrice = tierData?.price || 'R0';
     const tierName = tierData?.name || 'Starter';
-    cartManager.addItem(serviceId, tierName, service.title, price, 1, { tier: tierName });
-    document.getElementById('cartPopup').classList.add('active');
-    document.body.style.overflow = 'hidden';
-    cartManager.updateUI();
-};
 
-window.quickView = function(serviceId) {
-    const service = allServices.find(s => s.id === serviceId);
-    if (service) showToast(`${service.title} - ${service.category}`, 'info');
-};
+    let cartPrice = originalPrice;
 
-window.toggleCategory = function(category) {
-    const index = selectedCategories.indexOf(category);
-    if (index > -1) selectedCategories.splice(index, 1);
-    else selectedCategories.push(category);
-    applyFilters();
-};
+    const isOnSale =
+        service.discount_active === true &&
+        Number(service.discount_percentage) > 0;
+
+    if (isOnSale) {
+        const match = String(originalPrice).match(/R\s*(\d+(\.\d+)?)/);
+
+        if (match) {
+            const originalAmount = parseFloat(match[1]);
+            const saleAmount =
+                originalAmount *
+                (1 - Number(service.discount_percentage) / 100);
+
+            cartPrice = `R${saleAmount.toFixed(2)}`;
+        }
+    }
+
+    cartManager.addItem(
+        serviceId,
+        tierName,
+        service.title,
+        cartPrice,
+        1,
+        {
+            tier: tierName,
+            originalPrice,
+            discountPercentage: isOnSale
+                ? Number(service.discount_percentage)
+                : 0
+        }
+    );
+        document.getElementById('cartPopup').classList.add('active');
+        document.body.style.overflow = 'hidden';
+        cartManager.updateUI();
+    };
+
+    window.quickView = function(serviceId) {
+        const service = allServices.find(s => s.id === serviceId);
+        if (service) showToast(`${service.title} - ${service.category}`, 'info');
+    };
+
+    window.toggleCategory = function(category) {
+        const index = selectedCategories.indexOf(category);
+        if (index > -1) selectedCategories.splice(index, 1);
+        else selectedCategories.push(category);
+        applyFilters();
+    };
 
 window.applyFilters = function() {
     // Show loading while filtering
