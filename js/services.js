@@ -276,11 +276,39 @@ async function loadServices() {
         ],
 
         printingEnabled: service.printing_enabled === true,
-        printingPrice:
-            service.printing_price !== null &&
-            service.printing_price !== undefined
-                ? `R${Number(service.printing_price).toFixed(2)}`
-                : null
+
+printingOptions: Array.isArray(service.printing_options)
+    ? service.printing_options
+        .filter(option => option.active !== false)
+        .map(option => ({
+            id: String(option.id || ''),
+            size: String(option.size || '').trim(),
+            pricePerCopy: Number(
+                option.price_per_copy || 0
+            ),
+            minimumQuantity: Math.max(
+                1,
+                Number(option.minimum_quantity || 1)
+            ),
+            maximumQuantity:
+                option.maximum_quantity === null ||
+                option.maximum_quantity === undefined ||
+                option.maximum_quantity === ''
+                    ? null
+                    : Math.max(
+                        1,
+                        Number(option.maximum_quantity)
+                    ),
+            active: option.active !== false
+        }))
+        .filter(option => option.size)
+    : [],
+
+printingPrice:
+    service.printing_price !== null &&
+    service.printing_price !== undefined
+        ? `R${Number(service.printing_price).toFixed(2)}`
+        : null
     };
 });
         generateCategoryFilters(allServices);
@@ -368,29 +396,312 @@ function renderPrintingControls(service) {
         return '';
     }
 
-    const printingPrice = Number(
-        String(service.printingPrice || '0')
-            .replace(/[^\d.]/g, '')
-    );
+    const printingOptions = Array.isArray(
+        service.printingOptions
+    )
+        ? service.printingOptions
+        : [];
+
+    if (printingOptions.length === 0) {
+        return '';
+    }
+
+    const firstOption = printingOptions[0];
 
     return `
-        <label class="printing-option">
-            <input
-                type="checkbox"
-                id="printing-${service.id}"
-                data-printing-price="${printingPrice}"
-                onchange="updatePrintingSelection('${service.id}')"
+        <div
+            class="printing-selector"
+            id="printing-selector-${service.id}"
+        >
+            <label class="printing-toggle">
+                <input
+                    type="checkbox"
+                    id="printing-${service.id}"
+                    onchange="updatePrintingSelection('${service.id}')"
+                >
+
+                <span>Print this design</span>
+            </label>
+
+            <div
+                class="printing-details"
+                id="printing-details-${service.id}"
+                style="display:none;"
             >
+                <div class="printing-field">
+                    <label for="printing-size-${service.id}">
+                        Print size
+                    </label>
 
-            <span>
-                Add printing
-            </span>
+                    <select
+                        id="printing-size-${service.id}"
+                        onchange="updatePrintingSelection('${service.id}')"
+                    >
+                        ${printingOptions.map(option => `
+                            <option
+                                value="${option.id}"
+                                data-size="${option.size}"
+                                data-price="${option.pricePerCopy}"
+                                data-minimum="${option.minimumQuantity}"
+                                data-maximum="${
+                                    option.maximumQuantity ?? ''
+                                }"
+                            >
+                                ${option.size}
+                                — R${option.pricePerCopy.toFixed(2)}
+                                per copy
+                            </option>
+                        `).join('')}
+                    </select>
+                </div>
 
-            <strong>
-                +R${printingPrice.toFixed(2)}
-            </strong>
-        </label>
+                <div class="printing-field">
+                    <label for="printing-copies-${service.id}">
+                        Number of copies
+                    </label>
+
+                    <div class="printing-quantity-selector">
+                        <button
+                            type="button"
+                            onclick="changePrintingCopies(
+                                '${service.id}',
+                                -1
+                            )"
+                        >
+                            −
+                        </button>
+
+                        <input
+                            type="number"
+                            id="printing-copies-${service.id}"
+                            value="${firstOption.minimumQuantity}"
+                            min="${firstOption.minimumQuantity}"
+                            ${
+                                firstOption.maximumQuantity !== null
+                                    ? `max="${firstOption.maximumQuantity}"`
+                                    : ''
+                            }
+                            oninput="updatePrintingSelection('${service.id}')"
+                        >
+
+                        <button
+                            type="button"
+                            onclick="changePrintingCopies(
+                                '${service.id}',
+                                1
+                            )"
+                        >
+                            +
+                        </button>
+                    </div>
+
+                    <small
+                        id="printing-limits-${service.id}"
+                        class="printing-limits"
+                    >
+                        Minimum ${firstOption.minimumQuantity}
+                        ${
+                            firstOption.maximumQuantity !== null
+                                ? ` · Maximum ${firstOption.maximumQuantity}`
+                                : ''
+                        }
+                    </small>
+                </div>
+
+                <div class="printing-summary">
+                    <div>
+                        <span>Printing</span>
+
+                        <strong
+                            id="printing-calculation-${service.id}"
+                        >
+                            ${firstOption.minimumQuantity}
+                            ×
+                            R${firstOption.pricePerCopy.toFixed(2)}
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>Printing total</span>
+
+                        <strong
+                            id="printing-total-${service.id}"
+                        >
+                            R${(
+                                firstOption.minimumQuantity *
+                                firstOption.pricePerCopy
+                            ).toFixed(2)}
+                        </strong>
+                    </div>
+                </div>
+            </div>
+        </div>
     `;
+}
+
+function getPrintingSelection(serviceId, validate = false) {
+    const service = allServices.find(
+        item => item.id === serviceId
+    );
+
+    const checkbox = document.getElementById(
+        `printing-${serviceId}`
+    );
+
+    if (
+        !service ||
+        service.printingEnabled !== true ||
+        checkbox?.checked !== true
+    ) {
+        return {
+            selected: false,
+            optionId: null,
+            size: null,
+            pricePerCopy: 0,
+            copies: 0,
+            minimumQuantity: null,
+            maximumQuantity: null,
+            total: 0
+        };
+    }
+
+    const sizeSelect = document.getElementById(
+        `printing-size-${serviceId}`
+    );
+
+    const copiesInput = document.getElementById(
+        `printing-copies-${serviceId}`
+    );
+
+    const selectedOption =
+        sizeSelect?.options[sizeSelect.selectedIndex];
+
+    if (!selectedOption || !copiesInput) {
+        if (validate) {
+            showToast(
+                'Select a valid printing option.',
+                'info'
+            );
+        }
+
+        return null;
+    }
+
+    const optionId = selectedOption.value;
+
+    const size =
+        selectedOption.dataset.size ||
+        selectedOption.textContent.trim();
+
+    const pricePerCopy = Number(
+        selectedOption.dataset.price || 0
+    );
+
+    const minimumQuantity = Math.max(
+        1,
+        Number(selectedOption.dataset.minimum || 1)
+    );
+
+    const maximumValue =
+        selectedOption.dataset.maximum;
+
+    const maximumQuantity =
+        maximumValue === '' ||
+        maximumValue === undefined
+            ? null
+            : Number(maximumValue);
+
+    let copies = Number(copiesInput.value);
+
+    if (!Number.isFinite(copies)) {
+        copies = minimumQuantity;
+    }
+
+    copies = Math.floor(copies);
+    copies = Math.max(minimumQuantity, copies);
+
+    if (maximumQuantity !== null) {
+        copies = Math.min(maximumQuantity, copies);
+    }
+
+    copiesInput.value = copies;
+    copiesInput.min = minimumQuantity;
+
+    if (maximumQuantity !== null) {
+        copiesInput.max = maximumQuantity;
+    } else {
+        copiesInput.removeAttribute('max');
+    }
+
+    return {
+        selected: true,
+        optionId,
+        size,
+        pricePerCopy,
+        copies,
+        minimumQuantity,
+        maximumQuantity,
+        total: pricePerCopy * copies
+    };
+}
+
+function getServiceDesignPrice(service) {
+    if (service.has_page_quantity === true) {
+        const pagesInput = document.getElementById(
+            `service-pages-${service.id}`
+        );
+
+        const maxPages = Number(
+            service.max_pages || 1
+        );
+
+        let pages = Number(pagesInput?.value || 1);
+
+        pages = Math.max(
+            1,
+            Math.min(maxPages, pages)
+        );
+
+        const basePrice = Number(
+            service.base_price || 0
+        );
+
+        const pricePerPage = Number(
+            service.price_per_page || 0
+        );
+
+        const additionalPages = Math.max(
+            0,
+            pages - 1
+        );
+
+        return (
+            basePrice +
+            additionalPages * pricePerPage
+        );
+    }
+
+    let tierData = null;
+
+    for (const tier of service.tiers) {
+        if (
+            selectedTiers.includes(
+                tier.name.toLowerCase()
+            )
+        ) {
+            tierData = tier;
+            break;
+        }
+    }
+
+    if (!tierData) {
+        tierData = service.tiers[0];
+    }
+
+    return Number(
+        String(tierData?.price || '0')
+            .replace(/[^\d.]/g, '')
+    );
 }
 
 function renderPageQuantityControls(service) {
@@ -774,9 +1085,160 @@ window.updatePrintingSelection = function(serviceId) {
         return;
     }
 
+    const checkbox = document.getElementById(
+        `printing-${serviceId}`
+    );
+
+    const details = document.getElementById(
+        `printing-details-${serviceId}`
+    );
+
+    if (details) {
+        details.style.display =
+            checkbox?.checked === true
+                ? 'block'
+                : 'none';
+    }
+
+    if (checkbox?.checked === true) {
+        const sizeSelect = document.getElementById(
+            `printing-size-${serviceId}`
+        );
+
+        const selectedOption =
+            sizeSelect?.options[sizeSelect.selectedIndex];
+
+        const copiesInput = document.getElementById(
+            `printing-copies-${serviceId}`
+        );
+
+        if (selectedOption && copiesInput) {
+            const minimumQuantity = Math.max(
+                1,
+                Number(
+                    selectedOption.dataset.minimum || 1
+                )
+            );
+
+            const maximumValue =
+                selectedOption.dataset.maximum;
+
+            const maximumQuantity =
+                maximumValue === '' ||
+                maximumValue === undefined
+                    ? null
+                    : Number(maximumValue);
+
+            const currentCopies = Number(
+                copiesInput.value
+            );
+
+            if (
+                !Number.isFinite(currentCopies) ||
+                currentCopies < minimumQuantity ||
+                (
+                    maximumQuantity !== null &&
+                    currentCopies > maximumQuantity
+                )
+            ) {
+                copiesInput.value = minimumQuantity;
+            }
+
+            copiesInput.min = minimumQuantity;
+
+            if (maximumQuantity !== null) {
+                copiesInput.max = maximumQuantity;
+            } else {
+                copiesInput.removeAttribute('max');
+            }
+
+            const limits = document.getElementById(
+                `printing-limits-${serviceId}`
+            );
+
+            if (limits) {
+                limits.textContent =
+                    `Minimum ${minimumQuantity}` +
+                    (
+                        maximumQuantity !== null
+                            ? ` · Maximum ${maximumQuantity}`
+                            : ''
+                    );
+            }
+        }
+    }
+
+    const printing =
+        getPrintingSelection(serviceId) || {
+            selected: false,
+            total: 0
+        };
+
+    const calculation = document.getElementById(
+        `printing-calculation-${serviceId}`
+    );
+
+    const printingTotal = document.getElementById(
+        `printing-total-${serviceId}`
+    );
+
+    if (printing.selected) {
+        if (calculation) {
+            calculation.textContent =
+                `${printing.copies} × ` +
+                `R${printing.pricePerCopy.toFixed(2)}`;
+        }
+
+        if (printingTotal) {
+            printingTotal.textContent =
+                `R${printing.total.toFixed(2)}`;
+        }
+    }
+
     if (service.has_page_quantity === true) {
         updatePageServiceTotal(serviceId);
     }
+};
+
+window.changePrintingCopies = function(
+    serviceId,
+    amount
+) {
+    const input = document.getElementById(
+        `printing-copies-${serviceId}`
+    );
+
+    if (!input) {
+        return;
+    }
+
+    const minimumQuantity = Math.max(
+        1,
+        Number(input.min || 1)
+    );
+
+    const maximumQuantity =
+        input.max === ''
+            ? null
+            : Number(input.max);
+
+    let copies = Number(
+        input.value || minimumQuantity
+    );
+
+    copies += amount;
+    copies = Math.max(minimumQuantity, copies);
+
+    if (maximumQuantity !== null) {
+        copies = Math.min(
+            maximumQuantity,
+            copies
+        );
+    }
+
+    input.value = copies;
+
+    updatePrintingSelection(serviceId);
 };
 
 window.updateWebsiteAddonTotal = function(serviceId) {
@@ -844,24 +1306,19 @@ function addPageServiceToCart(service) {
         pages - 1
     );
 
-    const printingCheckbox =
-        document.getElementById(
-            `printing-${service.id}`
-        );
+    const printing =
+    getPrintingSelection(service.id);
 
-    const printingSelected =
-        printingCheckbox?.checked === true;
+const printingSelected =
+    printing?.selected === true;
 
-    const printingPrice = printingSelected
-        ? Number(
-            printingCheckbox.dataset.printingPrice || 0
-        )
-        : 0;
+const printingPrice =
+    printing?.total || 0;
 
-    const total =
-        basePrice +
-        additionalPages * pricePerPage +
-        printingPrice;
+const total =
+    basePrice +
+    additionalPages * pricePerPage +
+    printingPrice;
 
     cartManager.addItem(
         service.id,
@@ -883,6 +1340,19 @@ function addPageServiceToCart(service) {
                 service.printingEnabled,
 
             printingSelected,
+
+            printingOptionId:
+                printing?.optionId || null,
+
+            printingSize:
+                printing?.size || null,
+
+            printingCopies:
+                printing?.copies || 0,
+
+            printingPricePerCopy:
+                printing?.pricePerCopy || 0,
+
             printingPrice,
 
             calculatedTotal: total
@@ -1020,22 +1490,17 @@ window.addToCart = function(serviceId) {
         )
         : 0;
 
-    const printingCheckbox =
-        document.getElementById(
-            `printing-${service.id}`
-        );
+    const printing =
+    getPrintingSelection(service.id);
 
-    const printingSelected =
-        printingCheckbox?.checked === true;
+const printingSelected =
+    printing?.selected === true;
 
-    const printingPrice = printingSelected
-        ? Number(
-            printingCheckbox.dataset.printingPrice || 0
-        )
-        : 0;
+const printingPrice =
+    printing?.total || 0;
 
-    const finalPrice =
-        currentAmount + printingPrice;
+const finalPrice =
+    currentAmount + printingPrice;
 
     cartManager.addItem(
         service.id,
@@ -1057,6 +1522,19 @@ window.addToCart = function(serviceId) {
                 service.printingEnabled,
 
             printingSelected,
+
+            printingOptionId:
+                printing?.optionId || null,
+
+            printingSize:
+                printing?.size || null,
+
+            printingCopies:
+                printing?.copies || 0,
+
+            printingPricePerCopy:
+                printing?.pricePerCopy || 0,
+
             printingPrice,
 
             calculatedTotal: finalPrice

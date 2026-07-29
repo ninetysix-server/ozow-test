@@ -52,19 +52,41 @@ class CartManager {
         }
     }
 
-    createConfigurationKey(serviceId, tierName, details = {}) {
+    createConfigurationKey(
+    serviceId,
+    tierName,
+    details = {}
+) {
+    const printingSelected =
+        details.printingSelected === true;
+
     const configuration = {
         serviceId,
         tierName,
 
-        pages: Number(details.pages || 0),
-
-        printingSelected:
-            details.printingSelected === true,
-
-        printingPrice: Number(
-            details.printingPrice || 0
+        pages: Number(
+            details.pages || 0
         ),
+
+        printingSelected,
+
+        printingOptionId: printingSelected
+            ? details.printingOptionId || null
+            : null,
+
+        printingSize: printingSelected
+            ? details.printingSize || null
+            : null,
+
+        printingCopies: printingSelected
+            ? Number(details.printingCopies || 0)
+            : 0,
+
+        printingPricePerCopy: printingSelected
+            ? Number(
+                details.printingPricePerCopy || 0
+            )
+            : 0,
 
         addonId:
             details.addonId || null,
@@ -285,13 +307,96 @@ class CartManager {
     }
 
     if (details.printingSelected === true) {
+    const printingSize =
+        details.printingSize || 'Standard';
+
+    const printingCopies = Number(
+        details.printingCopies || 0
+    );
+
+    const printingPricePerCopy = Number(
+        details.printingPricePerCopy || 0
+    );
+
+    const printingTotal = Number(
+        details.printingPrice || 0
+    );
+
+    let designTotal = 0;
+
+    if (details.pages) {
+        designTotal =
+            Number(details.basePrice || 0) +
+            (
+                Number(details.additionalPages || 0) *
+                Number(details.pricePerPage || 0)
+            );
+    } else {
+        designTotal = Number(
+            details.servicePrice || 0
+        );
+    }
+
     rows.push(`
+        <div class="cart-selection-heading">
+            Printing details
+        </div>
+
+        <div class="cart-selection-row">
+            <span>Print size</span>
+            <strong>${printingSize}</strong>
+        </div>
+
+        <div class="cart-selection-row">
+            <span>Copies</span>
+            <strong>${printingCopies}</strong>
+        </div>
+
+        <div class="cart-selection-row">
+            <span>Price per copy</span>
+
+            <strong>
+                R${printingPricePerCopy.toFixed(2)}
+            </strong>
+        </div>
+
+        <div class="cart-selection-row">
+            <span>
+                Printing calculation
+            </span>
+
+            <strong>
+                ${printingCopies}
+                ×
+                R${printingPricePerCopy.toFixed(2)}
+            </strong>
+        </div>
+
+        <div class="cart-selection-divider"></div>
+
+        <div class="cart-selection-row">
+            <span>Design</span>
+
+            <strong>
+                R${designTotal.toFixed(2)}
+            </strong>
+        </div>
+
         <div class="cart-selection-row">
             <span>Printing</span>
 
             <strong>
-                Included — R${Number(
-                    details.printingPrice || 0
+                R${printingTotal.toFixed(2)}
+            </strong>
+        </div>
+
+        <div class="cart-selection-row cart-selection-total">
+            <span>Unit total</span>
+
+            <strong>
+                R${(
+                    designTotal +
+                    printingTotal
                 ).toFixed(2)}
             </strong>
         </div>
@@ -509,6 +614,144 @@ const popup = {
     }
 };
 
+function createOrderCartSnapshot(cart) {
+    return cart.map(item => {
+        const details = item.details || {};
+
+        const quantity = Math.max(
+            1,
+            Number(item.quantity || 1)
+        );
+
+        const unitTotal = Number(
+            item.price || 0
+        );
+
+        const printingSelected =
+            details.printingSelected === true;
+
+        const printingTotal = printingSelected
+            ? Number(details.printingPrice || 0)
+            : 0;
+
+        let designTotal = 0;
+
+        if (details.pages) {
+            designTotal =
+                Number(details.basePrice || 0) +
+                (
+                    Number(details.additionalPages || 0) *
+                    Number(details.pricePerPage || 0)
+                );
+        } else if (details.addonName) {
+            designTotal = Number(
+                details.addonPrice || unitTotal
+            );
+        } else {
+            designTotal = Number(
+                details.servicePrice ??
+                unitTotal - printingTotal
+            );
+        }
+
+        return {
+            id: item.id,
+            serviceId: item.serviceId,
+            serviceTitle: item.serviceTitle,
+            tierName: item.tierName,
+
+            price: unitTotal,
+            quantity,
+
+            lineTotal:
+                unitTotal * quantity,
+
+            configurationKey:
+                item.configurationKey || null,
+
+            details: {
+                ...details,
+
+                designTotal,
+                printingSelected,
+
+                printing: printingSelected
+                    ? {
+                        optionId:
+                            details.printingOptionId || null,
+
+                        size:
+                            details.printingSize || null,
+
+                        copies: Number(
+                            details.printingCopies || 0
+                        ),
+
+                        pricePerCopy: Number(
+                            details.printingPricePerCopy || 0
+                        ),
+
+                        total: printingTotal
+                    }
+                    : null,
+
+                calculatedTotal:
+                    Number(
+                        details.calculatedTotal ||
+                        unitTotal
+                    )
+            },
+
+            addedAt:
+                item.addedAt ||
+                new Date().toISOString()
+        };
+    });
+}
+
+function calculateOrderBreakdown(cartSnapshot) {
+    return cartSnapshot.reduce(
+        (totals, item) => {
+            const quantity = Number(
+                item.quantity || 1
+            );
+
+            const details =
+                item.details || {};
+
+            const designUnitTotal = Number(
+                details.designTotal || 0
+            );
+
+            const printingUnitTotal =
+                details.printingSelected === true
+                    ? Number(
+                        details.printing?.total ||
+                        details.printingPrice ||
+                        0
+                    )
+                    : 0;
+
+            totals.design +=
+                designUnitTotal * quantity;
+
+            totals.printing +=
+                printingUnitTotal * quantity;
+
+            totals.total +=
+                Number(item.price || 0) *
+                quantity;
+
+            return totals;
+        },
+        {
+            design: 0,
+            printing: 0,
+            total: 0
+        }
+    );
+}
+
 // Setup cart events
 document.addEventListener('DOMContentLoaded', function() {
     cartManager.setupEvents();
@@ -562,16 +805,50 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        const orderId = 'ORD-' + Date.now().toString().slice(-8);
-        const orderData = {
-            order_id: orderId,
-            cart: cartManager.cart,
-            userInput: {
-                sketchImageUrl: document.getElementById('sketchImageUrl').value.trim(),
-                designDescription: desc,
-                preferredColors: document.getElementById('preferredColors').value.trim()
-            },
-            totals: { subtotal: cartManager.getSubtotal(), total: cartManager.getTotal() },
+        const orderId =
+    'ORD-' +
+    Date.now()
+        .toString()
+        .slice(-8);
+
+const orderCart =
+    createOrderCartSnapshot(
+        cartManager.cart
+    );
+
+const orderBreakdown =
+    calculateOrderBreakdown(
+        orderCart
+    );
+
+const orderData = {
+    order_id: orderId,
+
+    cart: orderCart,
+
+    userInput: {
+        sketchImageUrl:
+            document
+                .getElementById('sketchImageUrl')
+                .value
+                .trim(),
+
+        designDescription: desc,
+
+        preferredColors:
+            document
+                .getElementById('preferredColors')
+                .value
+                .trim()
+    },
+
+    totals: {
+        design: orderBreakdown.design,
+        printing: orderBreakdown.printing,
+
+        subtotal: orderBreakdown.total,
+        total: orderBreakdown.total
+    },
             paymentStatus: 'Pending',
             designStatus: 'Waiting',
             progress: 0,
