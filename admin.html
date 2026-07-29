@@ -28,6 +28,12 @@
         <i class="fa-solid fa-layer-group"></i>
         Services
     </a>
+
+    <a class="nav-link" id="saleNav" href="#">
+    <i class="fa-solid fa-tags"></i>
+        Sale
+    </a>
+    
       <div class="sidebar-footer">
         <button class="signout-btn" id="signOutBtn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</button>
       </div>
@@ -94,6 +100,86 @@
     </div>
 
 </section>
+
+<section
+    class="panel"
+    id="salePanel"
+    style="display:none;"
+>
+    <div class="panel-toolbar">
+        <div>
+            <h2>Sale Header</h2>
+            <p style="color:#64748b;margin-top:6px;">
+                Control the website sale banner.
+            </p>
+        </div>
+
+        <span id="saleStatusBadge">
+            Inactive
+        </span>
+    </div>
+
+    <form
+        id="saleForm"
+        class="modal-body"
+    >
+        <div class="management-grid">
+
+            <div class="field">
+                <label for="saleActive">
+                    Sale status
+                </label>
+
+                <select id="saleActive">
+                    <option value="false">
+                        Inactive
+                    </option>
+
+                    <option value="true">
+                        Active
+                    </option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="saleEndDate">
+                    Sale ending date and time
+                </label>
+
+                <input
+                    id="saleEndDate"
+                    type="datetime-local"
+                >
+            </div>
+
+            <div class="field full">
+                <label for="saleTitle">
+                    Sale title
+                </label>
+
+                <input
+                    id="saleTitle"
+                    type="text"
+                    maxlength="200"
+                    placeholder="50% off on all Graphic Design services"
+                >
+            </div>
+
+        </div>
+
+        <div class="status-editor">
+            <button
+                class="save-btn"
+                id="saveSaleBtn"
+                type="submit"
+            >
+                <i class="fa-solid fa-floppy-disk"></i>
+                Save Sale
+            </button>
+        </div>
+    </form>
+</section>
+
     </section>
   </main>
 
