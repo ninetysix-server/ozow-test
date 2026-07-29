@@ -2066,6 +2066,8 @@ const finalPrice =
     window.searchDatabaseServices = async function(searchTerm) {
     const term = String(searchTerm || '').trim();
     const requestNumber = ++searchRequestNumber;
+    const minimumLoadingTime = 1500; // 1.5 seconds
+    const loadingStarted = Date.now();
 
     currentSearchTerm = term;
 
@@ -2076,6 +2078,14 @@ const finalPrice =
         activeSearchIds = null;
         currentPage = 1;
 
+        const elapsed = Date.now() - loadingStarted;
+
+        if (elapsed < minimumLoadingTime) {
+            await new Promise(resolve =>
+                setTimeout(resolve, minimumLoadingTime - elapsed)
+            );
+        }
+        
         applyFilters();
 
         return {
