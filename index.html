@@ -28,15 +28,15 @@
     <header id="header">
         <div class="header-container">
             <!-- Offer Bar -->
-            <div class="offer-bar" id="offerBar">
+            <div class="offer-bar" id="offerBar" hidden>
                 <div class="offer-content">
                     <span class="offer-tag">SALE</span>
-                    <span class="offer-text">50% off on all Graphic Design services</span>
+                    <span class="offer-text" id="saleTitle"></span>
                     <div class="countdown">
-                        <span class="time-unit">02d</span>
-                        <span class="time-unit">14h</span>
-                        <span class="time-unit">30m</span>
-                        <span class="time-unit">45s</span>
+                        <span class="time-unit" id="saleDays">00d</span>
+                        <span class="time-unit" id="saleHours">00h</span>
+                        <span class="time-unit" id="saleMinutes">00m</span>
+                        <span class="time-unit" id="saleSeconds">00s</span>
                     </div>
                 </div>
                 <div class="mobile-contact-offer">
@@ -168,38 +168,6 @@
         </div>
     </section>
 
-    <!-- TOP DESIGNS SECTION -->
-<section class="top-designs-section" id="topDesignsSection">
-    <div class="container">
-
-        <div class="top-designs-header">
-            <h2>Top Designs</h2>
-
-            <a href="#services" class="view-all-designs">
-                View All Collection
-                <i class="fas fa-arrow-right"></i>
-            </a>
-        </div>
-
-        <div class="swiper top-designs-swiper">
-            <div
-                class="swiper-wrapper"
-                id="topDesignsWrapper"
-            >
-                <div class="swiper-slide">
-                    <div class="top-design-loading">
-                        <div class="spinner"></div>
-                        <p>Loading top designs...</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="top-designs-pagination"></div>
-        </div>
-
-    </div>
-</section>
-
     <!-- WHATSAPP BUTTON -->
     <a id="whatsappBtn" class="whatsapp-btn" href="https://wa.me/27817925033" target="_blank" aria-label="Chat on WhatsApp">
         <img src="assets/icons/whatsapp.png" alt="WhatsApp" class="icon" />
@@ -272,6 +240,38 @@
             <div class="pagination-container" id="paginationContainer"></div>
     </div>
 
+</section>
+
+<!-- TOP DESIGNS SECTION -->
+<section class="top-designs-section" id="topDesignsSection">
+    <div class="container">
+
+        <div class="top-designs-header">
+            <h2>Top Designs</h2>
+
+            <a href="#services" class="view-all-designs">
+                View All Collection
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="swiper top-designs-swiper">
+            <div
+                class="swiper-wrapper"
+                id="topDesignsWrapper"
+            >
+                <div class="swiper-slide">
+                    <div class="top-design-loading">
+                        <div class="spinner"></div>
+                        <p>Loading top designs...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="top-designs-pagination"></div>
+        </div>
+
+    </div>
 </section>
 
     <!-- FEATURES SECTION -->
