@@ -63,3 +63,39 @@
 .confirmation-btn.primary { background:linear-gradient(135deg,#009B5B,#007a48); color:white; }
 .confirmation-btn.secondary { background:#f8fafc; color:#475569; border:2px solid #e2e8f0; }
 @keyframes slideInRight { from { transform:translateX(100%); opacity:0; } to { transform:translateX(0); opacity:1; } }
+
+.cart-selection-summary,
+.confirmation-selection-summary {
+    margin: 12px 0;
+    padding: 12px 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+}
+
+.cart-selection-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 6px 0;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.cart-selection-row + .cart-selection-row {
+    border-top: 1px solid #e2e8f0;
+}
+
+.cart-selection-row strong {
+    color: #1e293b;
+    text-align: right;
+    font-weight: 600;
+}
+
+@media (max-width: 480px) {
+    .cart-selection-row {
+        gap: 10px;
+        font-size: 12px;
+    }
+}
