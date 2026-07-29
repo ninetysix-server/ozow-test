@@ -628,7 +628,7 @@
 
 .top-design-card {
     position: relative;
-    height: 100%;
+    height: auto;
     overflow: hidden;
     background: #ffffff;
     border: 1px solid #dce4eb;
@@ -855,7 +855,7 @@
     }
 
     .top-design-image-wrap {
-        height: 175px;
+        height: 150px;
     }
 
     .top-designs-pagination {
@@ -885,10 +885,86 @@
     }
 
     .top-design-image-wrap {
-        height: 185px;
+        height: 145px;
     }
 
     .top-design-content {
         padding: 16px 15px 15px;
     }
+}
+
+/* =====================================================
+   TOP DESIGNS COMPACT CARD FIX
+===================================================== */
+
+.top-designs-swiper .swiper-wrapper {
+    align-items: flex-start;
+}
+
+.top-designs-swiper .swiper-slide {
+    height: auto;
+    align-self: flex-start;
+}
+
+.top-design-card {
+    height: auto;
+    min-height: 0;
+}
+
+.top-design-image-wrap {
+    height: 158px;
+}
+
+.top-design-content {
+    padding: 14px 15px 13px;
+}
+
+.top-design-title {
+    margin-bottom: 8px;
+    font-size: 15px;
+}
+
+.top-design-description {
+    min-height: 0;
+    height: 40px;
+    margin-bottom: 7px;
+    font-size: 13px;
+    line-height: 20px;
+}
+
+.design-more-image {
+    width: 126px;
+    height: 21px;
+    margin: 0 0 7px;
+}
+
+.top-design-footer {
+    align-items: center;
+}
+
+.top-design-price-group {
+    display: block;
+    line-height: 1.2;
+}
+
+.top-design-original-price:empty {
+    display: none;
+}
+
+.top-design-original-price {
+    min-height: 0;
+    margin-bottom: 2px;
+}
+
+.top-design-price {
+    font-size: 16px;
+    line-height: 1.2;
+}
+
+.top-design-tier {
+    padding: 5px 10px;
+}
+
+.top-designs-pagination {
+    margin-top: 12px;
 }
