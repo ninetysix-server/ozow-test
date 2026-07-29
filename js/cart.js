@@ -52,23 +52,85 @@ class CartManager {
         }
     }
 
-    addItem(serviceId, tierName, title, price, qty = 1, details = {}) {
-        const priceNum = this.parsePrice(price);
-        const existing = this.cart.find(i => i.serviceId === serviceId && i.tierName === tierName);
-        if (existing) {
-            existing.quantity += qty;
-        } else {
-            this.cart.push({
-                id: Date.now().toString(),
-                serviceId, tierName, serviceTitle: title,
-                price: priceNum, quantity: qty, details,
-                addedAt: new Date().toISOString()
-            });
-        }
-        this.saveCart();
-        return true;
+    createConfigurationKey(serviceId, tierName, details = {}) {
+    const configuration = {
+        serviceId,
+        tierName,
+
+        pages: Number(details.pages || 0),
+
+        printingSelected:
+            details.printingSelected === true,
+
+        printingPrice: Number(
+            details.printingPrice || 0
+        ),
+
+        addonId:
+            details.addonId || null,
+
+        parentServiceId:
+            details.parentServiceId || null
+    };
+
+    return JSON.stringify(configuration);
+}
+
+    addItem(
+    serviceId,
+    tierName,
+    title,
+    price,
+    qty = 1,
+    details = {}
+) {
+    const priceNum = this.parsePrice(price);
+
+    const configurationKey =
+        this.createConfigurationKey(
+            serviceId,
+            tierName,
+            details
+        );
+
+    const existing = this.cart.find(item => {
+        const existingKey =
+            item.configurationKey ||
+            this.createConfigurationKey(
+                item.serviceId,
+                item.tierName,
+                item.details || {}
+            );
+
+        return existingKey === configurationKey;
+    });
+
+    if (existing) {
+        existing.quantity += qty;
+    } else {
+        this.cart.push({
+            id: `${Date.now()}-${Math.random()
+                .toString(36)
+                .slice(2, 8)}`,
+
+            serviceId,
+            tierName,
+            serviceTitle: title,
+
+            price: priceNum,
+            quantity: qty,
+
+            details,
+            configurationKey,
+
+            addedAt: new Date().toISOString()
+        });
     }
 
+    this.saveCart();
+
+    return true;
+}
     parsePrice(str) {
         if (typeof str === 'number') return str;
         const match = str.match(/R\s*(\d+(\.\d+)?)/);
