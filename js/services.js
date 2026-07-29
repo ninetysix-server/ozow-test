@@ -614,22 +614,69 @@ async function loadServices() {
             ? service.features
             : {};
 
-    const createTier = (name, price, originalPrice, features) => ({
+    const createTier = (
+    name,
+    salePrice,
+    originalPrice,
+    features
+) => {
+    const hasSalePrice =
+        salePrice !== null &&
+        salePrice !== undefined &&
+        salePrice !== '';
+
+    const hasOriginalPrice =
+        originalPrice !== null &&
+        originalPrice !== undefined &&
+        originalPrice !== '';
+
+    const saleAmount = hasSalePrice
+        ? Number(salePrice)
+        : null;
+
+    const originalAmount = hasOriginalPrice
+        ? Number(originalPrice)
+        : null;
+
+    const tierIsOnSale =
+        saleCampaignActive &&
+        Number.isFinite(saleAmount) &&
+        Number.isFinite(originalAmount) &&
+        originalAmount > saleAmount;
+
+    /*
+     * Active sale:
+     * Display the lower sale price.
+     *
+     * Inactive or expired sale:
+     * Restore the original price.
+     */
+    const displayedAmount =
+        !saleCampaignActive && Number.isFinite(originalAmount)
+            ? originalAmount
+            : saleAmount;
+
+    return {
         name,
+
         price:
-            price !== null && price !== undefined
-                ? `R${Number(price).toFixed(2)}`
+            Number.isFinite(displayedAmount)
+                ? `R${displayedAmount.toFixed(2)}`
                 : 'Contact',
 
         originalPrice:
-            originalPrice !== null &&
-            originalPrice !== undefined
-                ? `R${Number(originalPrice).toFixed(2)}`
+            tierIsOnSale
+                ? `R${originalAmount.toFixed(2)}`
                 : null,
 
         description: service.description || '',
-        features: Array.isArray(features) ? features : []
-    });
+
+        features:
+            Array.isArray(features)
+                ? features
+                : []
+    };
+};
 
     return {
         ...service,
@@ -2049,6 +2096,7 @@ function updateServiceCount() {
 }
 
 let saleCountdownInterval = null;
+let saleCampaignActive = false;
 
 function hideSaleBanner() {
     const offerBar = document.getElementById('offerBar');
@@ -2075,9 +2123,18 @@ function updateSaleCountdown(endsAt) {
         const remaining = endTime - Date.now();
 
         if (remaining <= 0) {
-            hideSaleBanner();
-            return;
-        }
+    saleCampaignActive = false;
+
+    hideSaleBanner();
+
+    /*
+     * Reload services immediately so all sale prices
+     * return to their original prices.
+     */
+    loadServices();
+
+    return;
+}
 
         const days = Math.floor(
             remaining / (1000 * 60 * 60 * 24)
@@ -2125,14 +2182,18 @@ function updateSaleCountdown(endsAt) {
 }
 
 async function loadSaleCampaign() {
-    const offerBar = document.getElementById('offerBar');
-    const titleElement = document.getElementById('saleTitle');
+    const offerBar =
+        document.getElementById('offerBar');
+
+    const titleElement =
+        document.getElementById('saleTitle');
+
+    saleCampaignActive = false;
+    hideSaleBanner();
 
     if (!offerBar || !titleElement) {
-        return;
+        return false;
     }
-
-    hideSaleBanner();
 
     const { data, error } = await supabase
         .from('sale_campaign')
@@ -2146,7 +2207,7 @@ async function loadSaleCampaign() {
             error
         );
 
-        return;
+        return false;
     }
 
     if (
@@ -2155,7 +2216,7 @@ async function loadSaleCampaign() {
         !data.title ||
         !data.ends_at
     ) {
-        return;
+        return false;
     }
 
     const endTime =
@@ -2165,26 +2226,36 @@ async function loadSaleCampaign() {
         Number.isNaN(endTime) ||
         endTime <= Date.now()
     ) {
-        return;
+        return false;
     }
+
+    /*
+     * The campaign is active, so services may use
+     * their configured sale prices.
+     */
+    saleCampaignActive = true;
 
     const dismissedSale =
         localStorage.getItem(
             'dismissedSaleEndsAt'
         );
 
-    if (dismissedSale === data.ends_at) {
-        return;
+    /*
+     * Dismissing the header only hides the header.
+     * It must not disable the sale prices.
+     */
+    if (dismissedSale !== data.ends_at) {
+        titleElement.textContent = data.title;
+        offerBar.hidden = false;
     }
-
-    titleElement.textContent = data.title;
-    offerBar.hidden = false;
 
     updateSaleCountdown(data.ends_at);
 
     const closeButtons = [
         document.getElementById('closeOffer'),
-        document.getElementById('closeOfferDesktop')
+        document.getElementById(
+            'closeOfferDesktop'
+        )
     ];
 
     closeButtons.forEach(button => {
@@ -2201,10 +2272,15 @@ async function loadSaleCampaign() {
             hideSaleBanner();
         };
     });
+
+    return true;
 }
 
 // Initialize
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener(
+    'DOMContentLoaded',
+    async function() {
+
     // Wishlist modal events
     document.getElementById('mobileWishlistBtn')?.addEventListener('click', function(e) {
         e.preventDefault();
@@ -2278,8 +2354,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    loadSaleCampaign();
-    loadServices();
+await loadSaleCampaign();
+await loadServices();
+
 });
 
 window.addEventListener('resize', () => {
