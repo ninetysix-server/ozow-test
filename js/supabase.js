@@ -142,25 +142,40 @@ export async function getServices() {
 
 
 export async function searchServices(searchTerm) {
-    if (!searchTerm || searchTerm.trim() === '') {
+    const term = String(searchTerm || '').trim();
+
+    if (!term) {
         return getServices();
     }
 
-    const term = searchTerm.trim();
+    const safeTerm = term
+        .replace(/[%_]/g, '')
+        .replace(/,/g, ' ')
+        .trim();
+
+    if (!safeTerm) {
+        return [];
+    }
 
     const { data, error } = await supabase
         .from('services')
-        .select('*')
+        .select('id')
+        .eq('active', true)
         .or(
-            `title.ilike.%${term}%,description.ilike.%${term}%,category.ilike.%${term}%`
+            [
+                `title.ilike.%${safeTerm}%`,
+                `description.ilike.%${safeTerm}%`,
+                `category.ilike.%${safeTerm}%`,
+                `slug.ilike.%${safeTerm}%`
+            ].join(',')
         )
-        .order('created_at', {
+        .order('display_order', {
             ascending: true
         });
 
     if (error) {
         console.error('Search error:', error);
-        return [];
+        throw error;
     }
 
     return data || [];

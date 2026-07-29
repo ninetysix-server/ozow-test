@@ -1,12 +1,16 @@
-// js/services.js
 import {
     getServices,
+    searchServices,
     supabase
 } from './supabase.js';
 import { cartManager } from './cart.js';
 
 let allServices = [];
 let filteredServices = [];
+
+let activeSearchIds = null;
+let currentSearchTerm = '';
+let searchRequestNumber = 0;
 let currentSort = 'featured';
 let selectedCategories = [];
 let selectedTiers = ['starter'];
@@ -1262,10 +1266,72 @@ function renderServices() {
     }
     
     if (filteredServices.length === 0) {
-        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:#6b6b6b;"><i class="fas fa-search" style="font-size:48px;color:#cbd5e1;margin-bottom:16px;display:block;"></i><h3>No services found</h3><p>Try adjusting your filters</p></div>`;
-        document.getElementById('paginationContainer').innerHTML = '';
-        return;
-    }
+    const message = currentSearchTerm
+        ? `
+            <h3>No services found</h3>
+            <p>
+                We could not find anything matching
+                "<strong>${escapeTopDesignValue(
+                    currentSearchTerm
+                )}</strong>"
+            </p>
+        `
+        : `
+            <h3>No services found</h3>
+            <p>Try adjusting your filters</p>
+        `;
+
+    grid.innerHTML = `
+        <div
+            style="
+                grid-column:1/-1;
+                text-align:center;
+                padding:60px 20px;
+                color:#6b6b6b;
+            "
+        >
+            <i
+                class="fas fa-search"
+                style="
+                    font-size:48px;
+                    color:#cbd5e1;
+                    margin-bottom:16px;
+                    display:block;
+                "
+            ></i>
+
+            ${message}
+
+            ${
+                currentSearchTerm
+                    ? `
+                        <button
+                            type="button"
+                            onclick="clearServiceSearch()"
+                            style="
+                                margin-top:20px;
+                                border:none;
+                                border-radius:60px;
+                                padding:11px 24px;
+                                background:#1a1a1a;
+                                color:#ffffff;
+                                cursor:pointer;
+                            "
+                        >
+                            View all services
+                        </button>
+                    `
+                    : ''
+            }
+        </div>
+    `;
+
+    document
+        .getElementById('paginationContainer')
+        .innerHTML = '';
+
+    return;
+}
 
     // Calculate pagination
     totalPages = Math.ceil(filteredServices.length / itemsPerPage);
@@ -1997,6 +2063,159 @@ const finalPrice =
         applyFilters();
     };
 
+    window.searchDatabaseServices = async function(searchTerm) {
+    const term = String(searchTerm || '').trim();
+    const requestNumber = ++searchRequestNumber;
+
+    currentSearchTerm = term;
+
+    /*
+     * Empty search restores the complete service list.
+     */
+    if (!term) {
+        activeSearchIds = null;
+        currentPage = 1;
+
+        applyFilters();
+
+        return {
+            success: true,
+            count: allServices.length,
+            term: ''
+        };
+    }
+
+    const grid =
+        document.getElementById('servicesGrid');
+
+    const pagination =
+        document.getElementById(
+            'paginationContainer'
+        );
+
+    if (grid) {
+        grid.innerHTML = `
+            <div
+                style="
+                    grid-column:1/-1;
+                    text-align:center;
+                    padding:60px 20px;
+                "
+            >
+                <div class="spinner"></div>
+
+                <p
+                    style="
+                        color:#6b6b6b;
+                        margin-top:16px;
+                    "
+                >
+                    Searching services...
+                </p>
+            </div>
+        `;
+    }
+
+    if (pagination) {
+        pagination.innerHTML = '';
+    }
+
+    try {
+        const databaseResults =
+            await searchServices(term);
+
+        /*
+         * Ignore an older request when the user has
+         * already typed another search.
+         */
+        if (requestNumber !== searchRequestNumber) {
+            return {
+                success: false,
+                cancelled: true
+            };
+        }
+
+        activeSearchIds = new Set(
+            databaseResults.map(service =>
+                String(service.id)
+            )
+        );
+
+        currentPage = 1;
+
+        applyFilters();
+
+        document
+            .getElementById('services')
+            ?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+
+        return {
+            success: true,
+            count: activeSearchIds.size,
+            term
+        };
+    } catch (error) {
+        console.error(
+            'Unable to search services:',
+            error
+        );
+
+        if (requestNumber !== searchRequestNumber) {
+            return {
+                success: false,
+                cancelled: true
+            };
+        }
+
+        activeSearchIds = new Set();
+        filteredServices = [];
+        currentPage = 1;
+        isLoading = false;
+
+        renderServices();
+        updateServiceCount();
+
+        showToast(
+            'Unable to search services. Please try again.',
+            'error'
+        );
+
+        return {
+            success: false,
+            error
+        };
+    }
+};
+
+window.clearServiceSearch = function() {
+    const desktopInput =
+        document.getElementById(
+            'mainSearchInput'
+        );
+
+    const mobileInput =
+        document.getElementById(
+            'mobileSearchInput'
+        );
+
+    if (desktopInput) {
+        desktopInput.value = '';
+    }
+
+    if (mobileInput) {
+        mobileInput.value = '';
+    }
+
+    currentSearchTerm = '';
+    activeSearchIds = null;
+    currentPage = 1;
+
+    applyFilters();
+};
+
 window.applyFilters = function() {
     // Show loading while filtering
     const grid = document.getElementById('servicesGrid');
@@ -2010,7 +2229,11 @@ window.applyFilters = function() {
     
     // Use setTimeout to allow UI to update before filtering
     setTimeout(() => {
-        let results = [...allServices];
+        let results = activeSearchIds instanceof Set
+    ? allServices.filter(service =>
+        activeSearchIds.has(String(service.id))
+    )
+    : [...allServices];
         if (selectedCategories.length > 0) {
             results = results.filter(s => selectedCategories.includes(s.category));
         }
@@ -2091,8 +2314,24 @@ window.resetFilters = function() {
 };
 
 function updateServiceCount() {
-    const count = document.getElementById('serviceCount');
-    if (count) count.textContent = `${filteredServices.length} services`;
+    const count =
+        document.getElementById('serviceCount');
+
+    if (!count) {
+        return;
+    }
+
+    const total = filteredServices.length;
+
+    if (currentSearchTerm) {
+        count.textContent =
+            `${total} result${total === 1 ? '' : 's'} for "${currentSearchTerm}"`;
+
+        return;
+    }
+
+    count.textContent =
+        `${total} service${total === 1 ? '' : 's'}`;
 }
 
 let saleCountdownInterval = null;
