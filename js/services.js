@@ -249,20 +249,6 @@ function escapeTopDesignValue(value) {
     );
 }
 
-
-function getTopDesignImage(service) {
-    return (
-        service.image_url ||
-        service.imageUrl ||
-        service.service_image ||
-        service.thumbnail_url ||
-        service.cover_image ||
-        service.image ||
-        ''
-    );
-}
-
-
 function getTopDesignTier(service) {
     const tiers = Array.isArray(service.tiers)
         ? service.tiers
@@ -292,13 +278,52 @@ function renderTopDesigns() {
         return;
     }
 
-    const topServices = allServices
-        .filter(service =>
-            service &&
-            service.active !== false &&
-            service.is_addon_service !== true
-        )
-        .slice(0, 8);
+    const topDesignDefinitions = [
+    {
+        matcher: 'logo',
+        image: 'assets/images/vr_logo-design.png'
+    },
+    {
+        matcher: 'poster',
+        image: 'assets/images/vr_poster.png'
+    },
+    {
+        matcher: 'business card',
+        image: 'assets/images/vr_business-card.png'
+    },
+    {
+        matcher: 'board',
+        image: 'assets/images/vr_board-design.png'
+    }
+];
+
+const topServices = topDesignDefinitions
+    .map(definition => {
+        const service = allServices.find(item => {
+            const title = String(
+                item.title || ''
+            ).toLowerCase();
+
+            const slug = String(
+                item.slug || ''
+            )
+                .toLowerCase()
+                .replace(/-/g, ' ');
+
+            return (
+                title.includes(definition.matcher) ||
+                slug.includes(definition.matcher)
+            );
+        });
+
+        return service
+            ? {
+                ...service,
+                topDesignImage: definition.image
+            }
+            : null;
+    })
+    .filter(Boolean);
 
     if (!topServices.length) {
         wrapper.innerHTML = `
@@ -321,7 +346,7 @@ function renderTopDesigns() {
         const tier = getTopDesignTier(service);
 
         const imageUrl =
-            getTopDesignImage(service);
+            service.topDesignImage;
 
         const isInWishlist = wishlistItems.some(
             item => item.id === service.id
