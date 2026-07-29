@@ -24,6 +24,10 @@ function runSearch(input) {
 
     const term = input.value.trim();
 
+    /*
+     * Give the user enough time to finish typing.
+     * Search starts only after 1.2 seconds without typing.
+     */
     searchTimeout = setTimeout(async () => {
         if (
             typeof window.searchDatabaseServices !==
@@ -36,8 +40,11 @@ function runSearch(input) {
             return;
         }
 
-        await window.searchDatabaseServices(term);
-    }, 350);
+        await window.searchDatabaseServices(
+            term,
+            false
+        );
+    }, 1200);
 }
 
 function connectSearchInput(input) {
@@ -49,24 +56,24 @@ function connectSearchInput(input) {
         runSearch(input);
     });
 
-    input.addEventListener('keydown', event => {
-        if (event.key !== 'Enter') {
-            return;
-        }
+    input.addEventListener('keydown', async event => {
+    if (event.key !== 'Enter') {
+        return;
+    }
 
-        event.preventDefault();
+    event.preventDefault();
+    clearTimeout(searchTimeout);
 
-        clearTimeout(searchTimeout);
-
-        if (
-            typeof window.searchDatabaseServices ===
-            'function'
-        ) {
-            window.searchDatabaseServices(
-                input.value.trim()
-            );
-        }
-    });
+    if (
+        typeof window.searchDatabaseServices ===
+        'function'
+    ) {
+        await window.searchDatabaseServices(
+            input.value.trim(),
+            true
+        );
+    }
+});
 }
 
 document.addEventListener(

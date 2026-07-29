@@ -2063,7 +2063,10 @@ const finalPrice =
         applyFilters();
     };
 
-    window.searchDatabaseServices = async function(searchTerm) {
+    window.searchDatabaseServices = async function(
+    searchTerm,
+    shouldScroll = false
+    ) {
     const term = String(searchTerm || '').trim();
     const requestNumber = ++searchRequestNumber;
     const minimumLoadingTime = 1500; // 1.5 seconds
@@ -2085,7 +2088,7 @@ const finalPrice =
                 setTimeout(resolve, minimumLoadingTime - elapsed)
             );
         }
-        
+
         applyFilters();
 
         return {
@@ -2155,12 +2158,14 @@ const finalPrice =
 
         applyFilters();
 
-        document
-            .getElementById('services')
-            ?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
+        if (shouldScroll) {
+    document
+        .getElementById('services')
+        ?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+}
 
         return {
             success: true,
