@@ -360,6 +360,39 @@ function renderSpecialServiceControls(service) {
     return '';
 }
 
+function renderPrintingControls(service) {
+    if (
+        service.printingEnabled !== true ||
+        service.is_addon_service === true
+    ) {
+        return '';
+    }
+
+    const printingPrice = Number(
+        String(service.printingPrice || '0')
+            .replace(/[^\d.]/g, '')
+    );
+
+    return `
+        <label class="printing-option">
+            <input
+                type="checkbox"
+                id="printing-${service.id}"
+                data-printing-price="${printingPrice}"
+                onchange="updatePrintingSelection('${service.id}')"
+            >
+
+            <span>
+                Add printing
+            </span>
+
+            <strong>
+                +R${printingPrice.toFixed(2)}
+            </strong>
+        </label>
+    `;
+}
+
 function renderPageQuantityControls(service) {
     const basePrice = Number(service.base_price || 0);
     const pricePerPage = Number(service.price_per_page || 0);
@@ -570,6 +603,7 @@ const savingPercentage = isOnSale
                 }
             </div>
             ${renderSpecialServiceControls(service)}
+            ${renderPrintingControls(service)}
             <div class="product-rating"><span>★★★★☆</span><span>4.8 (120)</span></div>
                 <div class="product-price">
                     ${isOnSale ? `
@@ -688,20 +722,61 @@ window.updatePageServiceTotal = function(serviceId) {
 
     let pages = Number(input.value || 1);
 
-    pages = Math.max(1, Math.min(maxPages, pages));
+    pages = Math.max(
+        1,
+        Math.min(maxPages, pages)
+    );
 
     input.value = pages;
 
-    const basePrice = Number(service.base_price || 0);
-    const pricePerPage = Number(service.price_per_page || 0);
-    const additionalPages = Math.max(0, pages - 1);
+    const basePrice = Number(
+        service.base_price || 0
+    );
+
+    const pricePerPage = Number(
+        service.price_per_page || 0
+    );
+
+    const additionalPages = Math.max(
+        0,
+        pages - 1
+    );
+
+    const printingCheckbox =
+        document.getElementById(
+            `printing-${serviceId}`
+        );
+
+    const printingSelected =
+        printingCheckbox?.checked === true;
+
+    const printingPrice = printingSelected
+        ? Number(
+            printingCheckbox.dataset.printingPrice || 0
+        )
+        : 0;
 
     const total =
         basePrice +
-        additionalPages * pricePerPage;
+        additionalPages * pricePerPage +
+        printingPrice;
 
     totalElement.textContent =
         `Total: R${total.toFixed(2)}`;
+};
+
+window.updatePrintingSelection = function(serviceId) {
+    const service = allServices.find(
+        item => item.id === serviceId
+    );
+
+    if (!service) {
+        return;
+    }
+
+    if (service.has_page_quantity === true) {
+        updatePageServiceTotal(serviceId);
+    }
 };
 
 window.updateWebsiteAddonTotal = function(serviceId) {
@@ -743,19 +818,50 @@ function addPageServiceToCart(service) {
         `service-pages-${service.id}`
     );
 
-    const maxPages = Number(service.max_pages || 1);
+    const maxPages = Number(
+        service.max_pages || 1
+    );
 
-    let pages = Number(input?.value || 1);
+    let pages = Number(
+        input?.value || 1
+    );
 
-    pages = Math.max(1, Math.min(maxPages, pages));
+    pages = Math.max(
+        1,
+        Math.min(maxPages, pages)
+    );
 
-    const basePrice = Number(service.base_price || 0);
-    const pricePerPage = Number(service.price_per_page || 0);
-    const additionalPages = Math.max(0, pages - 1);
+    const basePrice = Number(
+        service.base_price || 0
+    );
+
+    const pricePerPage = Number(
+        service.price_per_page || 0
+    );
+
+    const additionalPages = Math.max(
+        0,
+        pages - 1
+    );
+
+    const printingCheckbox =
+        document.getElementById(
+            `printing-${service.id}`
+        );
+
+    const printingSelected =
+        printingCheckbox?.checked === true;
+
+    const printingPrice = printingSelected
+        ? Number(
+            printingCheckbox.dataset.printingPrice || 0
+        )
+        : 0;
 
     const total =
         basePrice +
-        additionalPages * pricePerPage;
+        additionalPages * pricePerPage +
+        printingPrice;
 
     cartManager.addItem(
         service.id,
@@ -767,10 +873,18 @@ function addPageServiceToCart(service) {
             tier: 'Standard',
             slug: service.slug,
             category: service.category,
+
             pages,
             basePrice,
             additionalPages,
             pricePerPage,
+
+            printingEnabled:
+                service.printingEnabled,
+
+            printingSelected,
+            printingPrice,
+
             calculatedTotal: total
         }
     );
@@ -832,16 +946,19 @@ window.addToCart = function(serviceId) {
         return;
     }
 
+    // Multi-page services
     if (service.has_page_quantity === true) {
         addPageServiceToCart(service);
         return;
     }
 
+    // Website add-ons
     if (service.is_addon_service === true) {
         addWebsiteAddonsToCart(service);
         return;
     }
 
+    // Normal Starter, Premium or Pro services
     let tierData = null;
 
     for (const tier of service.tiers) {
@@ -878,11 +995,13 @@ window.addToCart = function(serviceId) {
         tierData.originalPrice || null;
 
     const currentAmount = Number(
-        String(cartPrice).replace(/[^\d.]/g, '')
+        String(cartPrice)
+            .replace(/[^\d.]/g, '')
     );
 
     const originalAmount = Number(
-        String(originalPrice || '').replace(/[^\d.]/g, '')
+        String(originalPrice || '')
+            .replace(/[^\d.]/g, '')
     );
 
     const isOnSale =
@@ -892,26 +1011,55 @@ window.addToCart = function(serviceId) {
     const discountPercentage = isOnSale
         ? Math.round(
             (
-                (originalAmount - currentAmount) /
+                (
+                    originalAmount -
+                    currentAmount
+                ) /
                 originalAmount
             ) * 100
         )
         : 0;
 
+    const printingCheckbox =
+        document.getElementById(
+            `printing-${service.id}`
+        );
+
+    const printingSelected =
+        printingCheckbox?.checked === true;
+
+    const printingPrice = printingSelected
+        ? Number(
+            printingCheckbox.dataset.printingPrice || 0
+        )
+        : 0;
+
+    const finalPrice =
+        currentAmount + printingPrice;
+
     cartManager.addItem(
         service.id,
         tierName,
         service.title,
-        cartPrice,
+        `R${finalPrice.toFixed(2)}`,
         1,
         {
             tier: tierName,
             slug: service.slug,
             category: service.category,
+
             originalPrice,
             discountPercentage,
-            printingEnabled: service.printingEnabled,
-            printingPrice: service.printingPrice
+
+            servicePrice: currentAmount,
+
+            printingEnabled:
+                service.printingEnabled,
+
+            printingSelected,
+            printingPrice,
+
+            calculatedTotal: finalPrice
         }
     );
 

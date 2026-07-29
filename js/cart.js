@@ -222,9 +222,19 @@ class CartManager {
         `);
     }
 
-    if (rows.length === 0) {
-        return '';
-    }
+    if (details.printingSelected === true) {
+    rows.push(`
+        <div class="cart-selection-row">
+            <span>Printing</span>
+
+            <strong>
+                Included — R${Number(
+                    details.printingPrice || 0
+                ).toFixed(2)}
+            </strong>
+        </div>
+    `);
+}
 
     return `
         <div class="${
