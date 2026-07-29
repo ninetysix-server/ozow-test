@@ -418,33 +418,228 @@ $("filesList").innerHTML = filesWithThumbnails.map(file => `
   }
 }
 
-    function renderItems(order){
-      const items = Array.isArray(order.cart) ? order.cart : [];
+    function renderItems(order) {
+    const items = Array.isArray(order.cart)
+        ? order.cart
+        : [];
 
-      if(!items.length){
+    if (!items.length) {
         $("orderItems").innerHTML = `
-          <div class="empty-state">No service details found.</div>`;
+            <div class="empty-state">
+                No service details found.
+            </div>
+        `;
+
         return;
-      }
+    }
 
-      $("orderItems").innerHTML = items.map(item => {
-        const quantity = Number(item.quantity || 1);
-        const price = Number(item.price || 0);
+    $("orderItems").innerHTML = items.map(item => {
+        const details = item.details || {};
+
+        const quantity = Math.max(
+            1,
+            Number(item.quantity || 1)
+        );
+
+        const unitTotal = Number(item.price || 0);
+        const lineTotal = unitTotal * quantity;
+
         const name =
-          item.serviceTitle ||
-          item.title ||
-          item.serviceId ||
-          "Design service";
+            item.serviceTitle ||
+            item.title ||
+            item.serviceId ||
+            "Design service";
 
-        const tier = item.tierName ? ` · ${item.tierName}` : "";
+        const tier =
+            item.tierName ||
+            "Standard";
+
+        const printing =
+            details.printing &&
+            typeof details.printing === "object"
+                ? details.printing
+                : null;
+
+        const printingSelected =
+            details.printingSelected === true ||
+            printing !== null;
+
+        const printingSize =
+            printing?.size ||
+            details.printingSize ||
+            "Standard";
+
+        const printingCopies = Number(
+            printing?.copies ||
+            details.printingCopies ||
+            0
+        );
+
+        const printingPricePerCopy = Number(
+            printing?.pricePerCopy ||
+            details.printingPricePerCopy ||
+            0
+        );
+
+        const printingUnitTotal = Number(
+            printing?.total ||
+            details.printingPrice ||
+            0
+        );
+
+        const designUnitTotal = Number(
+            details.designTotal ??
+            details.servicePrice ??
+            (
+                details.pages
+                    ? Number(details.basePrice || 0) +
+                      (
+                          Number(
+                              details.additionalPages || 0
+                          ) *
+                          Number(details.pricePerPage || 0)
+                      )
+                    : unitTotal - printingUnitTotal
+            )
+        );
 
         return `
-          <div class="order-item">
-            <span>${safe(name)}${safe(tier)} × ${quantity}</span>
-            <strong>${money(price * quantity)}</strong>
-          </div>`;
-      }).join("");
-    }
+            <div class="order-item" style="
+                display:block;
+                padding:16px;
+                border:1px solid #e2e8f0;
+                border-radius:14px;
+                margin-bottom:14px;
+            ">
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:flex-start;
+                    gap:16px;
+                    margin-bottom:12px;
+                ">
+                    <div>
+                        <strong style="display:block;">
+                            ${safe(name)}
+                        </strong>
+
+                        <small style="color:#64748b;">
+                            ${safe(tier)} × ${quantity}
+                        </small>
+                    </div>
+
+                    <strong>
+                        ${money(lineTotal)}
+                    </strong>
+                </div>
+
+                <div style="
+                    display:grid;
+                    gap:8px;
+                    font-size:13px;
+                ">
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        gap:18px;
+                    ">
+                        <span>Design</span>
+                        <strong>
+                            ${money(
+                                designUnitTotal *
+                                quantity
+                            )}
+                        </strong>
+                    </div>
+
+                    ${
+                        printingSelected
+                            ? `
+                                <div style="
+                                    padding-top:10px;
+                                    margin-top:5px;
+                                    border-top:1px solid #e2e8f0;
+                                    font-weight:700;
+                                ">
+                                    Printing details
+                                </div>
+
+                                <div style="
+                                    display:flex;
+                                    justify-content:space-between;
+                                    gap:18px;
+                                ">
+                                    <span>Print size</span>
+                                    <strong>
+                                        ${safe(printingSize)}
+                                    </strong>
+                                </div>
+
+                                <div style="
+                                    display:flex;
+                                    justify-content:space-between;
+                                    gap:18px;
+                                ">
+                                    <span>Copies</span>
+                                    <strong>
+                                        ${printingCopies}
+                                    </strong>
+                                </div>
+
+                                <div style="
+                                    display:flex;
+                                    justify-content:space-between;
+                                    gap:18px;
+                                ">
+                                    <span>
+                                        Price per copy
+                                    </span>
+
+                                    <strong>
+                                        ${money(
+                                            printingPricePerCopy
+                                        )}
+                                    </strong>
+                                </div>
+
+                                <div style="
+                                    display:flex;
+                                    justify-content:space-between;
+                                    gap:18px;
+                                ">
+                                    <span>
+                                        Printing subtotal
+                                    </span>
+
+                                    <strong>
+                                        ${money(
+                                            printingUnitTotal *
+                                            quantity
+                                        )}
+                                    </strong>
+                                </div>
+                            `
+                            : ""
+                    }
+
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        gap:18px;
+                        padding-top:10px;
+                        margin-top:5px;
+                        border-top:1px solid #e2e8f0;
+                    ">
+                        <strong>Item total</strong>
+                        <strong>
+                            ${money(lineTotal)}
+                        </strong>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
 
     async function downloadFile(fileId, files, button){
   const file = files.find(item => item.id === fileId);

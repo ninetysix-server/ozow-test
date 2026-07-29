@@ -143,15 +143,203 @@ import {
       document.querySelectorAll("[data-open]").forEach(btn=>btn.addEventListener("click",()=>openOrder(btn.dataset.open)));
     }
 
+    function renderOrderItemDetails(item) {
+    const details = item.details || {};
+    const quantity = Math.max(
+        1,
+        Number(item.quantity || 1)
+    );
+
+    const unitTotal = Number(item.price || 0);
+    const lineTotal = unitTotal * quantity;
+
+    const printing =
+        details.printing &&
+        typeof details.printing === "object"
+            ? details.printing
+            : null;
+
+    const printingSelected =
+        details.printingSelected === true ||
+        printing !== null;
+
+    const printingSize =
+        printing?.size ||
+        details.printingSize ||
+        "Standard";
+
+    const printingCopies = Number(
+        printing?.copies ||
+        details.printingCopies ||
+        0
+    );
+
+    const printingPricePerCopy = Number(
+        printing?.pricePerCopy ||
+        details.printingPricePerCopy ||
+        0
+    );
+
+    const printingUnitTotal = Number(
+        printing?.total ||
+        details.printingPrice ||
+        0
+    );
+
+    const designUnitTotal = Number(
+        details.designTotal ??
+        details.servicePrice ??
+        (
+            details.pages
+                ? Number(details.basePrice || 0) +
+                  (
+                      Number(details.additionalPages || 0) *
+                      Number(details.pricePerPage || 0)
+                  )
+                : unitTotal - printingUnitTotal
+        )
+    );
+
+    return `
+        <div style="
+            padding:16px;
+            margin-bottom:14px;
+            border:1px solid #e2e8f0;
+            border-radius:14px;
+            background:#ffffff;
+        ">
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:flex-start;
+                gap:18px;
+                margin-bottom:12px;
+            ">
+                <div>
+                    <strong style="display:block;">
+                        ${safe(
+                            item.serviceTitle ||
+                            item.title ||
+                            "Design Service"
+                        )}
+                    </strong>
+
+                    <small style="color:#64748b;">
+                        ${safe(item.tierName || "Standard")}
+                        × ${quantity}
+                    </small>
+                </div>
+
+                <strong>
+                    ${money(lineTotal)}
+                </strong>
+            </div>
+
+            <div style="
+                display:grid;
+                gap:8px;
+                font-size:13px;
+            ">
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    gap:20px;
+                ">
+                    <span>Design</span>
+                    <strong>
+                        ${money(designUnitTotal * quantity)}
+                    </strong>
+                </div>
+
+                ${
+                    printingSelected
+                        ? `
+                            <div style="
+                                margin-top:6px;
+                                padding-top:10px;
+                                border-top:1px solid #edf2f7;
+                                font-weight:700;
+                            ">
+                                Printing details
+                            </div>
+
+                            <div style="
+                                display:flex;
+                                justify-content:space-between;
+                                gap:20px;
+                            ">
+                                <span>Size</span>
+                                <strong>
+                                    ${safe(printingSize)}
+                                </strong>
+                            </div>
+
+                            <div style="
+                                display:flex;
+                                justify-content:space-between;
+                                gap:20px;
+                            ">
+                                <span>Copies</span>
+                                <strong>
+                                    ${printingCopies}
+                                </strong>
+                            </div>
+
+                            <div style="
+                                display:flex;
+                                justify-content:space-between;
+                                gap:20px;
+                            ">
+                                <span>Price per copy</span>
+                                <strong>
+                                    ${money(printingPricePerCopy)}
+                                </strong>
+                            </div>
+
+                            <div style="
+                                display:flex;
+                                justify-content:space-between;
+                                gap:20px;
+                            ">
+                                <span>
+                                    Printing subtotal
+                                </span>
+
+                                <strong>
+                                    ${money(
+                                        printingUnitTotal *
+                                        quantity
+                                    )}
+                                </strong>
+                            </div>
+                        `
+                        : ""
+                }
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    gap:20px;
+                    margin-top:6px;
+                    padding-top:10px;
+                    border-top:1px solid #e2e8f0;
+                    font-size:14px;
+                ">
+                    <strong>Item total</strong>
+                    <strong>${money(lineTotal)}</strong>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
     function openOrder(id){
       activeOrder = allOrders.find(o=>o.id===id);
       if(!activeOrder) return;
       $("modalTitle").textContent = activeOrder.order_id;
-      const items = (activeOrder.cart || []).map(item=>`
-        <div class="item-row">
-          <span>${safe(item.serviceTitle || "Design Service")} · ${safe(item.tierName || "Standard")} × ${Number(item.quantity || 1)}</span>
-          <strong>${money(Number(item.price || 0) * Number(item.quantity || 1))}</strong>
-        </div>`).join("") || "No cart items";
+      const items = (activeOrder.cart || [])
+    .map(renderOrderItemDetails)
+    .join("") || "No cart items";
 
       $("modalBody").innerHTML = `
         <div class="detail-grid">
