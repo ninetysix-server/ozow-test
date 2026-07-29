@@ -9,6 +9,7 @@ let selectedCategories = [];
 let selectedTiers = ['starter'];
 let priceRange = { min: 0, max: 5000 };
 let wishlistItems = [];
+let topDesignsSwiper = null;
 
 let currentPage = 1;
 function getItemsPerPage() {
@@ -69,6 +70,37 @@ function updateAllWishlistIcons() {
                 icon.style.color = '#6b6b6b';
                 btn.title = 'Add to wishlist';
             }
+            document
+    .querySelectorAll('.top-design-wishlist')
+    .forEach(button => {
+        const serviceId =
+            button.dataset.serviceId;
+
+        const isInWishlist =
+            wishlistItems.some(
+                item => item.id === serviceId
+            );
+
+        const icon =
+            button.querySelector('i');
+
+        button.classList.toggle(
+            'is-liked',
+            isInWishlist
+        );
+
+        if (icon) {
+            icon.className = `${
+                isInWishlist
+                    ? 'fas'
+                    : 'far'
+            } fa-heart`;
+        }
+
+        button.title = isInWishlist
+            ? 'Remove from wishlist'
+            : 'Add to wishlist';
+    });
         }
     });
 }
@@ -204,6 +236,335 @@ function getCategories(services) {
     return Array.from(categories).sort();
 }
 
+function escapeTopDesignValue(value) {
+    return String(value ?? '').replace(
+        /[&<>"']/g,
+        character => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        })[character]
+    );
+}
+
+
+function getTopDesignImage(service) {
+    return (
+        service.image_url ||
+        service.imageUrl ||
+        service.service_image ||
+        service.thumbnail_url ||
+        service.cover_image ||
+        service.image ||
+        ''
+    );
+}
+
+
+function getTopDesignTier(service) {
+    const tiers = Array.isArray(service.tiers)
+        ? service.tiers
+        : [];
+
+    const firstPricedTier = tiers.find(tier =>
+        tier &&
+        tier.price &&
+        tier.price !== 'Contact'
+    );
+
+    return firstPricedTier || tiers[0] || {
+        name: 'Starter',
+        price: 'Contact',
+        originalPrice: null,
+        description: service.description || ''
+    };
+}
+
+
+function renderTopDesigns() {
+    const wrapper = document.getElementById(
+        'topDesignsWrapper'
+    );
+
+    if (!wrapper) {
+        return;
+    }
+
+    const topServices = allServices
+        .filter(service =>
+            service &&
+            service.active !== false &&
+            service.is_addon_service !== true
+        )
+        .slice(0, 8);
+
+    if (!topServices.length) {
+        wrapper.innerHTML = `
+            <div class="swiper-slide">
+                <div class="top-design-loading">
+                    <i
+                        class="fas fa-layer-group"
+                        style="font-size:38px;"
+                    ></i>
+
+                    <p>No top designs are available.</p>
+                </div>
+            </div>
+        `;
+
+        return;
+    }
+
+    wrapper.innerHTML = topServices.map(service => {
+        const tier = getTopDesignTier(service);
+
+        const imageUrl =
+            getTopDesignImage(service);
+
+        const isInWishlist = wishlistItems.some(
+            item => item.id === service.id
+        );
+
+        const description =
+            tier.description ||
+            service.description ||
+            'Professional design created for your business.';
+
+        return `
+            <div class="swiper-slide">
+                <article
+                    class="top-design-card"
+                    data-top-design-id="${escapeTopDesignValue(
+                        service.id
+                    )}"
+                >
+                    <div class="top-design-image-wrap">
+
+                        <div class="top-design-actions">
+                            <button
+                                type="button"
+                                class="top-design-icon-btn"
+                                onclick="addToCart('${escapeTopDesignValue(
+                                    service.id
+                                )}')"
+                                aria-label="Add ${escapeTopDesignValue(
+                                    service.title
+                                )} to cart"
+                                title="Add to cart"
+                            >
+                                <i class="fas fa-shopping-cart"></i>
+                            </button>
+
+                            <button
+                                type="button"
+                                class="
+                                    top-design-icon-btn
+                                    top-design-wishlist
+                                    ${isInWishlist
+                                        ? 'is-liked'
+                                        : ''
+                                    }
+                                "
+                                data-service-id="${escapeTopDesignValue(
+                                    service.id
+                                )}"
+                                onclick="toggleWishlist('${escapeTopDesignValue(
+                                    service.id
+                                )}')"
+                                aria-label="Add ${escapeTopDesignValue(
+                                    service.title
+                                )} to wishlist"
+                                title="Add to wishlist"
+                            >
+                                <i class="${
+                                    isInWishlist
+                                        ? 'fas'
+                                        : 'far'
+                                } fa-heart"></i>
+                            </button>
+                        </div>
+
+                        ${
+                            imageUrl
+                                ? `
+                                    <img
+                                        class="top-design-image"
+                                        src="${escapeTopDesignValue(
+                                            imageUrl
+                                        )}"
+                                        alt="${escapeTopDesignValue(
+                                            service.title
+                                        )}"
+                                        loading="lazy"
+                                        onerror="
+                                            this.style.display='none';
+                                            this.nextElementSibling.style.display='grid';
+                                        "
+                                    >
+
+                                    <div
+                                        class="top-design-image-fallback"
+                                        style="display:none;"
+                                    >
+                                        <i class="fas fa-paint-brush"></i>
+                                    </div>
+                                `
+                                : `
+                                    <div
+                                        class="top-design-image-fallback"
+                                    >
+                                        <i class="fas fa-paint-brush"></i>
+                                    </div>
+                                `
+                        }
+                    </div>
+
+                    <div class="top-design-content">
+                        <h3 class="top-design-title">
+                            ${escapeTopDesignValue(
+                                service.title
+                            )}
+                        </h3>
+
+                        <p class="top-design-description">
+                            ${escapeTopDesignValue(description)}
+                        </p>
+
+                        <img
+                            class="design-more-image"
+                            src="assets/images/cart-title-imge.png"
+                            alt="Design more"
+                            loading="lazy"
+                        >
+
+                        <div class="top-design-footer">
+                            <div class="top-design-price-group">
+                                <span class="top-design-original-price">
+                                    ${
+                                        tier.originalPrice
+                                            ? escapeTopDesignValue(
+                                                tier.originalPrice
+                                            )
+                                            : ''
+                                    }
+                                </span>
+
+                                <strong class="top-design-price">
+                                    ${escapeTopDesignValue(
+                                        tier.price
+                                    )}
+                                </strong>
+                            </div>
+
+                            <span class="top-design-tier">
+                                ${escapeTopDesignValue(
+                                    tier.name || 'Starter'
+                                )}
+                            </span>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        `;
+    }).join('');
+
+    initialiseTopDesignsSwiper();
+}
+
+
+function initialiseTopDesignsSwiper() {
+    const element = document.querySelector(
+        '.top-designs-swiper'
+    );
+
+    if (!element || typeof Swiper === 'undefined') {
+        return;
+    }
+
+    if (topDesignsSwiper) {
+        topDesignsSwiper.destroy(
+            true,
+            true
+        );
+
+        topDesignsSwiper = null;
+    }
+
+    topDesignsSwiper = new Swiper(
+        element,
+        {
+            slidesPerView: 1.08,
+            spaceBetween: 14,
+            speed: 650,
+            grabCursor: true,
+            watchOverflow: true,
+
+            pagination: {
+                el: '.top-designs-pagination',
+                clickable: true
+            },
+
+            breakpoints: {
+                480: {
+                    slidesPerView: 1.45,
+                    spaceBetween: 15
+                },
+
+                640: {
+                    slidesPerView: 2.15,
+                    spaceBetween: 18
+                },
+
+                769: {
+                    slidesPerView: 3,
+                    spaceBetween: 22
+                },
+
+                1100: {
+                    slidesPerView: 4,
+                    spaceBetween: 32
+                }
+            },
+
+            autoplay: {
+                delay: 2800,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true
+            }
+        }
+    );
+
+    updateTopDesignAutoplay();
+}
+
+
+function updateTopDesignAutoplay() {
+    if (
+        !topDesignsSwiper ||
+        !topDesignsSwiper.autoplay
+    ) {
+        return;
+    }
+
+    const smallScreen =
+        window.matchMedia(
+            '(max-width: 768px)'
+        ).matches;
+
+    if (smallScreen) {
+        topDesignsSwiper.autoplay.start();
+    } else {
+        topDesignsSwiper.autoplay.stop();
+
+        topDesignsSwiper.slideTo(
+            0,
+            0
+        );
+    }
+}
+
 async function loadServices() {
     try {
         isLoading = true;
@@ -312,10 +673,15 @@ printingPrice:
     };
 });
         generateCategoryFilters(allServices);
+
         filteredServices = [...allServices];
+
         isLoading = false;
+
+        renderTopDesigns();
         renderServices();
         updateServiceCount();
+        updateAllWishlistIcons();
     } catch (error) {
         console.error('Error loading services:', error);
         isLoading = false;
@@ -1733,13 +2099,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 window.addEventListener('resize', () => {
-    const newItemsPerPage = getItemsPerPage();
+    const newItemsPerPage =
+        getItemsPerPage();
 
     if (newItemsPerPage !== itemsPerPage) {
-        itemsPerPage = newItemsPerPage;
+        itemsPerPage =
+            newItemsPerPage;
+
         currentPage = 1;
+
         renderServices();
     }
+
+    updateTopDesignAutoplay();
 });
 
 
