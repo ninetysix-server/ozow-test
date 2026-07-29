@@ -139,6 +139,104 @@ class CartManager {
         }
     }
 
+    createItemDetailsHTML(item, confirmation = false) {
+    const details = item.details || {};
+    const rows = [];
+
+    // Multi-page services
+    if (details.pages) {
+        rows.push(`
+            <div class="cart-selection-row">
+                <span>Pages</span>
+                <strong>${details.pages}</strong>
+            </div>
+        `);
+
+        rows.push(`
+            <div class="cart-selection-row">
+                <span>First page</span>
+                <strong>R${Number(details.basePrice || 0).toFixed(2)}</strong>
+            </div>
+        `);
+
+        if (Number(details.additionalPages) > 0) {
+            rows.push(`
+                <div class="cart-selection-row">
+                    <span>
+                        Additional pages
+                        (${details.additionalPages} ×
+                        R${Number(details.pricePerPage || 0).toFixed(2)})
+                    </span>
+
+                    <strong>
+                        R${(
+                            Number(details.additionalPages || 0) *
+                            Number(details.pricePerPage || 0)
+                        ).toFixed(2)}
+                    </strong>
+                </div>
+            `);
+        }
+    }
+
+    // Website add-ons
+    if (details.addonName) {
+        rows.push(`
+            <div class="cart-selection-row">
+                <span>Website add-on</span>
+                <strong>${details.addonName}</strong>
+            </div>
+        `);
+
+        if (details.parentServiceTitle) {
+            rows.push(`
+                <div class="cart-selection-row">
+                    <span>Service</span>
+                    <strong>${details.parentServiceTitle}</strong>
+                </div>
+            `);
+        }
+    }
+
+    // Normal service category
+    if (
+        details.category &&
+        !details.pages &&
+        !details.addonName
+    ) {
+        rows.push(`
+            <div class="cart-selection-row">
+                <span>Category</span>
+                <strong>${details.category}</strong>
+            </div>
+        `);
+    }
+
+    // Sale information
+    if (Number(details.discountPercentage) > 0) {
+        rows.push(`
+            <div class="cart-selection-row">
+                <span>Discount</span>
+                <strong>${details.discountPercentage}% off</strong>
+            </div>
+        `);
+    }
+
+    if (rows.length === 0) {
+        return '';
+    }
+
+    return `
+        <div class="${
+            confirmation
+                ? 'confirmation-selection-summary'
+                : 'cart-selection-summary'
+        }">
+            ${rows.join('')}
+        </div>
+    `;
+}
+
     createItemHTML(item) {
         const li = document.createElement('li');
         li.className = 'cart-item';
@@ -154,6 +252,9 @@ class CartManager {
                 <div class="cart-detail-group"><div class="cart-detail-label">Unit Price</div><div class="cart-detail-value cart-item-price">R${item.price.toFixed(2)}</div></div>
                 <div class="cart-detail-group"><div class="cart-detail-label">Quantity</div><div class="cart-detail-value">${item.quantity || 1}</div></div>
             </div>
+
+            ${this.createItemDetailsHTML(item)}
+
             <div class="cart-item-footer">
                 <div class="cart-quantity-controls">
                     <button class="cart-quantity-btn minus" data-id="${item.id}"><i class="fas fa-minus"></i></button>
@@ -179,6 +280,9 @@ class CartManager {
                 <div class="confirmation-detail-group"><div class="confirmation-detail-label">Unit Price</div><div class="confirmation-detail-value confirmation-item-price">R${item.price.toFixed(2)}</div></div>
                 <div class="confirmation-detail-group"><div class="confirmation-detail-label">Quantity</div><div class="confirmation-detail-value">${item.quantity || 1}</div></div>
             </div>
+
+            ${this.createItemDetailsHTML(item, true)}
+
             <div class="confirmation-item-footer">
                 <div class="confirmation-quantity"><i class="fas fa-box"></i> Qty: ${item.quantity || 1}</div>
                 <div class="confirmation-item-total">R${total.toFixed(2)}</div>
