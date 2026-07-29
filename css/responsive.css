@@ -148,37 +148,6 @@
         min-height: auto;
     }
     
-    .designs-title {
-        font-size: 22px;
-    }
-    
-    .top-designs-swiper {
-        padding: 0 0 30px 0;
-        height: 350px;
-    }
-    
-    .design-image-container {
-        height: 180px;
-    }
-    
-    .design-info {
-        padding: 18px;
-    }
-    
-    .design-title {
-        font-size: 16px;
-        min-height: 44px;
-    }
-    
-    .design-price {
-        font-size: 17px;
-    }
-    
-    .top-designs-swiper .swiper-button-next,
-    .top-designs-swiper .swiper-button-prev {
-        display: none;
-    }
-    
     .cart-popup-container {
         max-width: 100%;
         width: 100%;
