@@ -1,5 +1,8 @@
 // js/services.js
-import { getServices } from './supabase.js';
+import {
+    getServices,
+    supabase
+} from './supabase.js';
 import { cartManager } from './cart.js';
 
 let allServices = [];
@@ -2045,6 +2048,161 @@ function updateServiceCount() {
     if (count) count.textContent = `${filteredServices.length} services`;
 }
 
+let saleCountdownInterval = null;
+
+function hideSaleBanner() {
+    const offerBar = document.getElementById('offerBar');
+
+    if (offerBar) {
+        offerBar.hidden = true;
+    }
+
+    if (saleCountdownInterval) {
+        clearInterval(saleCountdownInterval);
+        saleCountdownInterval = null;
+    }
+}
+
+function updateSaleCountdown(endsAt) {
+    const endTime = new Date(endsAt).getTime();
+
+    const daysElement = document.getElementById('saleDays');
+    const hoursElement = document.getElementById('saleHours');
+    const minutesElement = document.getElementById('saleMinutes');
+    const secondsElement = document.getElementById('saleSeconds');
+
+    function update() {
+        const remaining = endTime - Date.now();
+
+        if (remaining <= 0) {
+            hideSaleBanner();
+            return;
+        }
+
+        const days = Math.floor(
+            remaining / (1000 * 60 * 60 * 24)
+        );
+
+        const hours = Math.floor(
+            (remaining / (1000 * 60 * 60)) % 24
+        );
+
+        const minutes = Math.floor(
+            (remaining / (1000 * 60)) % 60
+        );
+
+        const seconds = Math.floor(
+            (remaining / 1000) % 60
+        );
+
+        if (daysElement) {
+            daysElement.textContent =
+                `${String(days).padStart(2, '0')}d`;
+        }
+
+        if (hoursElement) {
+            hoursElement.textContent =
+                `${String(hours).padStart(2, '0')}h`;
+        }
+
+        if (minutesElement) {
+            minutesElement.textContent =
+                `${String(minutes).padStart(2, '0')}m`;
+        }
+
+        if (secondsElement) {
+            secondsElement.textContent =
+                `${String(seconds).padStart(2, '0')}s`;
+        }
+    }
+
+    update();
+
+    saleCountdownInterval = setInterval(
+        update,
+        1000
+    );
+}
+
+async function loadSaleCampaign() {
+    const offerBar = document.getElementById('offerBar');
+    const titleElement = document.getElementById('saleTitle');
+
+    if (!offerBar || !titleElement) {
+        return;
+    }
+
+    hideSaleBanner();
+
+    const { data, error } = await supabase
+        .from('sale_campaign')
+        .select('active, title, ends_at')
+        .eq('id', 1)
+        .maybeSingle();
+
+    if (error) {
+        console.error(
+            'Error loading sale campaign:',
+            error
+        );
+
+        return;
+    }
+
+    if (
+        !data ||
+        data.active !== true ||
+        !data.title ||
+        !data.ends_at
+    ) {
+        return;
+    }
+
+    const endTime =
+        new Date(data.ends_at).getTime();
+
+    if (
+        Number.isNaN(endTime) ||
+        endTime <= Date.now()
+    ) {
+        return;
+    }
+
+    const dismissedSale =
+        localStorage.getItem(
+            'dismissedSaleEndsAt'
+        );
+
+    if (dismissedSale === data.ends_at) {
+        return;
+    }
+
+    titleElement.textContent = data.title;
+    offerBar.hidden = false;
+
+    updateSaleCountdown(data.ends_at);
+
+    const closeButtons = [
+        document.getElementById('closeOffer'),
+        document.getElementById('closeOfferDesktop')
+    ];
+
+    closeButtons.forEach(button => {
+        if (!button) {
+            return;
+        }
+
+        button.onclick = () => {
+            localStorage.setItem(
+                'dismissedSaleEndsAt',
+                data.ends_at
+            );
+
+            hideSaleBanner();
+        };
+    });
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     // Wishlist modal events
@@ -2120,6 +2278,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    loadSaleCampaign();
     loadServices();
 });
 
