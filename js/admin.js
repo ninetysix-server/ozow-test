@@ -22,6 +22,7 @@ import {
       $("toast").classList.add("show");
       setTimeout(()=>$("toast").classList.remove("show"),2400);
     }
+    
 
     async function sendOrderUpdateEmail(
   orderRecordId,
@@ -1081,6 +1082,237 @@ if(
     $("orderModal").addEventListener("click",e=>{if(e.target===$("orderModal")) closeModal()});
     ["searchInput","paymentFilter","designFilter"].forEach(id=>$("searchInput") && $(id).addEventListener(id==="searchInput"?"input":"change",renderOrders));
     $("signOutBtn").addEventListener("click",async()=>{await supabase.auth.signOut();window.location.href="index.html"});
+    $("saleForm").addEventListener(
+    "submit",
+    saveSaleCampaign
+    );
+
+    function toDateTimeLocal(value) {
+
+    if (!value) {
+        return "";
+    }
+
+    const date = new Date(value);
+
+    const timezoneOffset =
+        date.getTimezoneOffset() * 60000;
+
+    return new Date(
+        date.getTime() - timezoneOffset
+    )
+        .toISOString()
+        .slice(0, 16);
+}
+
+
+function updateSaleStatus(campaign) {
+
+    const badge = $("saleStatusBadge");
+
+    if (!badge) {
+        return;
+    }
+
+    const endTime = campaign?.ends_at
+        ? new Date(campaign.ends_at).getTime()
+        : 0;
+
+    const active =
+        campaign?.active === true &&
+        endTime > Date.now();
+
+    if (active) {
+
+        badge.textContent = "Active";
+        badge.style.color = "#166534";
+        badge.style.background = "#dcfce7";
+
+    } else if (
+        campaign?.active === true &&
+        endTime <= Date.now()
+    ) {
+
+        badge.textContent = "Expired";
+        badge.style.color = "#991b1b";
+        badge.style.background = "#fee2e2";
+
+    } else {
+
+        badge.textContent = "Inactive";
+        badge.style.color = "#475569";
+        badge.style.background = "#f1f5f9";
+
+    }
+
+    badge.style.padding = "8px 14px";
+    badge.style.borderRadius = "30px";
+    badge.style.fontWeight = "700";
+}
+
+
+async function loadSaleCampaign() {
+
+    const {
+        data,
+        error
+    } = await supabase
+        .from("sale_campaign")
+        .select("*")
+        .eq("id", 1)
+        .maybeSingle();
+
+    if (error) {
+
+        alert(
+            "Unable to load sale settings: " +
+            error.message
+        );
+
+        return;
+    }
+
+    const campaign = data || {
+        active: false,
+        title: "",
+        ends_at: null
+    };
+
+    $("saleActive").value =
+        campaign.active === true
+            ? "true"
+            : "false";
+
+    $("saleTitle").value =
+        campaign.title || "";
+
+    $("saleEndDate").value =
+        toDateTimeLocal(
+            campaign.ends_at
+        );
+
+    updateSaleStatus(campaign);
+}
+
+
+async function saveSaleCampaign(event) {
+
+    event.preventDefault();
+
+    const active =
+        $("saleActive").value === "true";
+
+    const title =
+        $("saleTitle").value.trim();
+
+    const endDateValue =
+        $("saleEndDate").value;
+
+    if (active && !title) {
+
+        alert("Enter the sale title.");
+
+        $("saleTitle").focus();
+
+        return;
+    }
+
+    if (active && !endDateValue) {
+
+        alert(
+            "Select the sale ending date and time."
+        );
+
+        $("saleEndDate").focus();
+
+        return;
+    }
+
+    let endsAt = null;
+
+    if (endDateValue) {
+
+        const selectedDate =
+            new Date(endDateValue);
+
+        if (
+            Number.isNaN(
+                selectedDate.getTime()
+            )
+        ) {
+
+            alert("The sale ending date is invalid.");
+
+            return;
+        }
+
+        if (
+            active &&
+            selectedDate.getTime() <= Date.now()
+        ) {
+
+            alert(
+                "The sale ending date must be in the future."
+            );
+
+            return;
+        }
+
+        endsAt =
+            selectedDate.toISOString();
+    }
+
+    const button =
+        $("saveSaleBtn");
+
+    button.disabled = true;
+
+    button.innerHTML = `
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Saving...
+    `;
+
+    const {
+        data,
+        error
+    } = await supabase
+        .from("sale_campaign")
+        .upsert({
+            id: 1,
+            active,
+            title,
+            ends_at: endsAt,
+            updated_at:
+                new Date().toISOString()
+        })
+        .select()
+        .single();
+
+    button.disabled = false;
+
+    button.innerHTML = `
+        <i class="fa-solid fa-floppy-disk"></i>
+        Save Sale
+    `;
+
+    if (error) {
+
+        alert(
+            "Unable to save sale: " +
+            error.message
+        );
+
+        return;
+    }
+
+    updateSaleStatus(data);
+
+    showToast(
+        active
+            ? "Sale activated successfully."
+            : "Sale deactivated successfully."
+    );
+}
 
     const admin = await guardAdmin();
 
@@ -1091,9 +1323,11 @@ if (admin) {
 
     const ordersNav = $("ordersNav");
     const servicesNav = $("servicesNav");
+    const saleNav = $("saleNav");
 
-const ordersPanel = $("ordersPanel");
-const servicesPanel = $("servicesPanel");
+    const ordersPanel = $("ordersPanel");
+    const servicesPanel = $("servicesPanel");
+    const salePanel = $("salePanel");
 
 ordersNav.addEventListener("click", e => {
 
@@ -1101,9 +1335,11 @@ ordersNav.addEventListener("click", e => {
 
     ordersNav.classList.add("active");
     servicesNav.classList.remove("active");
+    saleNav.classList.remove("active");
 
     ordersPanel.style.display = "";
     servicesPanel.style.display = "none";
+    salePanel.style.display = "none";
 
 });
 
@@ -1111,12 +1347,30 @@ servicesNav.addEventListener("click", async e => {
 
     e.preventDefault();
 
-    servicesNav.classList.add("active");
     ordersNav.classList.remove("active");
+    saleNav.classList.remove("active");
+    servicesNav.classList.add("active");
 
     ordersPanel.style.display = "none";
+    salePanel.style.display = "none";
     servicesPanel.style.display = "";
 
     await loadServices();
+
+});
+
+saleNav.addEventListener("click", async e => {
+
+    e.preventDefault();
+
+    saleNav.classList.add("active");
+    servicesNav.classList.remove("active");
+    ordersNav.classList.remove("active");
+
+    ordersPanel.style.display = "none";
+    servicesPanel.style.display = "none";
+    salePanel.style.display = "";
+
+    await loadSaleCampaign();
 
 });
