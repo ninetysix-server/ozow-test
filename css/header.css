@@ -18,6 +18,10 @@
     pointer-events: all;
 }
 
+.offer-bar[hidden] {
+    display: none !important;
+}
+
 .offer-bar {
     background: linear-gradient(135deg, #004370, #00609c);
     color: white;
