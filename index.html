@@ -84,7 +84,116 @@
             <!-- Desktop Nav -->
             <nav class="desktop-nav">
                 <ul class="nav-menu">
-                    <li class="nav-item"><a href="#" class="nav-link active" id="nav-services">Services</a></li>
+                    <li class="nav-item services-nav-item">
+    <a
+        href="#services"
+        class="nav-link active services-menu-trigger"
+        id="nav-services"
+        aria-haspopup="true"
+        aria-expanded="false"
+        aria-controls="servicesMegaMenu"
+    >
+        Services
+
+        <i
+            class="fas fa-chevron-down services-menu-arrow"
+            aria-hidden="true"
+        ></i>
+    </a>
+
+    <div
+        class="services-mega-menu"
+        id="servicesMegaMenu"
+        aria-hidden="true"
+    >
+        <div class="services-mega-content">
+
+            <!-- Design services card -->
+            <a
+                href="#services"
+                class="services-mega-feature"
+            >
+                <div class="services-mega-image">
+                    <img
+                        src="assets/images/slide-03.png"
+                        alt="96 Studios design services"
+                    >
+                </div>
+
+                <div class="services-mega-feature-content">
+                    <h3>Professional Design Services</h3>
+
+                    <p>
+                        Explore logos, posters, business cards,
+                        branding and other creative services.
+                    </p>
+
+                    <span>
+                        Explore designs
+                        <i class="fas fa-arrow-right"></i>
+                    </span>
+                </div>
+            </a>
+
+            <!-- Printing services card -->
+            <a
+                href="#printingServices"
+                class="services-mega-feature"
+            >
+                <div class="services-mega-image">
+                    <img
+                        src="assets/images/printing/pvc-banner.jpg"
+                        alt="96 Studios printing services"
+                    >
+                </div>
+
+                <div class="services-mega-feature-content">
+                    <h3>Printing Services</h3>
+
+                    <p>
+                        Configure banners, business cards,
+                        gazebos, posters and branded products.
+                    </p>
+
+                    <span>
+                        Explore printing
+                        <i class="fas fa-arrow-right"></i>
+                    </span>
+                </div>
+            </a>
+
+            <!-- Additional links -->
+            <div class="services-mega-links">
+                <h3>Explore more</h3>
+
+                <a href="#topDesignsSection">
+                    Top Designs
+                </a>
+
+                <a href="#services">
+                    Branding Services
+                </a>
+
+                <a href="#printingServices">
+                    Printing Quotations
+                </a>
+
+                <a href="#footer">
+                    Customer Support
+                </a>
+
+                <a
+                    href="https://wa.me/27817925033"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Contact Us
+                </a>
+            </div>
+
+        </div>
+    </div>
+</li>
                     <li class="nav-item"><a href="#" class="nav-link" id="nav-branding">Branding</a></li>
                     <li class="nav-item"><a href="#" class="nav-link" id="nav-pricing">Pricing</a></li>
                     <li class="nav-item"><a href="#footer" class="nav-link">Support</a></li>
@@ -779,5 +888,6 @@
     <script type="module" src="js/hero.js"></script>
     <script type="module" src="js/search.js"></script>
     <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/header.js"></script>
 </body>
 </html>
