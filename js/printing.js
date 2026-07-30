@@ -927,12 +927,8 @@ function createPrintingCard(service) {
                         data-configure-printing="${service.id}"
                         aria-label="Configure ${title}"
                     >
-                        <i
-                            class="fas fa-sliders-h"
-                            aria-hidden="true"
-                        ></i>
-
-                        <span>Configure</span>
+                    
+                        <span>Get Quote</span>
                     </button>
                 </div>
             </div>
