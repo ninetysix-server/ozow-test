@@ -1634,64 +1634,92 @@ if (downloadBtn) {
     );
 }
 
-$("downloadReportBeforeReset")
-    .addEventListener(
+const downloadBeforeResetBtn =
+    $("downloadReportBeforeReset");
+
+if (downloadBeforeResetBtn) {
+    downloadBeforeResetBtn.addEventListener(
         "click",
         generateOrdersPdf
     );
+}
 
-$("openResetOrders")
-    .addEventListener(
+const openResetOrdersBtn =
+    $("openResetOrders");
+
+if (openResetOrdersBtn) {
+    openResetOrdersBtn.addEventListener(
         "click",
         openResetOrdersModal
     );
+}
 
-$("closeResetOrders")
-    .addEventListener(
+const closeResetOrdersBtn =
+    $("closeResetOrders");
+
+if (closeResetOrdersBtn) {
+    closeResetOrdersBtn.addEventListener(
         "click",
         closeResetOrdersModal
     );
+}
 
-$("cancelResetOrders")
-    .addEventListener(
+const cancelResetOrdersBtn =
+    $("cancelResetOrders");
+
+if (cancelResetOrdersBtn) {
+    cancelResetOrdersBtn.addEventListener(
         "click",
         closeResetOrdersModal
     );
+}
 
-$("resetOrdersConfirmation")
-    .addEventListener(
+const resetConfirmationInput =
+    $("resetOrdersConfirmation");
+
+if (resetConfirmationInput) {
+    resetConfirmationInput.addEventListener(
         "input",
         updateResetButtonState
     );
+}
 
-$("resetOrdersAgreement")
-    .addEventListener(
+const resetAgreementCheckbox =
+    $("resetOrdersAgreement");
+
+if (resetAgreementCheckbox) {
+    resetAgreementCheckbox.addEventListener(
         "change",
         updateResetButtonState
     );
+}
 
-$("confirmResetOrders")
-    .addEventListener(
+const confirmResetOrdersBtn =
+    $("confirmResetOrders");
+
+if (confirmResetOrdersBtn) {
+    confirmResetOrdersBtn.addEventListener(
         "click",
         resetAllOrders
     );
+}
 
-$("resetOrdersModal")
-    .addEventListener(
+const resetOrdersModal =
+    $("resetOrdersModal");
+
+if (resetOrdersModal) {
+    resetOrdersModal.addEventListener(
         "click",
         event => {
             if (
                 event.target ===
-                $("resetOrdersModal")
+                resetOrdersModal
             ) {
                 closeResetOrdersModal();
             }
         }
     );
-    $("saleForm").addEventListener(
-    "submit",
-    saveSaleCampaign
-    );
+}
 
     function toDateTimeLocal(value) {
 
