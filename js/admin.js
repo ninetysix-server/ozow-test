@@ -1625,11 +1625,14 @@ if(
     $("orderModal").addEventListener("click",e=>{if(e.target===$("orderModal")) closeModal()});
     ["searchInput","paymentFilter","designFilter"].forEach(id=>$("searchInput") && $(id).addEventListener(id==="searchInput"?"input":"change",renderOrders));
     $("signOutBtn").addEventListener("click",async()=>{await supabase.auth.signOut();window.location.href="index.html"});
-    $("downloadOrdersReport")
-    .addEventListener(
+    const downloadBtn = $("downloadOrdersReport");
+
+if (downloadBtn) {
+    downloadBtn.addEventListener(
         "click",
         generateOrdersPdf
     );
+}
 
 $("downloadReportBeforeReset")
     .addEventListener(
