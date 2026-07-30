@@ -702,35 +702,81 @@
     </nav>
 
     <!-- HERO SECTION -->
-    <section class="hero-section">
-        <div class="swiper heroSwiper">
-            <div class="swiper-wrapper">
-                <div class="swiper-slide">
-                    <div class="slide-image-container"><img src="assets/images/slide-01.png" alt="Slide 1" class="slide-image" /></div>
-                    <div class="slide-overlay">
-                        <div class="slide-content">
-                            <h1 class="slide-title">Transform Your Vision Into Reality</h1>
-                            <p class="slide-description">Our award-winning design team creates stunning visuals that elevate your brand.</p>
-                            <a href="#" class="slide-cta">Get started <i class="fas fa-arrow-right"></i></a>
-                        </div>
-                    </div>
+<section class="hero-section hero-is-loading" id="heroSection">
+
+    <div class="hero-loading-screen" id="heroLoadingScreen">
+        <div class="hero-loading-content">
+            <span class="hero-loading-spinner"></span>
+            <span>Loading...</span>
+        </div>
+    </div>
+
+    <div class="swiper heroSwiper">
+        <div class="swiper-wrapper">
+
+            <div class="swiper-slide">
+                <div class="slide-image-container">
+                    <img
+                        src="assets/images/slide-01.png"
+                        alt="Slide 1"
+                        class="slide-image"
+                    >
                 </div>
-                <div class="swiper-slide">
-                    <div class="slide-image-container"><img src="assets/images/slide-03.png" alt="Slide 2" class="slide-image" /></div>
-                    <div class="slide-overlay">
-                        <div class="slide-content">
-                            <h1 class="slide-title">Quality Design Services</h1>
-                            <p class="slide-description">Get premium graphic design services tailored to your brand's identity.</p>
-                            <a href="#" class="slide-cta">Explore Services <i class="fas fa-arrow-right"></i></a>
-                        </div>
+
+                <div class="slide-overlay">
+                    <div class="slide-content">
+                        <h1 class="slide-title">
+                            Transform Your Vision Into Reality
+                        </h1>
+
+                        <p class="slide-description">
+                            Our award-winning design team creates
+                            stunning visuals that elevate your brand.
+                        </p>
+
+                        <a href="#" class="slide-cta">
+                            Get started
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
                 </div>
             </div>
-            <div class="swiper-pagination"></div>
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
+
+            <div class="swiper-slide">
+                <div class="slide-image-container">
+                    <img
+                        src="assets/images/slide-03.png"
+                        alt="Slide 2"
+                        class="slide-image"
+                    >
+                </div>
+
+                <div class="slide-overlay">
+                    <div class="slide-content">
+                        <h1 class="slide-title">
+                            Quality Design Services
+                        </h1>
+
+                        <p class="slide-description">
+                            Get premium graphic design services
+                            tailored to your brand's identity.
+                        </p>
+
+                        <a href="#" class="slide-cta">
+                            Explore Services
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
         </div>
-    </section>
+
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+    </div>
+</section>
 
     <!-- WHATSAPP BUTTON -->
     <a id="whatsappBtn" class="whatsapp-btn" href="https://wa.me/27817925033" target="_blank" aria-label="Chat on WhatsApp">
