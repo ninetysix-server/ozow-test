@@ -1,6 +1,5 @@
 /* =========================================================
    96 STUDIOS — PRINTING SERVICES
-   Complete full-image card styling
 ========================================================= */
 
 .printing-section {
@@ -37,7 +36,7 @@
     padding: 9px 18px;
     margin-bottom: 17px;
     border: 1px solid rgba(0, 155, 91, 0.15);
-    border-radius: 60px;
+    border-radius: 999px;
     background: rgba(0, 155, 91, 0.09);
     color: var(--accent, #009b5b);
     font-size: 12px;
@@ -74,15 +73,16 @@
 }
 
 /* =========================================================
-   FULL-IMAGE PRINTING CARD
+   SQUARE PRINTING CARDS
 ========================================================= */
 
 .printing-card {
     position: relative;
     display: flex;
     align-items: flex-end;
+    width: 100%;
     min-width: 0;
-    height: 440px;
+    aspect-ratio: 1 / 1;
     overflow: hidden;
     isolation: isolate;
     border-radius: 26px;
@@ -102,7 +102,9 @@
         0 8px 20px rgba(15, 23, 42, 0.12);
 }
 
-/* Background image */
+/* =========================================================
+   CARD IMAGE
+========================================================= */
 
 .printing-card-background {
     position: absolute;
@@ -123,7 +125,9 @@
     filter: saturate(1.08) contrast(1.03);
 }
 
-/* Dark overlay behind text */
+/* =========================================================
+   DARK IMAGE OVERLAY
+========================================================= */
 
 .printing-card-overlay {
     position: absolute;
@@ -133,27 +137,12 @@
         linear-gradient(
             to bottom,
             rgba(3, 12, 22, 0.04) 0%,
-            rgba(3, 12, 22, 0.08) 24%,
-            rgba(3, 12, 22, 0.38) 48%,
-            rgba(3, 12, 22, 0.85) 73%,
-            rgba(3, 12, 22, 0.98) 100%
-        );
-    transition: background 0.35s ease;
-}
-
-.printing-card:hover .printing-card-overlay {
-    background:
-        linear-gradient(
-            to bottom,
-            rgba(3, 12, 22, 0.02) 0%,
-            rgba(3, 12, 22, 0.07) 22%,
-            rgba(3, 12, 22, 0.35) 46%,
-            rgba(3, 12, 22, 0.87) 72%,
+            rgba(3, 12, 22, 0.08) 22%,
+            rgba(3, 12, 22, 0.48) 48%,
+            rgba(3, 12, 22, 0.9) 72%,
             rgba(3, 12, 22, 0.99) 100%
         );
 }
-
-/* Subtle card border */
 
 .printing-card::after {
     content: "";
@@ -166,36 +155,33 @@
 }
 
 /* =========================================================
-   CARD TOP TAGS
+   NEW BADGE
 ========================================================= */
 
 .printing-card-top {
     position: absolute;
-    top: 17px;
-    right: 17px;
-    left: 17px;
+    top: 15px;
+    left: 15px;
     z-index: 5;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
 }
 
 .printing-new-tag {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 34px;
-    padding: 8px 15px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 60px;
+    min-width: 68px;
+    height: 32px;
+    padding: 0 17px;
+    border: none;
+    border-radius: 999px;
     background: var(--accent, #009b5b);
     color: #ffffff;
     font-size: 10px;
     font-weight: 800;
-    letter-spacing: 0.11em;
+    line-height: 1;
+    letter-spacing: 0.09em;
     text-transform: uppercase;
-    box-shadow: 0 8px 20px rgba(0, 155, 91, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 155, 91, 0.32);
 }
 
 .printing-new-tag::before {
@@ -205,126 +191,116 @@
     margin-right: 7px;
     border-radius: 50%;
     background: #ffffff;
-    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.17);
-}
-
-.printing-card-number {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 38px;
-    min-height: 38px;
-    padding: 7px 11px;
-    border: 1px solid rgba(255, 255, 255, 0.24);
-    border-radius: 60px;
-    background: rgba(4, 18, 30, 0.55);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    color: #ffffff;
-    font-size: 11px;
-    font-weight: 800;
-    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.14);
 }
 
 /* =========================================================
-   CARD TEXT CONTENT
+   CARD CONTENT
 ========================================================= */
 
 .printing-card-content {
     position: relative;
     z-index: 3;
     width: 100%;
-    padding: 25px 20px 20px;
+    min-width: 0;
+    padding: 18px;
     color: #ffffff;
 }
 
 .printing-card-category {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 9px;
+    gap: 7px;
+    margin-bottom: 7px;
     color: #6ee7b7;
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 800;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.11em;
     text-transform: uppercase;
 }
 
 .printing-card-category::before {
     content: "";
-    width: 22px;
+    width: 18px;
     height: 2px;
     flex-shrink: 0;
-    border-radius: 20px;
+    border-radius: 999px;
     background: #6ee7b7;
 }
 
 .printing-card h3 {
-    margin: 0 0 9px;
+    margin: 0 0 7px;
     color: #ffffff;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 800;
-    line-height: 1.22;
-    text-shadow: 0 3px 15px rgba(0, 0, 0, 0.3);
+    line-height: 1.18;
+    text-shadow: 0 3px 15px rgba(0, 0, 0, 0.35);
 }
 
 .printing-description {
     display: -webkit-box;
     overflow: hidden;
-    margin: 0 0 17px;
-    color: rgba(255, 255, 255, 0.75);
-    font-size: 12px;
-    line-height: 1.55;
+    margin: 0 0 12px;
+    color: rgba(255, 255, 255, 0.76);
+    font-size: 11px;
+    line-height: 1.45;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
 }
 
 /* =========================================================
-   PRICE AND QUOTE BUTTON
+   PRICE AND BUTTON
 ========================================================= */
 
 .printing-card-footer {
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 12px;
-    padding-top: 15px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+    padding-top: 11px;
     border-top: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .printing-price-area {
+    display: block;
+    width: 100%;
     min-width: 0;
 }
 
 .printing-price-label {
     display: block;
-    margin-bottom: 4px;
-    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 3px;
+    color: rgba(255, 255, 255, 0.58);
     font-size: 8px;
     font-weight: 800;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.09em;
     text-transform: uppercase;
 }
 
 .printing-price {
+    display: block;
+    width: 100%;
     margin: 0;
     color: #ffffff;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 800;
     line-height: 1.2;
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 .printing-quote-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
     gap: 7px;
-    min-height: 41px;
-    padding: 10px 14px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 60px;
+    width: 100%;
+    min-width: 0;
+    min-height: 38px;
+    padding: 9px 12px;
+    border: none;
+    border-radius: 999px;
     background:
         linear-gradient(
             135deg,
@@ -333,12 +309,11 @@
         );
     color: #ffffff;
     font-family: inherit;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
     line-height: 1;
-    white-space: nowrap;
     cursor: pointer;
-    box-shadow: 0 9px 22px rgba(0, 155, 91, 0.28);
+    box-shadow: 0 8px 20px rgba(0, 155, 91, 0.3);
     transition:
         transform 0.2s ease,
         filter 0.2s ease,
@@ -346,13 +321,14 @@
 }
 
 .printing-quote-btn i {
-    font-size: 16px;
+    flex-shrink: 0;
+    font-size: 15px;
 }
 
 .printing-quote-btn:hover {
     transform: translateY(-2px);
     filter: brightness(1.08);
-    box-shadow: 0 13px 27px rgba(0, 155, 91, 0.4);
+    box-shadow: 0 12px 25px rgba(0, 155, 91, 0.42);
 }
 
 .printing-quote-btn:active {
@@ -451,16 +427,50 @@
 }
 
 /* =========================================================
+   LARGE DESKTOP
+   Five square cards have limited vertical room.
+========================================================= */
+
+@media (min-width: 1201px) {
+    .printing-description {
+        display: none;
+    }
+
+    .printing-card-category {
+        margin-bottom: 5px;
+    }
+
+    .printing-card h3 {
+        margin-bottom: 8px;
+        font-size: 16px;
+    }
+
+    .printing-card-content {
+        padding: 14px;
+    }
+
+    .printing-card-footer {
+        gap: 7px;
+        padding-top: 8px;
+    }
+
+    .printing-price {
+        font-size: 14px;
+    }
+
+    .printing-quote-btn {
+        min-height: 34px;
+        padding: 8px 10px;
+    }
+}
+
+/* =========================================================
    LAPTOP
 ========================================================= */
 
 @media (max-width: 1200px) {
     .printing-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .printing-card {
-        height: 460px;
     }
 }
 
@@ -478,8 +488,26 @@
         gap: 20px;
     }
 
-    .printing-card {
-        height: 470px;
+    .printing-card-content {
+        padding: 20px;
+    }
+
+    .printing-card h3 {
+        font-size: 21px;
+    }
+
+    .printing-description {
+        font-size: 12px;
+        -webkit-line-clamp: 3;
+    }
+
+    .printing-price {
+        font-size: 18px;
+    }
+
+    .printing-quote-btn {
+        min-height: 42px;
+        font-size: 11px;
     }
 
     .printing-feature-message {
@@ -525,19 +553,24 @@
 
     .printing-card {
         width: 100%;
-        height: 500px;
         min-height: 0;
+        aspect-ratio: 1 / 1;
         border-radius: 24px;
     }
 
     .printing-card-top {
         top: 16px;
-        right: 16px;
         left: 16px;
     }
 
+    .printing-new-tag {
+        height: 34px;
+        padding: 0 19px;
+        font-size: 11px;
+    }
+
     .printing-card-content {
-        padding: 28px 23px 23px;
+        padding: 23px;
     }
 
     .printing-card h3 {
@@ -546,8 +579,8 @@
 
     .printing-description {
         font-size: 14px;
-        line-height: 1.6;
-        -webkit-line-clamp: 4;
+        line-height: 1.55;
+        -webkit-line-clamp: 3;
     }
 
     .printing-price {
@@ -585,20 +618,30 @@
 ========================================================= */
 
 @media (max-width: 390px) {
-    .printing-card {
-        height: 510px;
+    .printing-card-content {
+        padding: 18px;
+    }
+
+    .printing-card h3 {
+        font-size: 20px;
+    }
+
+    .printing-description {
+        margin-bottom: 9px;
+        font-size: 12px;
+        -webkit-line-clamp: 2;
     }
 
     .printing-card-footer {
-        align-items: stretch;
-        flex-direction: column;
+        gap: 8px;
+        padding-top: 9px;
     }
 
     .printing-price {
-        margin-bottom: 3px;
+        font-size: 17px;
     }
 
     .printing-quote-btn {
-        width: 100%;
+        min-height: 40px;
     }
 }
