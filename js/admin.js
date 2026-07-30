@@ -102,6 +102,549 @@ import {
       return (order.cart || []).map(i=>i.serviceTitle || i.title || i.serviceId || "Design Service").join(", ");
     }
 
+    function reportMoney(value) {
+    return `R ${Number(value || 0).toFixed(2)}`;
+}
+
+function reportDate(value) {
+    if (!value) {
+        return "—";
+    }
+
+    return new Date(value).toLocaleString(
+        "en-ZA",
+        {
+            dateStyle: "medium",
+            timeStyle: "short"
+        }
+    );
+}
+
+function buildReportFileName() {
+    const now = new Date();
+
+    const datePart = now
+        .toISOString()
+        .slice(0, 10);
+
+    const timePart = now
+        .toTimeString()
+        .slice(0, 5)
+        .replace(":", "-");
+
+    return `96-Studios-Orders-${datePart}-${timePart}.pdf`;
+}
+
+function getOrderReportSummary() {
+    const paidOrders = allOrders.filter(order =>
+        String(
+            order.payment_status || ""
+        ).toLowerCase() === "paid"
+    );
+
+    const paidRevenue = paidOrders.reduce(
+        (total, order) =>
+            total +
+            Number(order.totals?.total || 0),
+        0
+    );
+
+    const pendingOrders = allOrders.filter(order =>
+        String(
+            order.payment_status || ""
+        ).toLowerCase() === "pending"
+    );
+
+    const completedOrders = allOrders.filter(order =>
+        String(
+            order.design_status || ""
+        ).toLowerCase() === "completed"
+    );
+
+    return {
+        totalOrders: allOrders.length,
+        paidOrders: paidOrders.length,
+        pendingOrders: pendingOrders.length,
+        completedOrders: completedOrders.length,
+        paidRevenue
+    };
+}
+
+function generateOrdersPdf() {
+    if (!allOrders.length) {
+        showToast("There are no orders to include in the report");
+        return false;
+    }
+
+    if (
+        !window.jspdf ||
+        typeof window.jspdf.jsPDF !== "function"
+    ) {
+        showToast("The PDF library failed to load");
+        return false;
+    }
+
+    const { jsPDF } = window.jspdf;
+
+    const documentPdf = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: "a4"
+    });
+
+    const summary = getOrderReportSummary();
+
+    const generatedDate =
+        new Date().toLocaleString(
+            "en-ZA",
+            {
+                dateStyle: "full",
+                timeStyle: "short"
+            }
+        );
+
+    documentPdf.setFont("helvetica", "bold");
+    documentPdf.setFontSize(20);
+    documentPdf.text(
+        "96 Studios Orders Report",
+        14,
+        17
+    );
+
+    documentPdf.setFont(
+        "helvetica",
+        "normal"
+    );
+
+    documentPdf.setFontSize(10);
+    documentPdf.text(
+        `Generated: ${generatedDate}`,
+        14,
+        24
+    );
+
+    documentPdf.setFontSize(11);
+
+    documentPdf.text(
+        `Total orders: ${summary.totalOrders}`,
+        14,
+        34
+    );
+
+    documentPdf.text(
+        `Paid orders: ${summary.paidOrders}`,
+        62,
+        34
+    );
+
+    documentPdf.text(
+        `Pending payments: ${summary.pendingOrders}`,
+        106,
+        34
+    );
+
+    documentPdf.text(
+        `Completed orders: ${summary.completedOrders}`,
+        166,
+        34
+    );
+
+    documentPdf.text(
+        `Paid revenue: ${reportMoney(
+            summary.paidRevenue
+        )}`,
+        222,
+        34
+    );
+
+    const reportRows = allOrders.map(order => [
+        order.order_id || "—",
+        order.client_id || "—",
+        serviceNames(order) || "—",
+        reportMoney(order.totals?.total),
+        order.payment_status || "Pending",
+        order.design_status || "Waiting",
+        `${Number(order.progress || 0)}%`,
+        reportDate(order.created_at)
+    ]);
+
+    documentPdf.autoTable({
+        startY: 42,
+
+        head: [[
+            "Order",
+            "Client",
+            "Services",
+            "Total",
+            "Payment",
+            "Design",
+            "Progress",
+            "Created"
+        ]],
+
+        body: reportRows,
+
+        theme: "grid",
+
+        styles: {
+            font: "helvetica",
+            fontSize: 8,
+            cellPadding: 2.5,
+            overflow: "linebreak",
+            valign: "middle"
+        },
+
+        headStyles: {
+            fillColor: [0, 67, 112],
+            textColor: [255, 255, 255],
+            fontStyle: "bold"
+        },
+
+        columnStyles: {
+            0: {
+                cellWidth: 28
+            },
+
+            1: {
+                cellWidth: 25
+            },
+
+            2: {
+                cellWidth: 62
+            },
+
+            3: {
+                cellWidth: 24,
+                halign: "right"
+            },
+
+            4: {
+                cellWidth: 23
+            },
+
+            5: {
+                cellWidth: 24
+            },
+
+            6: {
+                cellWidth: 18,
+                halign: "center"
+            },
+
+            7: {
+                cellWidth: 38
+            }
+        },
+
+        margin: {
+            left: 14,
+            right: 14,
+            bottom: 16
+        },
+
+        didDrawPage(data) {
+            const pageCount =
+                documentPdf.internal
+                    .getNumberOfPages();
+
+            const pageWidth =
+                documentPdf.internal
+                    .pageSize
+                    .getWidth();
+
+            const pageHeight =
+                documentPdf.internal
+                    .pageSize
+                    .getHeight();
+
+            documentPdf.setFontSize(8);
+            documentPdf.setTextColor(100);
+
+            documentPdf.text(
+                `96 Studios · Page ${pageCount}`,
+                pageWidth - 14,
+                pageHeight - 7,
+                {
+                    align: "right"
+                }
+            );
+        }
+    });
+
+    documentPdf.save(
+        buildReportFileName()
+    );
+
+    showToast("Orders PDF report generated");
+
+    return true;
+}
+
+function openResetOrdersModal() {
+    if (!allOrders.length) {
+        showToast("There are no orders to reset");
+        return;
+    }
+
+    $("resetOrdersConfirmation").value = "";
+    $("resetOrdersAgreement").checked = false;
+
+    updateResetButtonState();
+
+    $("resetOrdersModal").style.display =
+        "flex";
+
+    document.body.style.overflow =
+        "hidden";
+
+    setTimeout(() => {
+        $("resetOrdersConfirmation").focus();
+    }, 150);
+}
+
+function closeResetOrdersModal() {
+    $("resetOrdersModal").style.display =
+        "none";
+
+    $("resetOrdersConfirmation").value = "";
+    $("resetOrdersAgreement").checked = false;
+
+    updateResetButtonState();
+
+    if (
+        $("orderModal").style.display !==
+        "flex"
+    ) {
+        document.body.style.overflow = "";
+    }
+}
+
+function updateResetButtonState() {
+    const confirmation =
+        $("resetOrdersConfirmation")
+            .value
+            .trim();
+
+    const agreement =
+        $("resetOrdersAgreement").checked;
+
+    const allowed =
+        confirmation === "RESET ORDERS" &&
+        agreement === true;
+
+    const button =
+        $("confirmResetOrders");
+
+    button.disabled = !allowed;
+    button.style.opacity =
+        allowed ? "1" : "0.5";
+
+    button.style.cursor =
+        allowed
+            ? "pointer"
+            : "not-allowed";
+}
+
+function chunkValues(values, size = 100) {
+    const chunks = [];
+
+    for (
+        let index = 0;
+        index < values.length;
+        index += size
+    ) {
+        chunks.push(
+            values.slice(
+                index,
+                index + size
+            )
+        );
+    }
+
+    return chunks;
+}
+
+async function getAllOrderStoragePaths() {
+    const orderIds = allOrders
+        .map(order => order.id)
+        .filter(Boolean);
+
+    if (!orderIds.length) {
+        return [];
+    }
+
+    const storagePaths = [];
+
+    for (
+        const orderIdChunk of
+        chunkValues(orderIds, 100)
+    ) {
+        const {
+            data,
+            error
+        } = await supabase
+            .from("order_files")
+            .select("storage_path")
+            .in(
+                "order_id",
+                orderIdChunk
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        for (const file of data || []) {
+            if (file.storage_path) {
+                storagePaths.push(
+                    file.storage_path
+                );
+            }
+        }
+    }
+
+    return storagePaths;
+}
+
+async function removeOrderStorageFiles(
+    storagePaths
+) {
+    if (!storagePaths.length) {
+        return;
+    }
+
+    for (
+        const pathChunk of
+        chunkValues(storagePaths, 100)
+    ) {
+        const {
+            error
+        } = await supabase.storage
+            .from("design-files")
+            .remove(pathChunk);
+
+        if (error) {
+            throw error;
+        }
+    }
+}
+
+async function resetAllOrders() {
+    const confirmation =
+        $("resetOrdersConfirmation")
+            .value
+            .trim();
+
+    const agreement =
+        $("resetOrdersAgreement").checked;
+
+    if (
+        confirmation !== "RESET ORDERS" ||
+        !agreement
+    ) {
+        showToast(
+            "Complete the confirmation before resetting"
+        );
+
+        return;
+    }
+
+    const button =
+        $("confirmResetOrders");
+
+    button.disabled = true;
+    button.style.opacity = "0.7";
+    button.style.cursor = "wait";
+
+    button.innerHTML = `
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Preparing reset...
+    `;
+
+    try {
+        /*
+         * Load Storage paths before the database
+         * records are removed.
+         */
+        const storagePaths =
+            await getAllOrderStoragePaths();
+
+        if (storagePaths.length) {
+            button.innerHTML = `
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                Removing files...
+            `;
+
+            await removeOrderStorageFiles(
+                storagePaths
+            );
+        }
+
+        button.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Clearing orders...
+        `;
+
+        const {
+            data,
+            error
+        } = await supabase.rpc(
+            "reset_all_orders"
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        const deletedCount =
+            Number(
+                data?.deleted_orders ||
+                allOrders.length
+            );
+
+        allOrders = [];
+        activeOrder = null;
+
+        $("searchInput").value = "";
+        $("paymentFilter").value = "";
+        $("designFilter").value = "";
+
+        closeResetOrdersModal();
+
+        updateStats();
+        renderOrders();
+
+        showToast(
+            `${deletedCount} order${
+                deletedCount === 1
+                    ? ""
+                    : "s"
+            } permanently removed`
+        );
+    } catch (error) {
+        console.error(
+            "Order reset failed:",
+            error
+        );
+
+        showToast(
+            error.message ||
+            "Unable to reset orders"
+        );
+    } finally {
+        button.disabled = false;
+        button.style.opacity = "1";
+        button.style.cursor = "pointer";
+
+        button.innerHTML = `
+            <i class="fa-solid fa-trash-can"></i>
+            Permanently Reset
+        `;
+
+        updateResetButtonState();
+    }
+}
+
     function filteredOrders(){
       const query = $("searchInput").value.trim().toLowerCase();
       const payment = $("paymentFilter").value.toLowerCase();
@@ -1082,6 +1625,66 @@ if(
     $("orderModal").addEventListener("click",e=>{if(e.target===$("orderModal")) closeModal()});
     ["searchInput","paymentFilter","designFilter"].forEach(id=>$("searchInput") && $(id).addEventListener(id==="searchInput"?"input":"change",renderOrders));
     $("signOutBtn").addEventListener("click",async()=>{await supabase.auth.signOut();window.location.href="index.html"});
+    $("downloadOrdersReport")
+    .addEventListener(
+        "click",
+        generateOrdersPdf
+    );
+
+$("downloadReportBeforeReset")
+    .addEventListener(
+        "click",
+        generateOrdersPdf
+    );
+
+$("openResetOrders")
+    .addEventListener(
+        "click",
+        openResetOrdersModal
+    );
+
+$("closeResetOrders")
+    .addEventListener(
+        "click",
+        closeResetOrdersModal
+    );
+
+$("cancelResetOrders")
+    .addEventListener(
+        "click",
+        closeResetOrdersModal
+    );
+
+$("resetOrdersConfirmation")
+    .addEventListener(
+        "input",
+        updateResetButtonState
+    );
+
+$("resetOrdersAgreement")
+    .addEventListener(
+        "change",
+        updateResetButtonState
+    );
+
+$("confirmResetOrders")
+    .addEventListener(
+        "click",
+        resetAllOrders
+    );
+
+$("resetOrdersModal")
+    .addEventListener(
+        "click",
+        event => {
+            if (
+                event.target ===
+                $("resetOrdersModal")
+            ) {
+                closeResetOrdersModal();
+            }
+        }
+    );
     $("saleForm").addEventListener(
     "submit",
     saveSaleCampaign
