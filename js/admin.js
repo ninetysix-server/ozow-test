@@ -622,16 +622,23 @@ async function resetAllOrders() {
             } permanently removed`
         );
     } catch (error) {
-        console.error(
-            "Order reset failed:",
-            error
-        );
+    console.error("Order reset failed:", {
+        message: error?.message,
+        details: error?.details,
+        hint: error?.hint,
+        code: error?.code,
+        fullError: error
+    });
 
-        showToast(
-            error.message ||
-            "Unable to reset orders"
-        );
-    } finally {
+    const errorMessage =
+        error?.message ||
+        error?.details ||
+        error?.hint ||
+        "Unable to reset orders";
+
+    showToast(errorMessage);
+}
+     finally {
         button.disabled = false;
         button.style.opacity = "1";
         button.style.cursor = "pointer";
