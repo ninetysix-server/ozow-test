@@ -95,12 +95,6 @@
         box-shadow 0.35s ease;
 }
 
-.printing-card:hover {
-    transform: translateY(-8px);
-    box-shadow:
-        0 28px 55px rgba(15, 23, 42, 0.23),
-        0 8px 20px rgba(15, 23, 42, 0.12);
-}
 
 /* =========================================================
    CARD IMAGE
@@ -166,33 +160,23 @@
 }
 
 .printing-new-tag {
-    display: inline-flex;
+    width: 58px;
+    height: 58px;
+    display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 68px;
-    height: 32px;
-    padding: 0 17px;
-    border: none;
-    border-radius: 999px;
-    background: var(--accent, #009b5b);
-    color: #ffffff;
-    font-size: 10px;
-    font-weight: 800;
-    line-height: 1;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-    box-shadow: 0 8px 20px rgba(0, 155, 91, 0.32);
-}
 
-.printing-new-tag::before {
-    content: "";
-    width: 6px;
-    height: 6px;
-    margin-right: 7px;
     border-radius: 50%;
-    background: #ffffff;
-}
 
+    background: #fff;
+    color: var(--accent, #009b5b);
+
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+
+    box-shadow: 0 10px 25px rgba(0,0,0,.18);
+}
 /* =========================================================
    CARD CONTENT
 ========================================================= */
@@ -206,46 +190,13 @@
     color: #ffffff;
 }
 
-.printing-card-category {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    margin-bottom: 7px;
-    color: #6ee7b7;
-    font-size: 8px;
-    font-weight: 800;
-    letter-spacing: 0.11em;
-    text-transform: uppercase;
-}
-
-.printing-card-category::before {
-    content: "";
-    width: 18px;
-    height: 2px;
-    flex-shrink: 0;
-    border-radius: 999px;
-    background: #6ee7b7;
-}
-
 .printing-card h3 {
     margin: 0 0 7px;
-    color: #ffffff;
+    color: #009b5b;
     font-size: 18px;
-    font-weight: 800;
     line-height: 1.18;
-    text-shadow: 0 3px 15px rgba(0, 0, 0, 0.35);
 }
 
-.printing-description {
-    display: -webkit-box;
-    overflow: hidden;
-    margin: 0 0 12px;
-    color: rgba(255, 255, 255, 0.76);
-    font-size: 11px;
-    line-height: 1.45;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-}
 
 /* =========================================================
    PRICE AND BUTTON
@@ -259,7 +210,6 @@
     width: 100%;
     min-width: 0;
     padding-top: 11px;
-    border-top: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .printing-price-area {
@@ -268,23 +218,12 @@
     min-width: 0;
 }
 
-.printing-price-label {
-    display: block;
-    margin-bottom: 3px;
-    color: rgba(255, 255, 255, 0.58);
-    font-size: 8px;
-    font-weight: 800;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-}
-
 .printing-price {
     display: block;
     width: 100%;
     margin: 0;
     color: #ffffff;
     font-size: 16px;
-    font-weight: 800;
     line-height: 1.2;
     white-space: normal;
     overflow-wrap: anywhere;
@@ -310,10 +249,8 @@
     color: #ffffff;
     font-family: inherit;
     font-size: 10px;
-    font-weight: 800;
     line-height: 1;
     cursor: pointer;
-    box-shadow: 0 8px 20px rgba(0, 155, 91, 0.3);
     transition:
         transform 0.2s ease,
         filter 0.2s ease,
@@ -326,9 +263,7 @@
 }
 
 .printing-quote-btn:hover {
-    transform: translateY(-2px);
     filter: brightness(1.08);
-    box-shadow: 0 12px 25px rgba(0, 155, 91, 0.42);
 }
 
 .printing-quote-btn:active {
@@ -377,21 +312,22 @@
 }
 
 .printing-feature-icon {
-    position: relative;
-    z-index: 2;
+    width: 330px;
+    height: auto;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 88px;
-    height: 88px;
-    flex-shrink: 0;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 24px;
-    background: rgba(255, 255, 255, 0.11);
-    color: #ffffff;
-    font-size: 34px;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.printing-feature-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
 }
 
 .printing-feature-content {
@@ -723,7 +659,6 @@
 .printing-configurator-close:hover {
     border-color: var(--accent, #009b5b);
     background: rgba(0, 155, 91, 0.06);
-    transform: translateX(-2px);
 }
 
 .printing-configurator-service {
