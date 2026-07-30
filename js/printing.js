@@ -907,9 +907,6 @@ function createPrintingCard(service) {
             </div>
 
             <div class="printing-card-content">
-                <div class="printing-card-category">
-                    Printing Service
-                </div>
 
                 <h3>${title}</h3>
 
@@ -919,10 +916,6 @@ function createPrintingCard(service) {
 
                 <div class="printing-card-footer">
                     <div class="printing-price-area">
-                        <span class="printing-price-label">
-                            Starting price
-                        </span>
-
                         <div class="printing-price">
                             ${price}
                         </div>
