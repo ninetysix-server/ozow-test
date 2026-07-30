@@ -115,48 +115,65 @@ function createPrintingCard(service) {
     const image = escapePrintingValue(service.image);
 
     return `
-        <article class="printing-card">
-            <div class="printing-image-wrapper">
-                <img
-                    src="${image}"
-                    alt="${title}"
-                    class="printing-image"
-                    loading="lazy"
-                    onerror="
-                        this.onerror = null;
-                        this.src =
-                            'assets/images/slide-03.png';
-                    "
-                />
+        <article
+            class="printing-card"
+            style="--printing-card-image: url('${image}');"
+        >
+            <img
+                src="${image}"
+                alt="${title}"
+                class="printing-card-background"
+                loading="lazy"
+                onerror="
+                    this.onerror = null;
+                    this.src = 'assets/images/slide-03.png';
+                "
+            />
+
+            <div class="printing-card-overlay"></div>
+
+            <div class="printing-card-top">
+                <span class="printing-new-tag">
+                    New
+                </span>
 
                 <span class="printing-card-number">
                     ${String(service.id).padStart(2, "0")}
                 </span>
             </div>
 
-            <div class="printing-card-body">
+            <div class="printing-card-content">
+                <div class="printing-card-category">
+                    Printing Service
+                </div>
+
                 <h3>${title}</h3>
 
                 <p class="printing-description">
                     ${description}
                 </p>
 
-                <span class="printing-price-label">
-                    Starting price
-                </span>
+                <div class="printing-card-footer">
+                    <div class="printing-price-area">
+                        <span class="printing-price-label">
+                            Starting price
+                        </span>
 
-                <div class="printing-price">
-                    ${price}
+                        <div class="printing-price">
+                            ${price}
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="printing-quote-btn"
+                        data-printing-id="${service.id}"
+                        aria-label="Get a quote for ${title}"
+                    >
+                        <i class="fab fa-whatsapp"></i>
+                        <span>Get Quote</span>
+                    </button>
                 </div>
-
-                <button
-                    type="button"
-                    class="printing-quote-btn"
-                    data-printing-id="${service.id}"
-                >
-                    <i class="fab fa-whatsapp"></i>
-                    Get Quote
-                </button>
             </div>
         </article>
     `;
