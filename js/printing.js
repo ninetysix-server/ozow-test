@@ -115,10 +115,7 @@ function createPrintingCard(service) {
     const image = escapePrintingValue(service.image);
 
     return `
-        <article
-            class="printing-card"
-            style="--printing-card-image: url('${image}');"
-        >
+        <article class="printing-card">
             <img
                 src="${image}"
                 alt="${title}"
@@ -128,17 +125,13 @@ function createPrintingCard(service) {
                     this.onerror = null;
                     this.src = 'assets/images/slide-03.png';
                 "
-            />
+            >
 
             <div class="printing-card-overlay"></div>
 
             <div class="printing-card-top">
                 <span class="printing-new-tag">
                     New
-                </span>
-
-                <span class="printing-card-number">
-                    ${String(service.id).padStart(2, "0")}
                 </span>
             </div>
 
@@ -170,7 +163,11 @@ function createPrintingCard(service) {
                         data-printing-id="${service.id}"
                         aria-label="Get a quote for ${title}"
                     >
-                        <i class="fab fa-whatsapp"></i>
+                        <i
+                            class="fab fa-whatsapp"
+                            aria-hidden="true"
+                        ></i>
+
                         <span>Get Quote</span>
                     </button>
                 </div>
