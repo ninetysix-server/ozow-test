@@ -87,12 +87,6 @@
     isolation: isolate;
     border-radius: 26px;
     background: #0f172a;
-    box-shadow:
-        0 16px 40px rgba(15, 23, 42, 0.15),
-        0 4px 12px rgba(15, 23, 42, 0.08);
-    transition:
-        transform 0.35s ease,
-        box-shadow 0.35s ease;
 }
 
 
@@ -175,7 +169,6 @@
     font-weight: 800;
     text-transform: uppercase;
 
-    box-shadow: 0 10px 25px rgba(0,0,0,.18);
 }
 /* =========================================================
    CARD CONTENT
@@ -254,7 +247,6 @@
     transition:
         transform 0.2s ease,
         filter 0.2s ease,
-        box-shadow 0.2s ease;
 }
 
 .printing-quote-btn i {
@@ -296,7 +288,6 @@
             #05243a
         );
     color: #ffffff;
-    box-shadow: 0 22px 50px rgba(0, 67, 112, 0.2);
 }
 
 .printing-feature-message::after {
@@ -320,7 +311,6 @@
     justify-content: center;
     background: transparent;
     border: none;
-    box-shadow: none;
 }
 
 .printing-feature-icon img {
@@ -616,9 +606,6 @@
     border: 1px solid rgba(15, 23, 42, 0.08);
     border-radius: 32px;
     background: #ffffff;
-    box-shadow:
-        0 30px 80px rgba(15, 23, 42, 0.15),
-        0 8px 24px rgba(15, 23, 42, 0.08);
 }
 
 .printing-configurator-main {
@@ -792,19 +779,16 @@
         border-color 0.2s ease,
         background 0.2s ease,
         transform 0.2s ease,
-        box-shadow 0.2s ease;
 }
 
 .printing-option-card:hover {
     border-color: rgba(0, 155, 91, 0.5);
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
 }
 
 .printing-option-card.is-selected {
     border-color: var(--accent, #009b5b);
     background: rgba(0, 155, 91, 0.07);
-    box-shadow: 0 10px 25px rgba(0, 155, 91, 0.12);
 }
 
 .printing-option-check {
@@ -876,7 +860,6 @@
     transition:
         transform 0.2s ease,
         opacity 0.2s ease,
-        box-shadow 0.2s ease;
 }
 
 .printing-back-btn {
@@ -894,8 +877,6 @@
             #006aa5
         );
     color: #ffffff;
-    box-shadow:
-        0 12px 25px rgba(0, 67, 112, 0.22);
 }
 
 .printing-next-btn.is-whatsapp {
@@ -905,8 +886,7 @@
             var(--accent, #009b5b),
             #007a48
         );
-    box-shadow:
-        0 12px 25px rgba(0, 155, 91, 0.25);
+
 }
 
 .printing-navigation-btn:hover:not(:disabled) {
@@ -1143,9 +1123,6 @@
 
 .printing-card.is-active {
     transform: translateY(-7px);
-    box-shadow:
-        0 0 0 3px var(--accent, #009b5b),
-        0 28px 55px rgba(15, 23, 42, 0.23);
 }
 
 /* =========================================================
