@@ -585,6 +585,36 @@ async function resetAllOrders() {
             Clearing orders...
         `;
 
+                const {
+            data: sessionData,
+            error: sessionError
+        } = await supabase.auth.getSession();
+
+        if (sessionError) {
+            throw sessionError;
+        }
+
+        if (!sessionData?.session) {
+            throw new Error(
+                "Your administrator session has expired. Please sign in again."
+            );
+        }
+
+        const {
+            data: refreshData,
+            error: refreshError
+        } = await supabase.auth.refreshSession();
+
+        if (refreshError) {
+            throw refreshError;
+        }
+
+        if (!refreshData?.session?.access_token) {
+            throw new Error(
+                "Unable to refresh your administrator session. Please sign in again."
+            );
+        }
+
         const {
             data,
             error
@@ -622,21 +652,30 @@ async function resetAllOrders() {
             } permanently removed`
         );
     } catch (error) {
-    console.error("Order reset failed:", {
-        message: error?.message,
-        details: error?.details,
-        hint: error?.hint,
-        code: error?.code,
-        fullError: error
-    });
+    console.log("========== RESET ERROR ==========");
+    console.log("message:", error?.message);
+    console.log("details:", error?.details);
+    console.log("hint:", error?.hint);
+    console.log("code:", error?.code);
+    console.log("error object:", error);
 
-    const errorMessage =
+    alert(
+        JSON.stringify(
+            {
+                message: error?.message,
+                details: error?.details,
+                hint: error?.hint,
+                code: error?.code
+            },
+            null,
+            2
+        )
+    );
+
+    showToast(
         error?.message ||
-        error?.details ||
-        error?.hint ||
-        "Unable to reset orders";
-
-    showToast(errorMessage);
+        "Unable to reset orders"
+    );
 }
      finally {
         button.disabled = false;
