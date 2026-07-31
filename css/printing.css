@@ -29,22 +29,6 @@
     text-align: center;
 }
 
-.printing-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 9px 18px;
-    margin-bottom: 17px;
-    border: 1px solid rgba(0, 155, 91, 0.15);
-    border-radius: 999px;
-    background: rgba(0, 155, 91, 0.09);
-    color: var(--accent, #009b5b);
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 0.09em;
-    text-transform: uppercase;
-}
-
 .printing-heading h2 {
     margin: 0 0 15px;
     color: var(--primary, #004370);
@@ -154,8 +138,8 @@
 }
 
 .printing-new-tag {
-    width: 58px;
-    height: 58px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1773,8 +1757,6 @@
         minmax(0, 1.35fr);
     overflow: hidden;
 
-    border: 1px solid rgba(15, 23, 42, 0.12);
-    border-radius: 16px;
 
     background: #ffffff;
 
@@ -1840,7 +1822,6 @@
 }
 
 .support-whatsapp-btn:hover {
-    transform: translateY(-2px);
     filter: brightness(1.08);
 }
 
