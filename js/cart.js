@@ -3,6 +3,8 @@ import {
     getOrCreateClientId,
     getCustomerProfile,
     saveCustomerProfile,
+    validateSketchFile,
+    uploadOrderSketch,
     saveOrder
 } from './supabase.js';
 
@@ -734,6 +736,129 @@ function copyHomeAddressToDelivery() {
     );
 }
 
+let selectedSketchFile = null;
+
+
+function formatSketchFileSize(bytes) {
+    if (!Number.isFinite(bytes) || bytes <= 0) {
+        return '0 MB';
+    }
+
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+
+function clearSelectedSketch() {
+    selectedSketchFile = null;
+
+    const input =
+        document.getElementById('sketchFile');
+
+    const preview =
+        document.getElementById('sketchFilePreview');
+
+    const progress =
+        document.getElementById('sketchUploadProgress');
+
+    const progressFill =
+        document.getElementById('sketchProgressFill');
+
+    if (input) {
+        input.value = '';
+    }
+
+    if (preview) {
+        preview.hidden = true;
+    }
+
+    if (progress) {
+        progress.hidden = true;
+    }
+
+    if (progressFill) {
+        progressFill.style.width = '0%';
+    }
+}
+
+
+function showSelectedSketch(file) {
+    const preview =
+        document.getElementById('sketchFilePreview');
+
+    const fileName =
+        document.getElementById('sketchFileName');
+
+    const fileSize =
+        document.getElementById('sketchFileSize');
+
+    const previewIcon =
+        document.getElementById('sketchPreviewIcon');
+
+    if (fileName) {
+        fileName.textContent = file.name;
+    }
+
+    if (fileSize) {
+        fileSize.textContent =
+            formatSketchFileSize(file.size);
+    }
+
+    if (previewIcon) {
+        previewIcon.className =
+            file.type === 'application/pdf'
+                ? 'fas fa-file-pdf'
+                : 'fas fa-file-image';
+    }
+
+    if (preview) {
+        preview.hidden = false;
+    }
+}
+
+
+function updateSketchUploadProgress(
+    text,
+    percentage
+) {
+    const progress =
+        document.getElementById(
+            'sketchUploadProgress'
+        );
+
+    const status =
+        document.getElementById(
+            'sketchUploadStatus'
+        );
+
+    const percentageText =
+        document.getElementById(
+            'sketchUploadPercentage'
+        );
+
+    const progressFill =
+        document.getElementById(
+            'sketchProgressFill'
+        );
+
+    if (progress) {
+        progress.hidden = false;
+    }
+
+    if (status) {
+        status.textContent = text;
+    }
+
+    if (percentageText) {
+        percentageText.textContent =
+            `${percentage}%`;
+    }
+
+    if (progressFill) {
+        progressFill.style.width =
+            `${percentage}%`;
+    }
+}
+
 export const cartManager = new CartManager();
 
 // Cart popup - Using arrow functions for proper 'this' binding
@@ -781,10 +906,7 @@ const popup = {
         ''
     );
 
-    setCheckoutFieldValue(
-        'sketchImageUrl',
-        ''
-    );
+    clearSelectedSketch();
 
     const deliveryCheckbox = getCheckoutField(
         'useHomeAddressForDelivery'
@@ -1188,6 +1310,46 @@ function createDeliveryAddressSnapshot(profile) {
 document.addEventListener('DOMContentLoaded', function() {
     cartManager.setupEvents();
 
+        // Sketch file selection
+    document
+        .getElementById('sketchFile')
+        ?.addEventListener(
+            'change',
+            function() {
+                const file =
+                    this.files?.[0] || null;
+
+                if (!file) {
+                    clearSelectedSketch();
+                    return;
+                }
+
+                const validationError =
+                    validateSketchFile(file);
+
+                if (validationError) {
+                    popup.showToast(
+                        validationError.message,
+                        'error'
+                    );
+
+                    clearSelectedSketch();
+                    return;
+                }
+
+                selectedSketchFile = file;
+                showSelectedSketch(file);
+            }
+        );
+
+    // Remove selected sketch
+    document
+        .getElementById('removeSketchFile')
+        ?.addEventListener(
+            'click',
+            clearSelectedSketch
+        );
+
     document
     .getElementById('useHomeAddressForDelivery')
     ?.addEventListener(
@@ -1341,10 +1503,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     cart: orderCart,
 
                     userInput: {
-                        sketchImageUrl:
-                            getCheckoutText(
-                                'sketchImageUrl'
-                            ),
+                        sketchProvided:
+                            selectedSketchFile !== null,
+
+                        sketchFileName:
+                            selectedSketchFile?.name || null,
 
                         designDescription:
                             description,
@@ -1405,12 +1568,44 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
 
                 const {
-                    error: orderError
-                } = await saveOrder(orderData);
+    data: savedOrder,
+    error: orderError
+            } = await saveOrder(orderData);
 
-                if (orderError) {
-                    throw orderError;
+            if (orderError) {
+                throw orderError;
+            }
+
+            if (selectedSketchFile) {
+                updateSketchUploadProgress(
+                    'Uploading sketch...',
+                    35
+                );
+
+                const {
+                    error: sketchError
+                } = await uploadOrderSketch({
+                    file: selectedSketchFile,
+
+                    orderDatabaseId:
+                        savedOrder.id,
+
+                    orderNumber:
+                        savedOrder.order_id,
+
+                    userId:
+                        user.id
+                });
+
+                if (sketchError) {
+                    throw sketchError;
                 }
+
+                updateSketchUploadProgress(
+                    'Sketch uploaded successfully',
+                    100
+                );
+            }
 
                 cartManager.clearCart();
                 popup.closeConfirmation();

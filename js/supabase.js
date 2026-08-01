@@ -368,6 +368,189 @@ export async function searchServices(searchTerm) {
     return data || [];
 }
 
+// ======================================================
+// ORDER SKETCH UPLOADS
+// ======================================================
+
+const SKETCH_BUCKET = 'order-sketches';
+
+const ALLOWED_SKETCH_TYPES = [
+    'image/png',
+    'image/jpeg',
+    'application/pdf'
+];
+
+const MAX_SKETCH_SIZE = 5 * 1024 * 1024;
+
+
+function cleanSketchFileName(fileName) {
+    const extension =
+        String(fileName)
+            .split('.')
+            .pop()
+            ?.toLowerCase() || 'file';
+
+    const baseName =
+        String(fileName)
+            .replace(/\.[^/.]+$/, '')
+            .replace(/[^a-zA-Z0-9_-]+/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '')
+            .slice(0, 60) || 'sketch';
+
+    return `${baseName}.${extension}`;
+}
+
+
+export function validateSketchFile(file) {
+    if (!file) {
+        return null;
+    }
+
+    if (!ALLOWED_SKETCH_TYPES.includes(file.type)) {
+        return new Error(
+            'Only PNG, JPG, JPEG and PDF files are allowed.'
+        );
+    }
+
+    if (file.size > MAX_SKETCH_SIZE) {
+        return new Error(
+            'The sketch file must not be larger than 5 MB.'
+        );
+    }
+
+    return null;
+}
+
+
+export async function uploadOrderSketch({
+    file,
+    orderDatabaseId,
+    orderNumber,
+    userId
+}) {
+    if (!file) {
+        return {
+            data: null,
+            error: null
+        };
+    }
+
+    const validationError =
+        validateSketchFile(file);
+
+    if (validationError) {
+        return {
+            data: null,
+            error: validationError
+        };
+    }
+
+    if (
+        !orderDatabaseId ||
+        !orderNumber ||
+        !userId
+    ) {
+        return {
+            data: null,
+            error: new Error(
+                'Missing order information for sketch upload.'
+            )
+        };
+    }
+
+    const safeFileName =
+        cleanSketchFileName(file.name);
+
+    const uniqueName =
+        `${Date.now()}-${crypto.randomUUID()}-${safeFileName}`;
+
+    const storagePath =
+        `${userId}/${orderNumber}/${uniqueName}`;
+
+    const {
+        error: uploadError
+    } = await supabase.storage
+        .from(SKETCH_BUCKET)
+        .upload(
+            storagePath,
+            file,
+            {
+                cacheControl: '3600',
+                upsert: false,
+                contentType:
+                    file.type || undefined
+            }
+        );
+
+    if (uploadError) {
+        console.error(
+            'Sketch storage upload failed:',
+            uploadError
+        );
+
+        return {
+            data: null,
+            error: uploadError
+        };
+    }
+
+    const expiresAt = new Date(
+        Date.now() +
+        5 * 24 * 60 * 60 * 1000
+    ).toISOString();
+
+    const {
+        data,
+        error: recordError
+    } = await supabase
+        .from('order_sketches')
+        .insert({
+            order_id:
+                orderDatabaseId,
+
+            user_id:
+                userId,
+
+            storage_path:
+                storagePath,
+
+            file_name:
+                file.name,
+
+            mime_type:
+                file.type || null,
+
+            size_bytes:
+                file.size,
+
+            expires_at:
+                expiresAt
+        })
+        .select()
+        .single();
+
+    if (recordError) {
+        console.error(
+            'Sketch metadata insert failed:',
+            recordError
+        );
+
+        await supabase.storage
+            .from(SKETCH_BUCKET)
+            .remove([storagePath]);
+
+        return {
+            data: null,
+            error: recordError
+        };
+    }
+
+    return {
+        data,
+        error: null
+    };
+}
 
 // ======================================================
 // ORDERS
