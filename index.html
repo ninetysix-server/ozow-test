@@ -1478,11 +1478,105 @@
                 <div class="confirmation-input-section">
                     <h3><i class="fas fa-info-circle"></i> Project Details</h3>
                     <div class="confirmation-input-grid">
-                        <div class="confirmation-form-group">
-                            <label>Sketch Image URL (optional)</label>
-                            <input type="url" id="sketchImageUrl" placeholder="https://example.com/your-sketch-image.jpg" />
-                            <div class="hint"><i class="fas fa-link"></i> Paste a link to your sketch or reference image</div>
-                        </div>
+                        
+                        <div class="confirmation-form-group confirmation-full-width">
+    <label for="sketchFile">
+        Upload Sketch or Reference
+        <span class="optional-label">Optional</span>
+    </label>
+
+    <div class="sketch-upload-box" id="sketchUploadBox">
+        <input
+            type="file"
+            id="sketchFile"
+            accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf"
+        >
+
+        <label
+            for="sketchFile"
+            class="sketch-upload-label"
+        >
+            <span class="sketch-upload-icon">
+                <i class="fas fa-cloud-arrow-up"></i>
+            </span>
+
+            <span class="sketch-upload-text">
+                <strong>Choose a sketch file</strong>
+
+                <small>
+                    PNG, JPG, JPEG or PDF — maximum 5 MB
+                </small>
+            </span>
+
+            <span class="sketch-browse-button">
+                Browse
+            </span>
+        </label>
+    </div>
+
+    <div
+        class="sketch-file-preview"
+        id="sketchFilePreview"
+        hidden
+    >
+        <span class="sketch-preview-icon">
+            <i
+                class="fas fa-file-image"
+                id="sketchPreviewIcon"
+            ></i>
+        </span>
+
+        <span class="sketch-preview-details">
+            <strong id="sketchFileName">
+                Selected file
+            </strong>
+
+            <small id="sketchFileSize">
+                0 MB
+            </small>
+        </span>
+
+        <button
+            type="button"
+            class="remove-sketch-file"
+            id="removeSketchFile"
+            aria-label="Remove selected sketch"
+        >
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <div
+        class="sketch-upload-progress"
+        id="sketchUploadProgress"
+        hidden
+    >
+        <div class="sketch-progress-information">
+            <span id="sketchUploadStatus">
+                Uploading sketch…
+            </span>
+
+            <strong id="sketchUploadPercentage">
+                0%
+            </strong>
+        </div>
+
+        <div class="sketch-progress-track">
+            <div
+                class="sketch-progress-fill"
+                id="sketchProgressFill"
+            ></div>
+        </div>
+    </div>
+
+    <div class="hint">
+        <i class="fas fa-clock"></i>
+
+        Sketch files are securely stored and automatically
+        deleted five days after upload.
+    </div>
+</div>
+
                         <div class="confirmation-form-group">
                             <label>Design Description <span class="required">*</span></label>
                             <textarea id="designDescription" placeholder="Please describe your design requirements..."></textarea>
