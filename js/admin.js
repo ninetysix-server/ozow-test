@@ -923,6 +923,202 @@ async function resetAllOrders() {
     `;
 }
 
+function formatAddress(address = {}) {
+    const parts = [
+        address.addressLine1,
+        address.addressLine2,
+        address.area,
+        address.city,
+        address.province,
+        address.postalCode
+    ]
+        .map(value => String(value || '').trim())
+        .filter(Boolean);
+
+    return parts.length
+        ? parts.map(safe).join(', ')
+        : 'Not provided';
+}
+
+
+function renderCustomerOrderDetails(order) {
+    const customer =
+        order.customer_details || {};
+
+    const home =
+        order.home_address || {};
+
+    const delivery =
+        order.delivery_address || {};
+
+    const printingRequested =
+        order.printing_requested === true;
+
+    return `
+        <div class="detail-card full">
+            <small>Customer Details</small>
+
+            <div style="
+                display:grid;
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+                gap:14px;
+                margin-top:12px;
+            ">
+                <div>
+                    <span style="
+                        display:block;
+                        margin-bottom:4px;
+                        color:#64748b;
+                        font-size:12px;
+                    ">
+                        Customer name
+                    </span>
+
+                    <strong>
+                        ${safe(
+                            customer.fullName ||
+                            home.recipientName ||
+                            'Not provided'
+                        )}
+                    </strong>
+                </div>
+
+                <div>
+                    <span style="
+                        display:block;
+                        margin-bottom:4px;
+                        color:#64748b;
+                        font-size:12px;
+                    ">
+                        WhatsApp number
+                    </span>
+
+                    <strong>
+                        ${safe(
+                            customer.whatsappNumber ||
+                            'Not provided'
+                        )}
+                    </strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-card full">
+            <small>Personal Home Address</small>
+
+            <strong style="
+                display:block;
+                margin-top:10px;
+                line-height:1.65;
+            ">
+                ${formatAddress(home)}
+            </strong>
+        </div>
+
+        <div class="detail-card full">
+            <small>Printing and Delivery</small>
+
+            <div style="margin-top:10px;">
+                <strong>
+                    Printing requested:
+                    ${printingRequested ? 'Yes' : 'No'}
+                </strong>
+            </div>
+
+            ${
+                printingRequested
+                    ? `
+                        <div style="
+                            display:grid;
+                            gap:10px;
+                            margin-top:14px;
+                            padding-top:14px;
+                            border-top:1px solid #e2e8f0;
+                        ">
+                            <div>
+                                <span style="
+                                    display:block;
+                                    color:#64748b;
+                                    font-size:12px;
+                                    margin-bottom:4px;
+                                ">
+                                    Recipient
+                                </span>
+
+                                <strong>
+                                    ${safe(
+                                        delivery.recipientName ||
+                                        'Not provided'
+                                    )}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span style="
+                                    display:block;
+                                    color:#64748b;
+                                    font-size:12px;
+                                    margin-bottom:4px;
+                                ">
+                                    Delivery contact
+                                </span>
+
+                                <strong>
+                                    ${safe(
+                                        delivery.phone ||
+                                        'Not provided'
+                                    )}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span style="
+                                    display:block;
+                                    color:#64748b;
+                                    font-size:12px;
+                                    margin-bottom:4px;
+                                ">
+                                    Delivery address
+                                </span>
+
+                                <strong style="line-height:1.65;">
+                                    ${formatAddress(delivery)}
+                                </strong>
+                            </div>
+
+                            <div>
+                                <span style="
+                                    display:block;
+                                    color:#64748b;
+                                    font-size:12px;
+                                    margin-bottom:4px;
+                                ">
+                                    Delivery instructions
+                                </span>
+
+                                <strong>
+                                    ${safe(
+                                        delivery.instructions ||
+                                        'None'
+                                    )}
+                                </strong>
+                            </div>
+                        </div>
+                    `
+                    : `
+                        <div
+                            class="meta-note"
+                            style="margin-top:8px;"
+                        >
+                            No printing delivery is required.
+                        </div>
+                    `
+            }
+        </div>
+    `;
+}
+
     function openOrder(id){
       activeOrder = allOrders.find(o=>o.id===id);
       if(!activeOrder) return;
@@ -938,6 +1134,7 @@ async function resetAllOrders() {
           <div class="detail-card"><small>Payment Status</small><strong>${safe(activeOrder.payment_status || "Pending")}</strong></div>
           <div class="detail-card"><small>Total</small><strong>${money(activeOrder.totals?.total)}</strong></div>
           <div class="detail-card full"><small>Items</small><div class="items">${items}</div></div>
+          ${renderCustomerOrderDetails(activeOrder)}
           <div class="detail-card full"><small>Design Description</small><strong>${safe(activeOrder.user_input?.designDescription || "No description provided")}</strong></div>
 
 <div class="detail-card full" id="adminApprovalCard">
@@ -948,7 +1145,18 @@ async function resetAllOrders() {
 </div>
 
 <div class="detail-card"><small>Preferred Colours</small><strong>${safe(activeOrder.user_input?.preferredColors || "Not provided")}</strong></div>
-<div class="detail-card"><small>Reference</small><strong>${activeOrder.user_input?.sketchImageUrl ? `<a target="_blank" rel="noopener" href="${safe(activeOrder.user_input.sketchImageUrl)}">Open image</a>` : "Not provided"}</strong></div>
+
+<div class="detail-card full">
+    <small>Customer Sketch or Reference</small>
+
+    <div
+        id="adminSketchResult"
+        class="meta-note"
+        style="margin-top:12px;"
+    >
+        Loading sketch...
+    </div>
+</div>
         </div>
         <div class="management-grid">
           <div class="field">
@@ -1016,11 +1224,316 @@ async function resetAllOrders() {
       });
       $("saveOrder").addEventListener("click",saveOrderChanges);
       $("uploadFiles").addEventListener("click", uploadDeliveryFiles);
-      loadAdminApproval();
-      loadAdminDeliveryFiles();
+        loadAdminApproval();
+        loadAdminSketch();
+        loadAdminDeliveryFiles();
       $("orderModal").style.display = "flex";
       document.body.style.overflow = "hidden";
     }
+
+    async function loadAdminSketch() {
+    if (!activeOrder) {
+        return;
+    }
+
+    const result =
+        document.getElementById(
+            'adminSketchResult'
+        );
+
+    if (!result) {
+        return;
+    }
+
+    result.innerHTML = `
+        <div class="meta-note">
+            Loading sketch...
+        </div>
+    `;
+
+    const {
+        data: sketch,
+        error
+    } = await supabase
+        .from('order_sketches')
+        .select('*')
+        .eq('order_id', activeOrder.id)
+        .order('created_at', {
+            ascending: false
+        })
+        .limit(1)
+        .maybeSingle();
+
+    if (error) {
+        console.error(
+            'Admin sketch load failed:',
+            error
+        );
+
+        result.innerHTML = `
+            <span style="color:var(--danger);">
+                Unable to load the customer sketch.
+            </span>
+        `;
+
+        return;
+    }
+
+    if (!sketch) {
+        result.innerHTML = `
+            <span style="color:var(--muted);">
+                No sketch or reference file was provided.
+            </span>
+        `;
+
+        return;
+    }
+
+    const {
+        data: signedUrlData,
+        error: signedUrlError
+    } = await supabase.storage
+        .from('order-sketches')
+        .createSignedUrl(
+            sketch.storage_path,
+            60 * 30
+        );
+
+    if (
+        signedUrlError ||
+        !signedUrlData?.signedUrl
+    ) {
+        console.error(
+            'Sketch signed URL failed:',
+            signedUrlError
+        );
+
+        result.innerHTML = `
+            <span style="color:var(--danger);">
+                The sketch file exists, but its secure link
+                could not be created.
+            </span>
+        `;
+
+        return;
+    }
+
+    const signedUrl =
+        signedUrlData.signedUrl;
+
+    const isImage =
+        String(sketch.mime_type || '')
+            .startsWith('image/');
+
+    const isPdf =
+        sketch.mime_type ===
+            'application/pdf' ||
+        String(sketch.file_name || '')
+            .toLowerCase()
+            .endsWith('.pdf');
+
+    const expiresText =
+        sketch.expires_at
+            ? dateText(sketch.expires_at)
+            : 'Not available';
+
+    result.innerHTML = `
+        <div style="
+            display:grid;
+            gap:14px;
+        ">
+            ${
+                isImage
+                    ? `
+                        <button
+                            type="button"
+                            class="admin-sketch-preview"
+                            id="openAdminSketchPreview"
+                            style="
+                                width:100%;
+                                padding:0;
+                                overflow:hidden;
+                                border:1px solid #e2e8f0;
+                                border-radius:14px;
+                                background:#f8fafc;
+                                cursor:pointer;
+                            "
+                        >
+                            <img
+                                src="${safe(signedUrl)}"
+                                alt="${safe(
+                                    sketch.file_name ||
+                                    'Customer sketch'
+                                )}"
+                                style="
+                                    display:block;
+                                    width:100%;
+                                    max-height:360px;
+                                    object-fit:contain;
+                                    background:#f8fafc;
+                                "
+                            >
+                        </button>
+                    `
+                    : `
+                        <div style="
+                            display:flex;
+                            align-items:center;
+                            gap:14px;
+                            padding:18px;
+                            border:1px solid #e2e8f0;
+                            border-radius:14px;
+                            background:#f8fafc;
+                        ">
+                            <span style="
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;
+                                width:48px;
+                                height:48px;
+                                border-radius:12px;
+                                background:#fee2e2;
+                                color:#dc2626;
+                                font-size:21px;
+                            ">
+                                <i class="fa-solid fa-file-pdf"></i>
+                            </span>
+
+                            <div>
+                                <strong style="
+                                    display:block;
+                                    margin-bottom:4px;
+                                ">
+                                    ${safe(
+                                        sketch.file_name ||
+                                        'Customer sketch'
+                                    )}
+                                </strong>
+
+                                <small style="color:#64748b;">
+                                    PDF reference file
+                                </small>
+                            </div>
+                        </div>
+                    `
+            }
+
+            <div style="
+                display:flex;
+                flex-wrap:wrap;
+                gap:10px;
+            ">
+                <button
+                    type="button"
+                    class="save-btn"
+                    id="openAdminSketchFile"
+                >
+                    <i class="fa-solid ${
+                        isPdf
+                            ? 'fa-file-pdf'
+                            : 'fa-eye'
+                    }"></i>
+
+                    ${
+                        isPdf
+                            ? 'Preview PDF'
+                            : 'Open Preview'
+                    }
+                </button>
+
+                <a
+                    href="${safe(signedUrl)}"
+                    download="${safe(
+                        sketch.file_name ||
+                        'customer-sketch'
+                    )}"
+                    class="save-btn"
+                    style="
+                        display:inline-flex;
+                        align-items:center;
+                        justify-content:center;
+                        gap:8px;
+                        text-decoration:none;
+                    "
+                >
+                    <i class="fa-solid fa-download"></i>
+                    Download
+                </a>
+            </div>
+
+            <div class="meta-note">
+                File:
+                ${safe(
+                    sketch.file_name ||
+                    'Unnamed file'
+                )}
+                <br>
+                Scheduled deletion:
+                ${safe(expiresText)}
+            </div>
+        </div>
+    `;
+
+    const openPreview = () => {
+        const previewModal =
+            document.getElementById(
+                'filePreviewModal'
+            );
+
+        const previewFrame =
+            document.getElementById(
+                'filePreviewFrame'
+            );
+
+        const previewTitle =
+            document.getElementById(
+                'filePreviewTitle'
+            );
+
+        if (
+            !previewModal ||
+            !previewFrame ||
+            !previewTitle
+        ) {
+            window.open(
+                signedUrl,
+                '_blank',
+                'noopener'
+            );
+
+            return;
+        }
+
+        previewTitle.textContent =
+            sketch.file_name ||
+            'Customer Sketch';
+
+        previewFrame.src = signedUrl;
+
+        previewModal.style.display = 'flex';
+
+        document.body.style.overflow =
+            'hidden';
+    };
+
+    document
+        .getElementById(
+            'openAdminSketchFile'
+        )
+        ?.addEventListener(
+            'click',
+            openPreview
+        );
+
+    document
+        .getElementById(
+            'openAdminSketchPreview'
+        )
+        ?.addEventListener(
+            'click',
+            openPreview
+        );
+}
 
   
 function getFileIcon(mimeType, fileName) {
