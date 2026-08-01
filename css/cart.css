@@ -292,3 +292,284 @@
     }
 
 }
+
+/* =========================================================
+   SKETCH FILE UPLOAD
+========================================================= */
+
+.optional-label {
+    display: inline-flex;
+    margin-left: 6px;
+    padding: 3px 8px;
+
+    border-radius: 999px;
+
+    background: #f1f5f9;
+    color: #64748b;
+
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.sketch-upload-box {
+    position: relative;
+    width: 100%;
+}
+
+.sketch-upload-box input[type="file"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+
+    opacity: 0;
+    pointer-events: none;
+}
+
+.sketch-upload-label {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    width: 100%;
+    padding: 18px;
+
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+
+    background: #f8fafc;
+    cursor: pointer;
+
+    transition:
+        border-color 0.25s ease,
+        background 0.25s ease,
+        transform 0.25s ease;
+}
+
+.sketch-upload-label:hover {
+    border-color: #009b5b;
+    background: rgba(0, 155, 91, 0.04);
+    transform: translateY(-1px);
+}
+
+.sketch-upload-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+
+    border-radius: 12px;
+
+    background: rgba(0, 155, 91, 0.1);
+    color: #009b5b;
+
+    font-size: 20px;
+}
+
+.sketch-upload-text {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sketch-upload-text strong {
+    color: #1e293b;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.sketch-upload-text small {
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.sketch-browse-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 38px;
+    padding: 8px 16px;
+
+    border-radius: 9px;
+
+    background: #004370;
+    color: #ffffff;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* Selected file preview */
+
+.sketch-file-preview {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+
+    margin-top: 12px;
+    padding: 14px 15px;
+
+    border: 1px solid #dbe4ea;
+    border-radius: 11px;
+
+    background: #ffffff;
+}
+
+.sketch-file-preview[hidden] {
+    display: none;
+}
+
+.sketch-preview-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+
+    border-radius: 10px;
+
+    background: rgba(0, 155, 91, 0.1);
+    color: #009b5b;
+
+    font-size: 17px;
+}
+
+.sketch-preview-details {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sketch-preview-details strong {
+    overflow: hidden;
+
+    color: #1e293b;
+    font-size: 13px;
+    font-weight: 700;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sketch-preview-details small {
+    color: #64748b;
+    font-size: 11px;
+}
+
+.remove-sketch-file {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    padding: 0;
+
+    border: 1px solid #fecaca;
+    border-radius: 50%;
+
+    background: #fff1f2;
+    color: #dc2626;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.remove-sketch-file:hover {
+    background: #fee2e2;
+    transform: scale(1.05);
+}
+
+/* Upload progress */
+
+.sketch-upload-progress {
+    margin-top: 14px;
+    padding: 14px;
+
+    border: 1px solid #dbe4ea;
+    border-radius: 10px;
+
+    background: #f8fafc;
+}
+
+.sketch-upload-progress[hidden] {
+    display: none;
+}
+
+.sketch-progress-information {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    margin-bottom: 9px;
+
+    color: #475569;
+    font-size: 12px;
+}
+
+.sketch-progress-information strong {
+    color: #009b5b;
+}
+
+.sketch-progress-track {
+    width: 100%;
+    height: 8px;
+    overflow: hidden;
+
+    border-radius: 999px;
+    background: #e2e8f0;
+}
+
+.sketch-progress-fill {
+    width: 0;
+    height: 100%;
+
+    border-radius: inherit;
+    background: linear-gradient(
+        90deg,
+        #009b5b,
+        #22c55e
+    );
+
+    transition: width 0.3s ease;
+}
+
+/* =========================================================
+   SKETCH UPLOAD MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+    .sketch-upload-label {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        padding: 15px;
+    }
+
+    .sketch-upload-icon {
+        width: 42px;
+        height: 42px;
+        flex-basis: 42px;
+    }
+
+    .sketch-browse-button {
+        width: 100%;
+        margin-top: 3px;
+    }
+}
