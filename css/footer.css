@@ -86,29 +86,39 @@
     flex-wrap: wrap;
 }
 
-.ozow-logo-container {
+/* =========================================================
+   FOOTER PAYMENT LOGOS
+========================================================= */
+
+.payment-logos {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
-.ozow-logo-wrapper {
-    padding: 10px 15px;
-    border-radius: 8px;
+.payment-logo-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.3s ease;
+
+    width: 92px;
+    height: 48px;
+    padding: 2px 12px;
+
+    border-radius: 9px;
+
+    background: #ffffff00;
+
+
 }
 
-.ozow-logo-wrapper:hover {
-    transform: translateY(-2px);
-}
-
-.ozow-logo {
-    height: 35px;
-    width: auto;
+.payment-logo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
     object-fit: contain;
-    filter: brightness(0.9);
 }
 
 .copyright {
@@ -160,16 +170,9 @@
     height: 50px;
     background-color: #25D366;
     border-radius: 50%;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.whatsapp-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
 }
 
 .whatsapp-btn .icon {
@@ -216,9 +219,10 @@
         gap: 20px;
         text-align: center;
     }
-    .ozow-logo-container {
-        order: 1;
-    }
+    .payment-logos {
+            order: 1;
+            justify-content: center;
+        }
     .copyright {
         order: 2;
         margin-left: 0;
@@ -245,10 +249,33 @@
 }
 
 @media (max-width: 480px) {
-    .ozow-logo-wrapper {
-        padding: 5px 12px;
+    .payment-logos {
+        gap: 7px;
     }
-    .ozow-logo {
-        height: 40px;
+
+    .payment-logo-wrapper {
+        width: 82px;
+        height: 44px;
+        padding: 7px 10px;
     }
+}
+
+.footer-bottom .social-icon {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+
+    border: 2px solid #64748b;
+    border-radius: 50%;
+
+    background: #00000000;
+    color: #ffffff;
+
+    font-size: 13px;
+}
+
+.footer-bottom .social-icon:hover {
+    border-color: #ffffff00;
+    background: #02253d;
+    color: #ffffff;
 }

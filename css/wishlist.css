@@ -127,7 +127,6 @@
     padding: 20px;
     margin-bottom: 15px;
     border: 1px solid #e2e8f0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .wishlist-item-header {
@@ -261,7 +260,6 @@
 .wishlist-btn.primary:hover:not(:disabled) {
     background: linear-gradient(135deg, #128C7E, #075E54);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
 }
 
 .wishlist-btn.secondary {

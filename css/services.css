@@ -152,11 +152,6 @@
     position: relative;
 }
 
-.product-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.08);
-}
-
 .card-top{
     display:flex;
     justify-content:flex-end;
@@ -298,7 +293,7 @@
 
 .btn-primary {
     flex: 1;
-    background: #1a1a1a;
+    background: #009B5B;
     color: white;
     border: none;
     padding: 10px 0;
@@ -636,7 +631,6 @@
     border-radius: 12px;
     transition:
         transform 0.25s ease,
-        box-shadow 0.25s ease;
 }
 
 .top-design-image-wrap {
@@ -696,7 +690,6 @@
     background: rgba(255, 255, 255, 0.94);
     border: 0;
     border-radius: 50%;
-    box-shadow: 0 5px 14px rgba(15, 23, 42, 0.08);
     cursor: pointer;
     transition:
         transform 0.2s ease,

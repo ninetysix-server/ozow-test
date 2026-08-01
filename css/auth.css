@@ -16,7 +16,7 @@
 .password-wrapper { position:relative; }
 .password-toggle { position:absolute; right:15px; top:50%; transform:translateY(-50%); background:none; border:none; color:#64748b; cursor:pointer; }
 .auth-button { width:100%; padding:16px; background:linear-gradient(135deg,#009B5B,#007a48); color:white; border:none; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer; }
-.auth-button:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,155,91,0.3); }
+.auth-button:hover { transform:translateY(-2px); }
 .divider { text-align:center; margin:25px 0; color:#64748b; font-size:14px; }
 .google-button { width:100%; padding:14px; background:white; color:#334155; border:2px solid #e2e8f0; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; }
 .google-button:hover { background:#f8fafc; }

@@ -13,7 +13,6 @@
     max-width: 500px;
     background: white;
     border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 }
 
@@ -196,11 +195,6 @@
 .payment-btn.primary {
     background: linear-gradient(135deg, #009B5B, #007a48);
     color: white;
-}
-
-.payment-btn.primary:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 155, 91, 0.3);
 }
 
 .payment-btn.secondary {

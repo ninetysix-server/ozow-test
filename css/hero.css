@@ -4,7 +4,6 @@
     margin: 20px auto;
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     position: relative;
 }
 
@@ -177,7 +176,6 @@
     display: none;
     overflow-y: auto;
     padding: 0;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
 }
 
 .search-results-dropdown.active {
