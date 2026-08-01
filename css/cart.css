@@ -138,3 +138,157 @@
 .cart-selection-total {
     margin-top: 6px;
 }
+
+/* =========================================================
+   CUSTOMER DETAILS & DELIVERY ADDRESS
+========================================================= */
+
+.confirmation-input-section {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 24px;
+}
+
+.confirmation-input-section h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin: 0 0 8px;
+
+    color: #004370;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.confirmation-input-section h3 i {
+    color: #009B5B;
+}
+
+.confirmation-section-note {
+    margin: 0 0 22px;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.confirmation-input-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 18px;
+}
+
+.confirmation-form-group {
+    margin: 0;
+}
+
+.confirmation-full-width {
+    grid-column: 1 / -1;
+}
+
+.confirmation-form-group input,
+.confirmation-form-group select,
+.confirmation-form-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    font-size: 14px;
+    font-family: inherit;
+
+    transition:
+        border-color .25s,
+        box-shadow .25s;
+}
+
+.confirmation-form-group input:focus,
+.confirmation-form-group select:focus,
+.confirmation-form-group textarea:focus {
+
+    outline: none;
+
+    border-color: #009B5B;
+
+    box-shadow:
+        0 0 0 4px rgba(0,155,91,.08);
+}
+
+.confirmation-form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.required {
+    color: #ef4444;
+    margin-left: 3px;
+}
+
+.hint {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    margin-top: 8px;
+
+    color: #64748b;
+    font-size: 12px;
+}
+
+.hint i {
+    color: #25D366;
+}
+
+.delivery-copy-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-bottom: 20px;
+
+    padding: 14px 16px;
+
+    border: 1px solid #dbe4ea;
+    border-radius: 10px;
+
+    background: #f8fafc;
+
+    cursor: pointer;
+}
+
+.delivery-copy-option input {
+    width: 18px;
+    height: 18px;
+
+    accent-color: #009B5B;
+}
+
+.delivery-copy-option span {
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width:768px){
+
+    .confirmation-input-grid{
+        grid-template-columns:1fr;
+    }
+
+    .confirmation-input-section{
+        padding:20px;
+    }
+
+    .confirmation-input-section h3{
+        font-size:18px;
+    }
+
+}
