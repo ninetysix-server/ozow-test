@@ -936,6 +936,14 @@ function createPrintingCard(service) {
     `;
 }
 
+function createPrintingSlide(service) {
+    return `
+        <div class="swiper-slide printing-swiper-slide">
+            ${createPrintingCard(service)}
+        </div>
+    `;
+}
+
 function renderPrintingServices() {
     const topContainer = document.getElementById(
         "printingServicesTop"
@@ -953,12 +961,100 @@ function renderPrintingServices() {
     const secondGroup = printingServices.slice(5, 10);
 
     topContainer.innerHTML = firstGroup
-        .map(createPrintingCard)
+        .map(createPrintingSlide)
         .join("");
 
     bottomContainer.innerHTML = secondGroup
-        .map(createPrintingCard)
+        .map(createPrintingSlide)
         .join("");
+}
+
+let printingTopSwiper = null;
+let printingBottomSwiper = null;
+
+function createPrintingSwiper(
+    selector,
+    paginationSelector,
+    reverseDirection = false
+) {
+    const sliderElement = document.querySelector(selector);
+
+    if (!sliderElement || typeof Swiper === "undefined") {
+        return null;
+    }
+
+    return new Swiper(selector, {
+        slidesPerView: 1.15,
+        spaceBetween: 14,
+        speed: 850,
+        loop: true,
+        grabCursor: true,
+        watchOverflow: true,
+        observer: true,
+        observeParents: true,
+
+        autoplay: {
+            delay: 3200,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: true,
+            reverseDirection
+        },
+
+        pagination: {
+            el: paginationSelector,
+            clickable: true,
+            dynamicBullets: true
+        },
+
+        breakpoints: {
+            430: {
+                slidesPerView: 1.35,
+                spaceBetween: 16
+            },
+
+            560: {
+                slidesPerView: 2,
+                spaceBetween: 18
+            },
+
+            820: {
+                slidesPerView: 2.5,
+                spaceBetween: 20
+            },
+
+            1000: {
+                slidesPerView: 3,
+                spaceBetween: 21
+            },
+
+            1200: {
+                slidesPerView: 4,
+                spaceBetween: 22
+            }
+        }
+    });
+}
+
+function initialisePrintingSwipers() {
+    if (printingTopSwiper) {
+        printingTopSwiper.destroy(true, true);
+    }
+
+    if (printingBottomSwiper) {
+        printingBottomSwiper.destroy(true, true);
+    }
+
+    printingTopSwiper = createPrintingSwiper(
+        "#printingSwiperTop",
+        ".printing-pagination-top",
+        false
+    );
+
+    printingBottomSwiper = createPrintingSwiper(
+        "#printingSwiperBottom",
+        ".printing-pagination-bottom",
+        true
+    );
 }
 
 function createPrintingConfigurator() {
@@ -1091,14 +1187,16 @@ function openPrintingConfigurator(serviceId) {
 
     selectedCard.classList.add("is-active");
 
-    const selectedGrid = selectedCard.closest(".printing-grid");
+    const selectedSwiper = selectedCard.closest(
+    ".printing-swiper"
+);
 
-    if (selectedGrid) {
-        selectedGrid.insertAdjacentElement(
-            "afterend",
-            configurator
-        );
-    }
+if (selectedSwiper) {
+    selectedSwiper.insertAdjacentElement(
+        "afterend",
+        configurator
+    );
+}
 
     configurator.hidden = false;
 
@@ -1689,6 +1787,7 @@ function handlePrintingSectionClick(event) {
 
 function initialisePrintingServices() {
     renderPrintingServices();
+    initialisePrintingSwipers();
 
     const printingSection = document.getElementById(
         "printingServices"
@@ -1698,9 +1797,15 @@ function initialisePrintingServices() {
         return;
     }
 
-    const configurator = createPrintingConfigurator();
+    const existingConfigurator = document.getElementById(
+        "printingConfigurator"
+    );
 
-    printingSection.appendChild(configurator);
+    if (!existingConfigurator) {
+        const configurator = createPrintingConfigurator();
+
+        printingSection.appendChild(configurator);
+    }
 
     printingSection.addEventListener(
         "click",

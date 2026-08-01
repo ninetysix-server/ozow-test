@@ -1,6 +1,10 @@
-// ./js/cart.js - Fully Fixed Version
-
-import { getCurrentUser, getOrCreateClientId, saveOrder } from './supabase.js';
+import {
+    getCurrentUser,
+    getOrCreateClientId,
+    getCustomerProfile,
+    saveCustomerProfile,
+    saveOrder
+} from './supabase.js';
 
 class CartManager {
     constructor() {
@@ -533,6 +537,203 @@ class CartManager {
     }
 }
 
+function getCheckoutField(id) {
+    return document.getElementById(id);
+}
+
+
+function setCheckoutFieldValue(id, value) {
+    const field = getCheckoutField(id);
+
+    if (field) {
+        field.value = value ?? '';
+    }
+}
+
+
+function checkoutHasPrinting() {
+    return cartManager.cart.some(item =>
+        item?.details?.printingSelected === true
+    );
+}
+
+
+function setDeliverySectionVisibility() {
+    const deliverySection = getCheckoutField(
+        'deliveryAddressSection'
+    );
+
+    if (!deliverySection) {
+        return;
+    }
+
+    deliverySection.hidden = !checkoutHasPrinting();
+}
+
+
+function populateCustomerProfile(profile = {}) {
+    setCheckoutFieldValue(
+        'customerWhatsapp',
+        profile.whatsapp_number
+    );
+
+    setCheckoutFieldValue(
+        'homeRecipientName',
+        profile.home_recipient_name
+    );
+
+    setCheckoutFieldValue(
+        'homeAddressLine1',
+        profile.home_address_line_1
+    );
+
+    setCheckoutFieldValue(
+        'homeAddressLine2',
+        profile.home_address_line_2
+    );
+
+    setCheckoutFieldValue(
+        'homeArea',
+        profile.home_area
+    );
+
+    setCheckoutFieldValue(
+        'homeCity',
+        profile.home_city
+    );
+
+    setCheckoutFieldValue(
+        'homeProvince',
+        profile.home_province
+    );
+
+    setCheckoutFieldValue(
+        'homePostalCode',
+        profile.home_postal_code
+    );
+
+    setCheckoutFieldValue(
+        'deliveryRecipientName',
+        profile.delivery_recipient_name
+    );
+
+    setCheckoutFieldValue(
+        'deliveryPhone',
+        profile.delivery_phone
+    );
+
+    setCheckoutFieldValue(
+        'deliveryAddressLine1',
+        profile.delivery_address_line_1
+    );
+
+    setCheckoutFieldValue(
+        'deliveryAddressLine2',
+        profile.delivery_address_line_2
+    );
+
+    setCheckoutFieldValue(
+        'deliveryArea',
+        profile.delivery_area
+    );
+
+    setCheckoutFieldValue(
+        'deliveryCity',
+        profile.delivery_city
+    );
+
+    setCheckoutFieldValue(
+        'deliveryProvince',
+        profile.delivery_province
+    );
+
+    setCheckoutFieldValue(
+        'deliveryPostalCode',
+        profile.delivery_postal_code
+    );
+
+    setCheckoutFieldValue(
+        'deliveryInstructions',
+        profile.delivery_instructions
+    );
+}
+
+
+async function loadCheckoutCustomerProfile() {
+    const user = await cartManager.getCurrentUser();
+
+    if (!user) {
+        return;
+    }
+
+    const {
+        data,
+        error
+    } = await getCustomerProfile(user.id);
+
+    if (error) {
+        console.error(
+            'Unable to load checkout customer profile:',
+            error
+        );
+
+        return;
+    }
+
+    populateCustomerProfile(data || {});
+}
+
+
+function copyHomeAddressToDelivery() {
+    const useHomeAddress = getCheckoutField(
+        'useHomeAddressForDelivery'
+    )?.checked === true;
+
+    if (!useHomeAddress) {
+        return;
+    }
+
+    setCheckoutFieldValue(
+        'deliveryRecipientName',
+        getCheckoutField('homeRecipientName')?.value
+    );
+
+    setCheckoutFieldValue(
+        'deliveryPhone',
+        getCheckoutField('customerWhatsapp')?.value
+    );
+
+    setCheckoutFieldValue(
+        'deliveryAddressLine1',
+        getCheckoutField('homeAddressLine1')?.value
+    );
+
+    setCheckoutFieldValue(
+        'deliveryAddressLine2',
+        getCheckoutField('homeAddressLine2')?.value
+    );
+
+    setCheckoutFieldValue(
+        'deliveryArea',
+        getCheckoutField('homeArea')?.value
+    );
+
+    setCheckoutFieldValue(
+        'deliveryCity',
+        getCheckoutField('homeCity')?.value
+    );
+
+    setCheckoutFieldValue(
+        'deliveryProvince',
+        getCheckoutField('homeProvince')?.value
+    );
+
+    setCheckoutFieldValue(
+        'deliveryPostalCode',
+        getCheckoutField('homePostalCode')?.value
+    );
+}
+
 export const cartManager = new CartManager();
 
 // Cart popup - Using arrow functions for proper 'this' binding
@@ -547,21 +748,55 @@ const popup = {
         document.getElementById('cartPopup').classList.remove('active');
         document.body.style.overflow = 'auto';
     },
-    openConfirmation: () => {
-        if (cartManager.isEmpty()) {
-            popup.showToast('Your cart is empty!', 'error');
-            return;
-        }
-        // Close cart popup
-        popup.close();
-        // Open confirmation popup
-        document.getElementById('confirmationPopup').classList.add('active');
-        document.body.style.overflow = 'hidden';
-        cartManager.updateConfirmationUI();
-        document.getElementById('designDescription').value = '';
-        document.getElementById('preferredColors').value = '';
-        document.getElementById('sketchImageUrl').value = '';
-    },
+    
+    openConfirmation: async () => {
+    if (cartManager.isEmpty()) {
+        popup.showToast(
+            'Your cart is empty!',
+            'error'
+        );
+
+        return;
+    }
+
+    popup.close();
+
+    document
+        .getElementById('confirmationPopup')
+        ?.classList.add('active');
+
+    document.body.style.overflow = 'hidden';
+
+    cartManager.updateConfirmationUI();
+
+    setDeliverySectionVisibility();
+
+    setCheckoutFieldValue(
+        'designDescription',
+        ''
+    );
+
+    setCheckoutFieldValue(
+        'preferredColors',
+        ''
+    );
+
+    setCheckoutFieldValue(
+        'sketchImageUrl',
+        ''
+    );
+
+    const deliveryCheckbox = getCheckoutField(
+        'useHomeAddressForDelivery'
+    );
+
+    if (deliveryCheckbox) {
+        deliveryCheckbox.checked = false;
+    }
+
+    await loadCheckoutCustomerProfile();
+},
+
     closeConfirmation: () => {
         document.getElementById('confirmationPopup').classList.remove('active');
         document.body.style.overflow = 'auto';
@@ -752,9 +987,213 @@ function calculateOrderBreakdown(cartSnapshot) {
     );
 }
 
+function getCheckoutText(id) {
+    return String(
+        getCheckoutField(id)?.value || ''
+    ).trim();
+}
+
+
+function collectCustomerProfileDetails() {
+    return {
+        whatsapp_number:
+            getCheckoutText('customerWhatsapp'),
+
+        home_recipient_name:
+            getCheckoutText('homeRecipientName'),
+
+        home_address_line_1:
+            getCheckoutText('homeAddressLine1'),
+
+        home_address_line_2:
+            getCheckoutText('homeAddressLine2'),
+
+        home_area:
+            getCheckoutText('homeArea'),
+
+        home_city:
+            getCheckoutText('homeCity'),
+
+        home_province:
+            getCheckoutText('homeProvince'),
+
+        home_postal_code:
+            getCheckoutText('homePostalCode'),
+
+        delivery_recipient_name:
+            getCheckoutText('deliveryRecipientName'),
+
+        delivery_phone:
+            getCheckoutText('deliveryPhone'),
+
+        delivery_address_line_1:
+            getCheckoutText('deliveryAddressLine1'),
+
+        delivery_address_line_2:
+            getCheckoutText('deliveryAddressLine2'),
+
+        delivery_area:
+            getCheckoutText('deliveryArea'),
+
+        delivery_city:
+            getCheckoutText('deliveryCity'),
+
+        delivery_province:
+            getCheckoutText('deliveryProvince'),
+
+        delivery_postal_code:
+            getCheckoutText('deliveryPostalCode'),
+
+        delivery_instructions:
+            getCheckoutText('deliveryInstructions')
+    };
+}
+
+
+function validateCustomerProfile(
+    profile,
+    printingRequested
+) {
+    const requiredHomeFields = [
+        ['whatsapp_number', 'WhatsApp number'],
+        ['home_recipient_name', 'full name'],
+        ['home_address_line_1', 'home address'],
+        ['home_area', 'area or suburb'],
+        ['home_city', 'city or town'],
+        ['home_province', 'province'],
+        ['home_postal_code', 'postal code']
+    ];
+
+    for (const [field, label] of requiredHomeFields) {
+        if (!profile[field]) {
+            return `Please enter your ${label}`;
+        }
+    }
+
+    const phoneDigits =
+        profile.whatsapp_number.replace(/\D/g, '');
+
+    if (phoneDigits.length < 9) {
+        return 'Please enter a valid WhatsApp number';
+    }
+
+    if (
+        profile.home_postal_code &&
+        !/^\d{4}$/.test(profile.home_postal_code)
+    ) {
+        return 'Please enter a valid 4-digit home postal code';
+    }
+
+    if (!printingRequested) {
+        return null;
+    }
+
+    const requiredDeliveryFields = [
+        ['delivery_recipient_name', 'delivery recipient name'],
+        ['delivery_phone', 'delivery contact number'],
+        ['delivery_address_line_1', 'delivery address'],
+        ['delivery_area', 'delivery area or suburb'],
+        ['delivery_city', 'delivery city or town'],
+        ['delivery_province', 'delivery province'],
+        ['delivery_postal_code', 'delivery postal code']
+    ];
+
+    for (const [field, label] of requiredDeliveryFields) {
+        if (!profile[field]) {
+            return `Please enter the ${label}`;
+        }
+    }
+
+    if (
+        !/^\d{4}$/.test(
+            profile.delivery_postal_code
+        )
+    ) {
+        return 'Please enter a valid 4-digit delivery postal code';
+    }
+
+    return null;
+}
+
+
+function createCustomerSnapshot(profile) {
+    return {
+        whatsappNumber:
+            profile.whatsapp_number,
+
+        fullName:
+            profile.home_recipient_name
+    };
+}
+
+
+function createHomeAddressSnapshot(profile) {
+    return {
+        recipientName:
+            profile.home_recipient_name,
+
+        addressLine1:
+            profile.home_address_line_1,
+
+        addressLine2:
+            profile.home_address_line_2,
+
+        area:
+            profile.home_area,
+
+        city:
+            profile.home_city,
+
+        province:
+            profile.home_province,
+
+        postalCode:
+            profile.home_postal_code
+    };
+}
+
+
+function createDeliveryAddressSnapshot(profile) {
+    return {
+        recipientName:
+            profile.delivery_recipient_name,
+
+        phone:
+            profile.delivery_phone,
+
+        addressLine1:
+            profile.delivery_address_line_1,
+
+        addressLine2:
+            profile.delivery_address_line_2,
+
+        area:
+            profile.delivery_area,
+
+        city:
+            profile.delivery_city,
+
+        province:
+            profile.delivery_province,
+
+        postalCode:
+            profile.delivery_postal_code,
+
+        instructions:
+            profile.delivery_instructions
+    };
+}
+
 // Setup cart events
 document.addEventListener('DOMContentLoaded', function() {
     cartManager.setupEvents();
+
+    document
+    .getElementById('useHomeAddressForDelivery')
+    ?.addEventListener(
+        'change',
+        copyHomeAddressToDelivery
+    );
     
     // Cart icons
     document.querySelectorAll('.cart-icon, .cart-icon-mobile, .nav-icon[href="#"]').forEach(el => {
@@ -786,91 +1225,228 @@ document.addEventListener('DOMContentLoaded', function() {
         popup.open();
     });
     
-    // Checkout - Updated to redirect to payment page
-    document.getElementById('proceedToCheckout')?.addEventListener('click', async function() {
-        const desc = document.getElementById('designDescription').value.trim();
-        if (!desc) {
-            popup.showToast('Please provide a design description', 'error');
-            return;
-        }
-        
-        const user = await cartManager.getCurrentUser();
-        if (!user) {
-            popup.showToast('Please login to proceed', 'error');
-            popup.closeConfirmation();
-            setTimeout(() => {
-                document.getElementById('desktopAuthOverlay')?.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }, 500);
-            return;
-        }
-        
-        const orderId =
-    'ORD-' +
-    Date.now()
-        .toString()
-        .slice(-8);
+   document
+    .getElementById('proceedToCheckout')
+    ?.addEventListener(
+        'click',
+        async function() {
+            const checkoutButton = this;
 
-const orderCart =
-    createOrderCartSnapshot(
-        cartManager.cart
+            const description =
+                getCheckoutText(
+                    'designDescription'
+                );
+
+            if (!description) {
+                popup.showToast(
+                    'Please provide a design description',
+                    'error'
+                );
+
+                return;
+            }
+
+            const user =
+                await cartManager.getCurrentUser();
+
+            if (!user) {
+                popup.showToast(
+                    'Please login to proceed',
+                    'error'
+                );
+
+                popup.closeConfirmation();
+
+                setTimeout(() => {
+                    document
+                        .getElementById(
+                            'desktopAuthOverlay'
+                        )
+                        ?.classList.add('active');
+
+                    document.body.style.overflow =
+                        'hidden';
+                }, 500);
+
+                return;
+            }
+
+            const printingRequested =
+                checkoutHasPrinting();
+
+            if (
+                printingRequested &&
+                getCheckoutField(
+                    'useHomeAddressForDelivery'
+                )?.checked
+            ) {
+                copyHomeAddressToDelivery();
+            }
+
+            const customerProfile =
+                collectCustomerProfileDetails();
+
+            const validationError =
+                validateCustomerProfile(
+                    customerProfile,
+                    printingRequested
+                );
+
+            if (validationError) {
+                popup.showToast(
+                    validationError,
+                    'error'
+                );
+
+                return;
+            }
+
+            checkoutButton.disabled = true;
+
+            checkoutButton.innerHTML = `
+                <i class="fas fa-spinner fa-spin"></i>
+                Saving details...
+            `;
+
+            try {
+                const {
+                    error: profileError
+                } = await saveCustomerProfile(
+                    customerProfile,
+                    user.id
+                );
+
+                if (profileError) {
+                    throw profileError;
+                }
+
+                const orderId =
+                    `ORD-${Date.now()
+                        .toString()
+                        .slice(-8)}`;
+
+                const orderCart =
+                    createOrderCartSnapshot(
+                        cartManager.cart
+                    );
+
+                const orderBreakdown =
+                    calculateOrderBreakdown(
+                        orderCart
+                    );
+
+                const orderData = {
+                    order_id: orderId,
+
+                    cart: orderCart,
+
+                    userInput: {
+                        sketchImageUrl:
+                            getCheckoutText(
+                                'sketchImageUrl'
+                            ),
+
+                        designDescription:
+                            description,
+
+                        preferredColors:
+                            getCheckoutText(
+                                'preferredColors'
+                            )
+                    },
+
+                    customerDetails:
+                        createCustomerSnapshot(
+                            customerProfile
+                        ),
+
+                    homeAddress:
+                        createHomeAddressSnapshot(
+                            customerProfile
+                        ),
+
+                    printingRequested,
+
+                    deliveryAddress:
+                        printingRequested
+                            ? createDeliveryAddressSnapshot(
+                                customerProfile
+                            )
+                            : {},
+
+                    totals: {
+                        design:
+                            orderBreakdown.design,
+
+                        printing:
+                            orderBreakdown.printing,
+
+                        subtotal:
+                            orderBreakdown.total,
+
+                        total:
+                            orderBreakdown.total
+                    },
+
+                    paymentStatus: 'Pending',
+                    designStatus: 'Waiting',
+                    progress: 0,
+
+                    created_at:
+                        new Date().toISOString(),
+
+                    updated_at:
+                        new Date().toISOString()
+                };
+
+                checkoutButton.innerHTML = `
+                    <i class="fas fa-spinner fa-spin"></i>
+                    Creating order...
+                `;
+
+                const {
+                    error: orderError
+                } = await saveOrder(orderData);
+
+                if (orderError) {
+                    throw orderError;
+                }
+
+                cartManager.clearCart();
+                popup.closeConfirmation();
+
+                popup.showToast(
+                    'Order created! Redirecting to payment...',
+                    'success'
+                );
+
+                setTimeout(() => {
+                    window.location.href =
+                        `payment.html?orderId=${encodeURIComponent(
+                            orderId
+                        )}`;
+                }, 1500);
+            } catch (error) {
+                console.error(
+                    'Checkout failed:',
+                    error
+                );
+
+                popup.showToast(
+                    error?.message ||
+                    'Unable to create the order. Please try again.',
+                    'error'
+                );
+
+                checkoutButton.disabled = false;
+
+                checkoutButton.innerHTML = `
+                    <i class="fas fa-lock"></i>
+                    Proceed to Checkout
+                `;
+            }
+        }
     );
-
-const orderBreakdown =
-    calculateOrderBreakdown(
-        orderCart
-    );
-
-const orderData = {
-    order_id: orderId,
-
-    cart: orderCart,
-
-    userInput: {
-        sketchImageUrl:
-            document
-                .getElementById('sketchImageUrl')
-                .value
-                .trim(),
-
-        designDescription: desc,
-
-        preferredColors:
-            document
-                .getElementById('preferredColors')
-                .value
-                .trim()
-    },
-
-    totals: {
-        design: orderBreakdown.design,
-        printing: orderBreakdown.printing,
-
-        subtotal: orderBreakdown.total,
-        total: orderBreakdown.total
-    },
-            paymentStatus: 'Pending',
-            designStatus: 'Waiting',
-            progress: 0,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-        };
-        
-        const { error } = await saveOrder(orderData);
-        if (error) {
-            popup.showToast('Error creating order. Please try again.', 'error');
-            return;
-        }
-        
-        cartManager.clearCart();
-        popup.closeConfirmation();
-        popup.showToast('Order created! Redirecting to payment...', 'success');
-        
-        // Redirect to payment page with order ID
-        setTimeout(() => {
-            window.location.href = `payment.html?orderId=${orderId}`;
-        }, 1500);
-    });
 });
 
 // Initial load

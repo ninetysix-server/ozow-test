@@ -117,6 +117,193 @@ export async function getOrCreateClientId(userId) {
     return clientId;
 }
 
+// ======================================================
+// CUSTOMER PROFILE
+// ======================================================
+
+export async function getCustomerProfile(userId = null) {
+    let resolvedUserId = userId;
+
+    if (!resolvedUserId) {
+        const user = await getCurrentUser();
+
+        if (!user) {
+            return {
+                data: null,
+                error: new Error(
+                    'User not authenticated'
+                )
+            };
+        }
+
+        resolvedUserId = user.id;
+    }
+
+    const { data, error } = await supabase
+        .from('users')
+        .select(`
+            id,
+            client_id,
+            whatsapp_number,
+            home_recipient_name,
+            home_address_line_1,
+            home_address_line_2,
+            home_area,
+            home_city,
+            home_province,
+            home_postal_code,
+            delivery_recipient_name,
+            delivery_phone,
+            delivery_address_line_1,
+            delivery_address_line_2,
+            delivery_area,
+            delivery_city,
+            delivery_province,
+            delivery_postal_code,
+            delivery_instructions
+        `)
+        .eq('id', resolvedUserId)
+        .maybeSingle();
+
+    if (error) {
+        console.error(
+            'Error loading customer profile:',
+            error
+        );
+    }
+
+    return {
+        data,
+        error
+    };
+}
+
+
+export async function saveCustomerProfile(
+    profileDetails,
+    userId = null
+) {
+    let resolvedUserId = userId;
+
+    if (!resolvedUserId) {
+        const user = await getCurrentUser();
+
+        if (!user) {
+            return {
+                data: null,
+                error: new Error(
+                    'User not authenticated'
+                )
+            };
+        }
+
+        resolvedUserId = user.id;
+    }
+
+    const cleanText = value => {
+        const text = String(value ?? '').trim();
+
+        return text || null;
+    };
+
+    const profileRecord = {
+        id: resolvedUserId,
+
+        whatsapp_number: cleanText(
+            profileDetails.whatsapp_number
+        ),
+
+        home_recipient_name: cleanText(
+            profileDetails.home_recipient_name
+        ),
+
+        home_address_line_1: cleanText(
+            profileDetails.home_address_line_1
+        ),
+
+        home_address_line_2: cleanText(
+            profileDetails.home_address_line_2
+        ),
+
+        home_area: cleanText(
+            profileDetails.home_area
+        ),
+
+        home_city: cleanText(
+            profileDetails.home_city
+        ),
+
+        home_province: cleanText(
+            profileDetails.home_province
+        ),
+
+        home_postal_code: cleanText(
+            profileDetails.home_postal_code
+        ),
+
+        delivery_recipient_name: cleanText(
+            profileDetails.delivery_recipient_name
+        ),
+
+        delivery_phone: cleanText(
+            profileDetails.delivery_phone
+        ),
+
+        delivery_address_line_1: cleanText(
+            profileDetails.delivery_address_line_1
+        ),
+
+        delivery_address_line_2: cleanText(
+            profileDetails.delivery_address_line_2
+        ),
+
+        delivery_area: cleanText(
+            profileDetails.delivery_area
+        ),
+
+        delivery_city: cleanText(
+            profileDetails.delivery_city
+        ),
+
+        delivery_province: cleanText(
+            profileDetails.delivery_province
+        ),
+
+        delivery_postal_code: cleanText(
+            profileDetails.delivery_postal_code
+        ),
+
+        delivery_instructions: cleanText(
+            profileDetails.delivery_instructions
+        ),
+
+        updated_at: new Date().toISOString()
+    };
+
+    const { data, error } = await supabase
+        .from('users')
+        .upsert(
+            profileRecord,
+            {
+                onConflict: 'id'
+            }
+        )
+        .select()
+        .single();
+
+    if (error) {
+        console.error(
+            'Error saving customer profile:',
+            error
+        );
+    }
+
+    return {
+        data,
+        error
+    };
+}
+
 
 // ======================================================
 // SERVICES
@@ -192,31 +379,74 @@ export async function saveOrder(orderData) {
     if (!user) {
         return {
             data: null,
-            error: 'User not authenticated'
+            error: new Error(
+                'User not authenticated'
+            )
         };
     }
 
-    const clientId = await getOrCreateClientId(user.id);
+    const clientId = await getOrCreateClientId(
+        user.id
+    );
+
+    const customerDetails =
+        orderData.customerDetails || {};
+
+    const homeAddress =
+        orderData.homeAddress || {};
+
+    const deliveryAddress =
+        orderData.deliveryAddress || {};
 
     const { data, error } = await supabase
         .from('orders')
         .insert({
             order_id: orderData.order_id,
+
             user_id: user.id,
             client_id: clientId,
+
             cart: orderData.cart,
             user_input: orderData.userInput,
             totals: orderData.totals,
-            payment_status: orderData.paymentStatus || 'Pending',
-            design_status: orderData.designStatus || 'Waiting',
-            progress: orderData.progress || 0,
+
+            customer_details: customerDetails,
+            home_address: homeAddress,
+
+            printing_requested:
+                orderData.printingRequested === true,
+
+            delivery_address:
+                orderData.printingRequested === true
+                    ? deliveryAddress
+                    : {},
+
+            payment_status:
+                orderData.paymentStatus || 'Pending',
+
+            design_status:
+                orderData.designStatus || 'Waiting',
+
+            progress:
+                Number(orderData.progress || 0),
+
             created_at:
-                orderData.created_at || new Date().toISOString(),
+                orderData.created_at ||
+                new Date().toISOString(),
+
             updated_at:
-                orderData.updated_at || new Date().toISOString()
+                orderData.updated_at ||
+                new Date().toISOString()
         })
         .select()
         .single();
+
+    if (error) {
+        console.error(
+            'Error saving order:',
+            error
+        );
+    }
 
     return {
         data,
