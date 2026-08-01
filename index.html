@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="css/main.css" />
     <link rel="stylesheet" href="css/header.css" />
     <link rel="stylesheet" href="css/hero.css" />
+    <link rel="stylesheet" href="css/promotions.css" />
     <link rel="stylesheet" href="css/services.css" />
     <link rel="stylesheet" href="css/features.css" />
     <link rel="stylesheet" href="css/printing.css" />
@@ -68,10 +69,26 @@
                 <div class="logo">
                     <img src="assets/images/logo.svg" alt="96 Studios Logo" class="logo-img" />
                 </div>
+                
                 <div class="search-container">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" class="search-input" id="mainSearchInput" placeholder="Search services..." autocomplete="off" />
+                    <input
+                        type="text"
+                        class="search-input"
+                        id="mainSearchInput"
+                        placeholder="What are you looking for?"
+                        autocomplete="off"
+                    />
+
+                    <button
+                        type="button"
+                        class="search-submit"
+                        id="mainSearchButton"
+                        aria-label="Search"
+                    >
+                        <i class="fas fa-search"></i>
+                    </button>
                 </div>
+
                 <div class="contact-info">
                     <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
                     <div>
@@ -888,21 +905,18 @@
 <section class="printing-section" id="printingServices">
     <div class="container">
 
-        <div class="printing-heading">
-
-            <h2>Printing Services</h2>
-
-            <p>
-                High-quality printing solutions for businesses,
-                events, promotions and professional branding.
-            </p>
-        </div>
-
-        <!-- FIRST 5 PRINTING SERVICES -->
+                <!-- FIRST 5 PRINTING SERVICES SWIPER -->
         <div
-            class="printing-grid"
-            id="printingServicesTop"
-        ></div>
+            class="swiper printing-swiper printing-swiper-top"
+            id="printingSwiperTop"
+        >
+            <div
+                class="swiper-wrapper printing-swiper-wrapper"
+                id="printingServicesTop"
+            ></div>
+
+            
+        </div>
 
         <!-- PRINTING PARAGRAPH DIVIDER -->
         <div class="printing-feature-message">
@@ -931,12 +945,139 @@
             </div>
         </div>
 
-        <!-- SECOND 5 PRINTING SERVICES -->
-        <div
-            class="printing-grid"
-            id="printingServicesBottom"
-        ></div>
+        <!-- SECOND 5 PRINTING SERVICES SWIPER -->
+            <div
+                class="swiper printing-swiper printing-swiper-bottom"
+                id="printingSwiperBottom"
+            >
+                <div
+                    class="swiper-wrapper printing-swiper-wrapper"
+                    id="printingServicesBottom"
+                ></div>
 
+                <div
+                    class="swiper-pagination printing-pagination-bottom"
+                ></div>
+            </div>
+
+    </div>
+</section>
+
+<!-- PROMOTIONS AND DEALS SECTION -->
+<section class="promotions-section" id="promotionsSection">
+    <div class="promotions-container">
+
+        <div class="promotions-heading">
+            <div class="promotions-heading-mark">
+                <span></span>
+            </div>
+
+            <div class="promotions-heading-text">
+                <h2>Promotions &amp; Deals</h2>
+
+                <p>
+                    Smarter services, easier payments and better savings.
+                </p>
+            </div>
+        </div>
+
+        <div class="promotions-grid">
+
+            <!-- DESIGNMORE CARD -->
+            <article class="promotion-card designmore-promotion">
+                <div class="promotion-card-decoration"></div>
+
+                <div class="promotion-card-content">
+
+                    <span class="promotion-eyebrow">
+                        More Creative Possibilities
+                    </span>
+
+                    <h3>DesignMore</h3>
+
+                    <p>
+                        Need a design that is not listed in our pricing?
+                        DesignMore gives you a smarter way to request
+                        almost anything you can imagine.
+                    </p>
+
+                    <a href="#services" class="promotion-action">
+                        <span>Design Anything</span>
+                        <span class="promotion-arrow">→</span>
+                    </a>
+                </div>
+
+                <img
+                    src="assets/images/cart-title-image.png"
+                    alt="DesignMore"
+                    class="designmore-card-image"
+                >
+            </article>
+
+            <!-- OZOW PAYMENT CARD -->
+            <article class="promotion-card ozow-promotion">
+                <div class="promotion-card-decoration"></div>
+
+                <div class="promotion-card-content">
+   
+                    <span class="promotion-eyebrow">
+                        Secure Online Payments
+                    </span>
+
+                    <h3>Pay Easily With Ozow</h3>
+
+                    <p>
+                        Pay securely using instant EFT or card.
+                        A simple, safe and faster way to complete
+                        your order online.
+                    </p>
+
+                    <a href="#services" class="promotion-action">
+                        <span>Choose a Service</span>
+                        <span class="promotion-arrow">→</span>
+                    </a>
+                </div>
+
+                <div class="ozow-card-logo">
+                    <img
+                        src="assets/images/ozow-image.png"
+                        alt="Ozow secure payments"
+                    >
+                </div>
+            </article>
+
+            <!-- SALE CARD -->
+            <article class="promotion-card sale-promotion">
+                <div class="promotion-card-decoration"></div>
+
+                <div class="promotion-card-content">
+   
+
+                    <span class="promotion-eyebrow">
+                        Selected Design Services
+                    </span>
+
+                    <h3>Save Up To 50%</h3>
+
+                    <p>
+                        Enjoy special savings on selected design
+                        services and packages while promotional
+                        offers are available.
+                    </p>
+
+                    <a href="#services" class="promotion-action">
+                        <span>View Sale Offers</span>
+                        <span class="promotion-arrow">→</span>
+                    </a>
+                </div>
+
+                <div class="sale-card-amount">
+                    <strong>50%</strong>
+                    <span>OFF</span>
+                </div>
+            </article>
+
+        </div>
     </div>
 </section>
 
@@ -1003,11 +1144,33 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <div class="ozow-logo-container">
-                    <div class="ozow-logo-wrapper">
-                        <img src="assets/images/ozow-image.png" alt="Ozow Payment" class="ozow-logo" />
-                    </div>
-                </div>
+                
+                <div class="payment-logos">
+    <div class="payment-logo-wrapper">
+        <img
+            src="assets/images/ozow-image.png"
+            alt="Ozow Payment"
+            class="payment-logo"
+        />
+    </div>
+
+    <div class="payment-logo-wrapper">
+        <img
+            src="assets/images/MasterCard.png"
+            alt="Payment method"
+            class="payment-logo"
+        />
+    </div>
+
+    <div class="payment-logo-wrapper">
+        <img
+            src="assets/images/Visa.png"
+            alt="Payment method"
+            class="payment-logo"
+        />
+    </div>
+</div>
+                
                 <div class="social-icons">
                     <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
                     <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
@@ -1330,9 +1493,352 @@
                             <input type="text" id="preferredColors" placeholder="e.g., Blue & White, Earth tones" />
                             <div class="hint"><i class="fas fa-palette"></i> Mention specific color codes if you have them</div>
                         </div>
+                    
                     </div>
                 </div>
+
+                <!-- CUSTOMER CONTACT AND ADDRESS -->
+<div
+    class="confirmation-input-section"
+    id="customerDetailsSection"
+>
+    <h3>
+        <i class="fas fa-user"></i>
+        Customer Details
+    </h3>
+
+    <p class="confirmation-section-note">
+        These details will be saved securely so you do not
+        need to enter them again on your next order.
+    </p>
+
+    <div class="confirmation-input-grid">
+
+        <div class="confirmation-form-group">
+            <label for="customerWhatsapp">
+                WhatsApp Number
+                <span class="required">*</span>
+            </label>
+
+            <input
+                type="tel"
+                id="customerWhatsapp"
+                placeholder="Example: 081 792 5033"
+                autocomplete="tel"
+            >
+
+            <div class="hint">
+                <i class="fab fa-whatsapp"></i>
+                We may use this number to discuss your order.
+            </div>
+        </div>
+
+        <div class="confirmation-form-group">
+            <label for="homeRecipientName">
+                Full Name
+                <span class="required">*</span>
+            </label>
+
+            <input
+                type="text"
+                id="homeRecipientName"
+                placeholder="Customer full name"
+                autocomplete="name"
+            >
+        </div>
+
+        <div class="confirmation-form-group">
+            <label for="homeAddressLine1">
+                Home Address
+                <span class="required">*</span>
+            </label>
+
+            <input
+                type="text"
+                id="homeAddressLine1"
+                placeholder="House number and street name"
+                autocomplete="address-line1"
+            >
+        </div>
+
+        <div class="confirmation-form-group">
+            <label for="homeAddressLine2">
+                Address Line 2
+            </label>
+
+            <input
+                type="text"
+                id="homeAddressLine2"
+                placeholder="Complex, unit or additional details"
+                autocomplete="address-line2"
+            >
+        </div>
+
+        <div class="confirmation-form-group">
+            <label for="homeArea">
+                Area or Suburb
+                <span class="required">*</span>
+            </label>
+
+            <input
+                type="text"
+                id="homeArea"
+                placeholder="Example: Seshego"
+                autocomplete="address-level3"
+            >
+        </div>
+
+        <div class="confirmation-form-group">
+            <label for="homeCity">
+                City or Town
+                <span class="required">*</span>
+            </label>
+
+            <input
+                type="text"
+                id="homeCity"
+                placeholder="Example: Polokwane"
+                autocomplete="address-level2"
+            >
+        </div>
+
+        <div class="confirmation-form-group">
+            <label for="homeProvince">
+                Province
+                <span class="required">*</span>
+            </label>
+
+            <select
+                id="homeProvince"
+                autocomplete="address-level1"
+            >
+                <option value="">Select province</option>
+                <option value="Eastern Cape">
+                    Eastern Cape
+                </option>
+                <option value="Free State">
+                    Free State
+                </option>
+                <option value="Gauteng">
+                    Gauteng
+                </option>
+                <option value="KwaZulu-Natal">
+                    KwaZulu-Natal
+                </option>
+                <option value="Limpopo">
+                    Limpopo
+                </option>
+                <option value="Mpumalanga">
+                    Mpumalanga
+                </option>
+                <option value="North West">
+                    North West
+                </option>
+                <option value="Northern Cape">
+                    Northern Cape
+                </option>
+                <option value="Western Cape">
+                    Western Cape
+                </option>
+            </select>
+        </div>
+
+        <div class="confirmation-form-group">
+            <label for="homePostalCode">
+                Postal Code
+                <span class="required">*</span>
+            </label>
+
+            <input
+                type="text"
+                id="homePostalCode"
+                inputmode="numeric"
+                maxlength="4"
+                placeholder="Example: 0699"
+                autocomplete="postal-code"
+            >
+        </div>
+
+    </div>
+</div>
+
+
+<!-- PRINTING DELIVERY ADDRESS -->
+<div
+    class="confirmation-input-section"
+    id="deliveryAddressSection"
+    hidden
+>
+    <h3>
+        <i class="fas fa-truck"></i>
+        Printing Delivery Address
+    </h3>
+
+    <p class="confirmation-section-note">
+        These fields appear only when your cart contains
+        a printing order.
+    </p>
+
+    <label class="delivery-copy-option">
+        <input
+            type="checkbox"
+            id="useHomeAddressForDelivery"
+        >
+
+        <span>
+            Use my home address for delivery
+        </span>
+    </label>
+
+    <div
+        class="confirmation-input-grid"
+        id="deliveryAddressFields"
+    >
+        <div class="confirmation-form-group">
+            <label for="deliveryRecipientName">
+                Recipient Name
+                <span class="required">*</span>
+            </label>
+
+            <input
+                type="text"
+                id="deliveryRecipientName"
+                placeholder="Name of the person receiving the order"
+            >
+        </div>
+
+        <div class="confirmation-form-group">
+            <label for="deliveryPhone">
+                Delivery Contact Number
+                <span class="required">*</span>
+            </label>
+
+            <input
+                type="tel"
+                id="deliveryPhone"
+                placeholder="Example: 081 792 5033"
+            >
+        </div>
+
+        <div class="confirmation-form-group">
+            <label for="deliveryAddressLine1">
+                Delivery Address
+                <span class="required">*</span>
+            </label>
+
+            <input
+                type="text"
+                id="deliveryAddressLine1"
+                placeholder="Building number and street name"
+            >
+        </div>
+
+        <div class="confirmation-form-group">
+            <label for="deliveryAddressLine2">
+                Address Line 2
+            </label>
+
+            <input
+                type="text"
+                id="deliveryAddressLine2"
+                placeholder="Complex, unit or additional details"
+            >
+        </div>
+
+        <div class="confirmation-form-group">
+            <label for="deliveryArea">
+                Area or Suburb
+                <span class="required">*</span>
+            </label>
+
+            <input
+                type="text"
+                id="deliveryArea"
+                placeholder="Area or suburb"
+            >
+        </div>
+
+        <div class="confirmation-form-group">
+            <label for="deliveryCity">
+                City or Town
+                <span class="required">*</span>
+            </label>
+
+            <input
+                type="text"
+                id="deliveryCity"
+                placeholder="City or town"
+            >
+        </div>
+
+        <div class="confirmation-form-group">
+            <label for="deliveryProvince">
+                Province
+                <span class="required">*</span>
+            </label>
+
+            <select id="deliveryProvince">
+                <option value="">Select province</option>
+                <option value="Eastern Cape">
+                    Eastern Cape
+                </option>
+                <option value="Free State">
+                    Free State
+                </option>
+                <option value="Gauteng">
+                    Gauteng
+                </option>
+                <option value="KwaZulu-Natal">
+                    KwaZulu-Natal
+                </option>
+                <option value="Limpopo">
+                    Limpopo
+                </option>
+                <option value="Mpumalanga">
+                    Mpumalanga
+                </option>
+                <option value="North West">
+                    North West
+                </option>
+                <option value="Northern Cape">
+                    Northern Cape
+                </option>
+                <option value="Western Cape">
+                    Western Cape
+                </option>
+            </select>
+        </div>
+
+        <div class="confirmation-form-group">
+            <label for="deliveryPostalCode">
+                Postal Code
+                <span class="required">*</span>
+            </label>
+
+            <input
+                type="text"
+                id="deliveryPostalCode"
+                inputmode="numeric"
+                maxlength="4"
+                placeholder="Postal code"
+            >
+        </div>
+
+        <div class="confirmation-form-group confirmation-full-width">
+            <label for="deliveryInstructions">
+                Delivery Instructions
+            </label>
+
+            <textarea
+                id="deliveryInstructions"
+                placeholder="Gate code, landmarks or other delivery information"
+            ></textarea>
+        </div>
+    </div>
+</div>
+                
                 <div class="confirmation-summary">
+
                     <h4><i class="fas fa-receipt"></i> Order Summary</h4>
                     <div class="confirmation-summary-row"><span class="confirmation-summary-label">Subtotal</span><span class="confirmation-summary-value" id="confirmationSubtotal">R0</span></div>
                     <div class="confirmation-summary-row final"><span class="confirmation-summary-label">Total Amount</span><span class="confirmation-summary-value" id="confirmationTotal">R0</span></div>
