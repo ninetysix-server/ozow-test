@@ -9,6 +9,66 @@ import {
     saveOrder
 } from './supabase.js';
 
+let validationMessageTimer = null;
+
+function showValidationMessage(message) {
+    const popup =
+        document.getElementById(
+            "validationMessage"
+        );
+
+    const messageText =
+        document.getElementById(
+            "validationMessageText"
+        );
+
+    if (!popup || !messageText) {
+        console.warn(message);
+        return;
+    }
+
+    clearTimeout(validationMessageTimer);
+
+    messageText.textContent = message;
+
+    popup.classList.add("show");
+    popup.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+    validationMessageTimer = setTimeout(
+        hideValidationMessage,
+        3500
+    );
+}
+
+function hideValidationMessage() {
+    const popup =
+        document.getElementById(
+            "validationMessage"
+        );
+
+    if (!popup) {
+        return;
+    }
+
+    popup.classList.remove("show");
+    popup.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+}
+
+document
+    .getElementById(
+        "closeValidationMessage"
+    )
+    ?.addEventListener(
+        "click",
+        hideValidationMessage
+    );
+
 class CartManager {
     constructor() {
         this.cartKey = 'designStudioCart';
@@ -935,38 +995,16 @@ const popup = {
         
         const bgColor = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6';
         
-        Object.assign(toast.style, {
-            position: 'fixed', 
-            bottom: '30px', 
-            left: '50%',
-            transform: 'translateX(-50%) translateY(100px)',
-            padding: '14px 32px',
-            background: bgColor, 
-            color: 'white',
-            borderRadius: '60px', 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '10px',
-            zIndex: '9999', 
-            boxShadow: '0 5px 20px rgba(0,0,0,0.15)',
-            opacity: '0',
-            transition: 'all 0.4s ease',
-            fontFamily: 'Inter, sans-serif',
-            fontSize: '0.9rem',
-            fontWeight: '500',
-            maxWidth: '400px'
-        });
+    
         document.body.appendChild(toast);
         
         // Trigger animation
         requestAnimationFrame(() => {
-            toast.style.transform = 'translateX(-50%) translateY(0)';
-            toast.style.opacity = '1';
+            toast.classList.add("show");
         });
         
         setTimeout(() => {
-            toast.style.transform = 'translateX(-50%) translateY(100px)';
-            toast.style.opacity = '0';
+            toast.classList.remove("show");
             setTimeout(() => toast.remove(), 400);
         }, 3000);
     }

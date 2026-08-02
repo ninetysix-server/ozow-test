@@ -1125,7 +1125,6 @@ function createPrintingConfigurator() {
 
             <aside class="printing-configurator-summary">
                 <div class="printing-summary-heading">
-                    <span>Your request</span>
                     <h3>Quotation summary</h3>
                 </div>
 
@@ -1140,7 +1139,6 @@ function createPrintingConfigurator() {
                 ></div>
 
                 <div class="printing-summary-price">
-                    <span>Starting price</span>
                     <strong id="printingSummaryPrice"></strong>
 
                     <p>

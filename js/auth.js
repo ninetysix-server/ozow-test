@@ -59,7 +59,7 @@ function updateAuthUI() {
         const initials = getInitials(currentUser.email);
         if (desktopBtn) {
             desktopBtn.innerHTML = `
-                <div class="profile-initials" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#007a48;color:white;font-weight:600;font-size:14px;">
+                <div class="profile-initials" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#004370;background:#004370;color:white;font-weight:600;font-size:14px;">
                     ${initials}
                 </div>
             `;
@@ -69,7 +69,7 @@ function updateAuthUI() {
             const icon = mobileBtn.querySelector('.nav-icon-mobile');
             if (icon) {
                 icon.innerHTML = `
-                    <div class="profile-initials" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#007a48;color:white;font-weight:600;font-size:14px;">
+                    <div class="profile-initials" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#004370;color:white;font-weight:600;font-size:14px;">
                         ${initials}
                     </div>
                 `;

@@ -288,19 +288,19 @@ function renderTopDesigns() {
     const topDesignDefinitions = [
     {
         matcher: 'logo',
-        image: 'assets/images/vr_logo-design.png'
+        image: 'assets/images/tp-h/vr_logo-design.png'
     },
     {
         matcher: 'poster',
-        image: 'assets/images/vr_poster.png'
+        image: 'assets/images/tp-h/vr_poster.png'
     },
     {
         matcher: 'business card',
-        image: 'assets/images/vr_business-card.png'
+        image: 'assets/images/tp-h/vr_business-card.png'
     },
     {
         matcher: 'board',
-        image: 'assets/images/vr_board-design.png'
+        image: 'assets/images/tp-h/vr_board-design.png'
     }
 ];
 
@@ -1442,7 +1442,6 @@ const savingPercentage = isOnSale
                 </div>
                 <div class="card-actions">
                     <button class="btn-primary" onclick="addToCart('${service.id}')"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
-                    <button class="btn-secondary" onclick="quickView('${service.id}')"><i class="fas fa-eye"></i></button>
                 </div>
             </div>
         `;
@@ -2050,11 +2049,6 @@ const finalPrice =
 
     openCartPopup();
 };
-
-    window.quickView = function(serviceId) {
-        const service = allServices.find(s => s.id === serviceId);
-        if (service) showToast(`${service.title} - ${service.category}`, 'info');
-    };
 
     window.toggleCategory = function(category) {
         const index = selectedCategories.indexOf(category);
