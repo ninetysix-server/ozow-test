@@ -1607,6 +1607,41 @@ document.addEventListener('DOMContentLoaded', function() {
                 );
             }
 
+            try {
+    const {
+        data: emailData,
+        error: emailError
+    } = await supabase.functions.invoke(
+        'send-new-order-email',
+        {
+            body: {
+                orderRecordId: savedOrder.id
+            }
+        }
+    );
+
+    if (emailError) {
+        throw emailError;
+    }
+
+    if (!emailData?.success) {
+        throw new Error(
+            emailData?.error ||
+            'Admin email was not sent'
+        );
+    }
+
+    console.log(
+        'Admin new-order email sent:',
+        emailData
+    );
+} catch (emailError) {
+    console.error(
+        'Admin new-order email failed:',
+        emailError
+    );
+}
+
                 cartManager.clearCart();
                 popup.closeConfirmation();
 
