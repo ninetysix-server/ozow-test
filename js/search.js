@@ -2,6 +2,11 @@
 
 let searchTimeout = null;
 
+
+/* =========================================================
+   CLOSE MOBILE SEARCH
+========================================================= */
+
 function closeMobileSearch() {
     const mobileModal =
         document.getElementById(
@@ -9,72 +14,141 @@ function closeMobileSearch() {
         );
 
     if (mobileModal) {
-        mobileModal.classList.remove('active');
-    }
-
-    document.body.style.overflow = 'auto';
-}
-
-function runSearch(input) {
-    if (!input) {
-        return;
-    }
-
-    clearTimeout(searchTimeout);
-
-    const term = input.value.trim();
-
-    /*
-     * Give the user enough time to finish typing.
-     * Search starts only after 1.2 seconds without typing.
-     */
-    searchTimeout = setTimeout(async () => {
-        if (
-            typeof window.searchDatabaseServices !==
-            'function'
-        ) {
-            console.error(
-                'Service search is not ready.'
-            );
-
-            return;
-        }
-
-        await window.searchDatabaseServices(
-            term,
-            false
+        mobileModal.classList.remove(
+            'active'
         );
-    }, 1200);
+
+        mobileModal.setAttribute(
+            'aria-hidden',
+            'true'
+        );
+    }
+
+    document.body.style.overflow = '';
 }
 
-function connectSearchInput(input) {
+
+/* =========================================================
+   RUN DATABASE SEARCH
+========================================================= */
+
+async function searchForServices(
+    input,
+    shouldScroll = false
+) {
     if (!input) {
         return;
     }
 
-    input.addEventListener('input', () => {
-        runSearch(input);
-    });
+    const searchTerm =
+        input.value.trim();
 
-    input.addEventListener('keydown', async event => {
-    if (event.key !== 'Enter') {
+    if (!searchTerm) {
+        input.focus();
         return;
     }
-
-    event.preventDefault();
-    clearTimeout(searchTimeout);
 
     if (
-        typeof window.searchDatabaseServices ===
+        typeof window.searchDatabaseServices !==
         'function'
     ) {
-        await window.searchDatabaseServices(
-            input.value.trim(),
-            true
+        console.error(
+            'Service search is not ready.'
         );
+
+        return;
     }
-});
+
+    await window.searchDatabaseServices(
+        searchTerm,
+        shouldScroll
+    );
 }
+
+
+/* =========================================================
+   SEARCH WHILE TYPING
+========================================================= */
+
+function runDelayedSearch(input) {
+    if (!input) {
+        return;
+    }
+
+    clearTimeout(searchTimeout);
+
+    searchTimeout = setTimeout(
+        async () => {
+            const searchTerm =
+                input.value.trim();
+
+            if (!searchTerm) {
+                if (
+                    typeof window.clearServiceSearch ===
+                    'function'
+                ) {
+                    window.clearServiceSearch();
+                }
+
+                return;
+            }
+
+            await searchForServices(
+                input,
+                false
+            );
+        },
+        1200
+    );
+}
+
+
+/* =========================================================
+   CONNECT SEARCH INPUT
+========================================================= */
+
+function connectSearchInput(
+    input,
+    isMobile = false
+) {
+    if (!input) {
+        return;
+    }
+
+    input.addEventListener(
+        'input',
+        () => {
+            runDelayedSearch(input);
+        }
+    );
+
+    input.addEventListener(
+        'keydown',
+        async event => {
+            if (event.key !== 'Enter') {
+                return;
+            }
+
+            event.preventDefault();
+
+            clearTimeout(searchTimeout);
+
+            if (isMobile) {
+                closeMobileSearch();
+            }
+
+            await searchForServices(
+                input,
+                true
+            );
+        }
+    );
+}
+
+
+/* =========================================================
+   PAGE EVENTS
+========================================================= */
 
 document.addEventListener(
     'DOMContentLoaded',
@@ -82,6 +156,11 @@ document.addEventListener(
         const desktopInput =
             document.getElementById(
                 'mainSearchInput'
+            );
+
+        const desktopButton =
+            document.getElementById(
+                'mainSearchButton'
             );
 
         const mobileInput =
@@ -94,6 +173,11 @@ document.addEventListener(
                 'mobileSearchBtn'
             );
 
+        const mobileSubmitButton =
+            document.getElementById(
+                'mobileSearchSubmit'
+            );
+
         const mobileModal =
             document.getElementById(
                 'mobileSearchModal'
@@ -104,46 +188,148 @@ document.addEventListener(
                 'closeMobileSearch'
             );
 
-        connectSearchInput(desktopInput);
-        connectSearchInput(mobileInput);
+
+        /* Connect desktop and mobile inputs */
+
+        connectSearchInput(
+            desktopInput,
+            false
+        );
+
+        connectSearchInput(
+            mobileInput,
+            true
+        );
+
+
+        /* Desktop search button */
+
+        desktopButton?.addEventListener(
+            'click',
+            async () => {
+                clearTimeout(
+                    searchTimeout
+                );
+
+                await searchForServices(
+                    desktopInput,
+                    true
+                );
+            }
+        );
+
+
+        /* Open mobile search */
 
         mobileButton?.addEventListener(
             'click',
             () => {
-                mobileModal?.classList.add(
+                if (!mobileModal) {
+                    console.error(
+                        'Mobile search popup is missing.'
+                    );
+
+                    return;
+                }
+
+                mobileModal.classList.add(
                     'active'
+                );
+
+                mobileModal.setAttribute(
+                    'aria-hidden',
+                    'false'
                 );
 
                 document.body.style.overflow =
                     'hidden';
 
-                setTimeout(() => {
-                    mobileInput?.focus();
-                }, 250);
+                setTimeout(
+                    () => {
+                        mobileInput?.focus();
+                    },
+                    250
+                );
             }
         );
+
+
+        /* Mobile Search button */
+
+        mobileSubmitButton?.addEventListener(
+            'click',
+            async () => {
+                clearTimeout(
+                    searchTimeout
+                );
+
+                closeMobileSearch();
+
+                await searchForServices(
+                    mobileInput,
+                    true
+                );
+            }
+        );
+
+
+        /* Close button */
 
         closeButton?.addEventListener(
             'click',
             closeMobileSearch
         );
 
+
+        /* Close when dark background is clicked */
+
         mobileModal?.addEventListener(
             'click',
             event => {
-                if (event.target === mobileModal) {
+                if (
+                    event.target ===
+                    mobileModal
+                ) {
                     closeMobileSearch();
                 }
             }
         );
 
-        mobileInput?.addEventListener(
-            'keydown',
-            event => {
-                if (event.key === 'Enter') {
-                    closeMobileSearch();
-                }
-            }
-        );
+
+        /* Popular search buttons */
+
+        document
+            .querySelectorAll(
+                '[data-mobile-search]'
+            )
+            .forEach(button => {
+                button.addEventListener(
+                    'click',
+                    async () => {
+                        const searchTerm =
+                            button.dataset
+                                .mobileSearch ||
+                            '';
+
+                        if (!mobileInput) {
+                            return;
+                        }
+
+                        mobileInput.value =
+                            searchTerm;
+
+                        clearTimeout(
+                            searchTimeout
+                        );
+
+                        closeMobileSearch();
+
+                        await searchForServices(
+                            mobileInput,
+                            true
+                        );
+                    }
+                );
+            });
     }
 );
