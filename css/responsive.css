@@ -1670,6 +1670,8 @@ iframe {
         width: 100%;
         max-width: none;
         padding: 38px 15px;
+        margin-top: -70px;
+
     }
 
     .services-section .container {
@@ -1715,11 +1717,6 @@ iframe {
         display: block;
         margin: 0 0 32px;
     }
-
-    /*
-       On mobile the filter panel becomes a horizontal,
-       scrollable filter area instead of a tall sidebar.
-    */
 
     .filter-sidebar {
         position: relative;
@@ -1853,6 +1850,7 @@ iframe {
         width: 100%;
         max-width: none;
         padding: 32px 10px;
+        margin-top: -90px;
     }
 
     .services-section .container {
@@ -3476,7 +3474,7 @@ iframe {
 
     width: 100%;
     padding: 10px 18px;
-    border-radius: 10px;
+    border-radius: 0 0 10px 10px;
 
     background:
         linear-gradient(
@@ -3490,6 +3488,7 @@ iframe {
 .mobile-info-message {
     flex: 1;
     min-width: 0;
+    text-align: center;
 
     font-size: 13px;
     font-weight: 500;
@@ -3522,7 +3521,7 @@ iframe {
     flex: 0 0 28px;
 
     border:
-        1px solid
+        2px solid
         rgba(255, 255, 255, 0.45);
 
     border-radius: 50%;
@@ -3643,5 +3642,237 @@ iframe {
         flex-basis: 25px;
 
         font-size: 9px;
+    }
+}
+
+/* =========================================================
+   DESIGN SERVICES — TABLET FIX
+   769px TO 1024px
+========================================================= */
+
+@media (
+    min-width: 769px
+) and (
+    max-width: 1024px
+) {
+
+    .services-section {
+        width: calc(100% - 24px);
+        max-width: none;
+        padding: 48px 0;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    .services-section .container {
+        width: 100%;
+        max-width: none;
+        padding: 0;
+    }
+
+    /* Heading and sorting */
+
+    .category-toolbar {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+
+        margin: 0 0 24px;
+        padding-bottom: 16px;
+    }
+
+    .category-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .category-info h2 {
+        font-size: 1.5rem;
+        line-height: 1.25;
+    }
+
+    .category-info .count {
+        margin-top: 4px;
+        font-size: 12px;
+    }
+
+    .toolbar-controls {
+        flex: 0 0 auto;
+    }
+
+    .toolbar-controls select {
+        width: auto;
+        min-width: 180px;
+        max-width: 220px;
+        padding: 9px 15px;
+        font-size: 12px;
+    }
+
+    /*
+       Remove the empty 210px sidebar column.
+       The sidebar is already hidden at this width.
+    */
+
+    .category-layout {
+        display: block;
+        width: 100%;
+        margin: 0 0 34px;
+    }
+
+    .filter-sidebar {
+        display: none !important;
+    }
+
+    /* Two comfortable service cards per row */
+
+    .product-grid {
+        display: grid;
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        width: 100%;
+        gap: 20px;
+    }
+
+    .product-card {
+        display: flex;
+        flex-direction: column;
+
+        width: 100%;
+        min-width: 0;
+        height: 100%;
+        padding: 15px;
+
+        border-radius: 13px;
+    }
+
+    .card-top {
+        min-height: 32px;
+        margin-bottom: 10px;
+    }
+
+    .wishlist-btn {
+        width: 32px;
+        height: 32px;
+        flex: 0 0 32px;
+    }
+
+    .sale-badge {
+        padding: 4px 9px;
+        font-size: 10px;
+    }
+
+    /* Make service image shorter than a square */
+
+    .product-image {
+        width: 100%;
+        aspect-ratio: 16 / 10;
+        margin-bottom: 13px;
+
+        border-radius: 9px;
+        font-size: 2.5rem;
+    }
+
+    .product-brand {
+        font-size: 10px;
+    }
+
+    .product-name {
+        margin: 4px 0 6px;
+        font-size: 16px;
+        line-height: 1.3;
+        overflow-wrap: anywhere;
+    }
+
+    .product-desc {
+        min-height: 38px;
+        margin-bottom: 9px;
+
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .product-features {
+        gap: 5px;
+        margin: 7px 0 10px;
+    }
+
+    .feature-tag {
+        padding: 4px 8px;
+        font-size: 9px;
+        line-height: 1.3;
+    }
+
+    .product-rating {
+        margin-top: auto;
+        margin-bottom: 8px;
+        font-size: 11px;
+    }
+
+    .product-rating span:last-child {
+        font-size: 10px;
+    }
+
+    .product-price {
+        gap: 8px;
+        margin-bottom: 13px;
+    }
+
+    .price-current {
+        font-size: 18px;
+    }
+
+    .price-original {
+        font-size: 12px;
+    }
+
+    .price-save {
+        font-size: 10px;
+    }
+
+    .card-actions {
+        gap: 9px;
+    }
+
+    .btn-primary {
+        min-height: 41px;
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+
+    .btn-secondary {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 42px;
+        min-width: 42px;
+        min-height: 41px;
+        padding: 0;
+
+        font-size: 12px;
+    }
+
+    .pagination-container {
+        padding-top: 25px;
+        padding-bottom: 5px;
+    }
+}
+
+/* Tablet and mobile: vertically center hero overlay content */
+
+@media (max-width: 1024px) {
+
+    .hero-section .slide-overlay {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+    }
+
+    .hero-section .slide-content {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
     }
 }

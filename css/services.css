@@ -198,7 +198,7 @@
 .product-image {
     background: #f6f6f6;
     border-radius: 8px;
-    aspect-ratio: 1/1;
+    aspect-ratio: 16 / 10;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -700,7 +700,6 @@
 .top-design-icon-btn:hover {
     color: #004370;
     background: #ffffff;
-    transform: translateY(-2px);
 }
 
 .top-design-icon-btn.is-liked {
@@ -955,4 +954,328 @@
 
 .top-designs-pagination {
     margin-top: 12px;
+}
+
+/* =========================================================
+   DESIGN SERVICE PRINTING CONTROLS
+========================================================= */
+
+.printing-selector {
+    width: 100%;
+    margin: 14px 0;
+    padding: 14px;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+
+    background: #f8fafc;
+}
+
+
+/* Print this design checkbox row */
+
+.printing-toggle {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    color: #172033;
+    font-size: 12px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.printing-toggle input {
+    width: 17px;
+    height: 17px;
+    margin: 0;
+
+    accent-color: #009b5b;
+
+    cursor: pointer;
+}
+
+
+/* Expanded printing controls */
+
+.printing-details {
+    display: grid;
+    gap: 14px;
+
+    margin-top: 14px;
+    padding-top: 14px;
+
+    border-top: 1px solid #e2e8f0;
+}
+
+.printing-field {
+    display: grid;
+    gap: 7px;
+}
+
+.printing-field > label {
+    color: #475569;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   PRINT SIZE DROPDOWN
+========================================================= */
+
+.printing-field select {
+    width: 100%;
+    min-width: 0;
+    height: 43px;
+
+    padding: 0 40px 0 13px;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+
+    outline: none;
+
+    background-color: #ffffff;
+    color: #172033;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    background-image:
+        linear-gradient(
+            45deg,
+            transparent 50%,
+            #64748b 50%
+        ),
+        linear-gradient(
+            135deg,
+            #64748b 50%,
+            transparent 50%
+        );
+
+    background-position:
+        calc(100% - 17px) 18px,
+        calc(100% - 12px) 18px;
+
+    background-size:
+        5px 5px,
+        5px 5px;
+
+    background-repeat: no-repeat;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.printing-field select:hover {
+    border-color: #94a3b8;
+}
+
+.printing-field select:focus {
+    border-color: #009b5b;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(0, 155, 91, 0.1);
+
+    background-color: #ffffff;
+}
+
+
+/* =========================================================
+   NUMBER OF COPIES SELECTOR
+========================================================= */
+
+.printing-quantity-selector {
+    display: grid;
+    grid-template-columns:
+        42px minmax(0, 1fr) 42px;
+
+    align-items: stretch;
+
+    width: 100%;
+    height: 43px;
+
+    overflow: hidden;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+
+    background: #ffffff;
+}
+
+.printing-quantity-selector button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 100%;
+    padding: 0;
+
+    border: none;
+
+    background: #eef2f6;
+    color: #004370;
+
+    font-family: inherit;
+    font-size: 19px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.printing-quantity-selector button:first-child {
+    border-right: 1px solid #e2e8f0;
+}
+
+.printing-quantity-selector button:last-child {
+    border-left: 1px solid #e2e8f0;
+}
+
+.printing-quantity-selector button:hover {
+    background: #004370;
+    color: #ffffff;
+}
+
+.printing-quantity-selector button:active {
+    background: #002f50;
+}
+
+.printing-quantity-selector input {
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    padding: 0 8px;
+
+    border: none;
+    outline: none;
+
+    background: #ffffff;
+    color: #172033;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+.printing-quantity-selector input::-webkit-inner-spin-button,
+.printing-quantity-selector input::-webkit-outer-spin-button {
+    margin: 0;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+
+/* Minimum and maximum message */
+
+.printing-limits {
+    display: block;
+
+    color: #64748b;
+    font-size: 9px;
+    line-height: 1.4;
+}
+
+
+/* Printing total summary */
+
+.printing-summary {
+    display: grid;
+    gap: 8px;
+
+    padding: 12px;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+}
+
+.printing-summary > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    color: #64748b;
+    font-size: 11px;
+}
+
+.printing-summary strong {
+    color: #172033;
+    font-size: 11px;
+}
+
+.printing-summary > div:last-child {
+    padding-top: 8px;
+
+    border-top: 1px solid #e2e8f0;
+}
+
+.printing-summary > div:last-child strong {
+    color: #009b5b;
+    font-size: 13px;
+}
+
+/* Mobile adjustments */
+
+@media (max-width: 768px) {
+
+    .printing-selector {
+        margin: 11px 0;
+        padding: 11px;
+        border-radius: 10px;
+    }
+
+    .printing-details {
+        gap: 12px;
+        margin-top: 11px;
+        padding-top: 11px;
+    }
+
+    .printing-field select,
+    .printing-quantity-selector {
+        height: 40px;
+    }
+
+    .printing-field select {
+        padding-left: 10px;
+        font-size: 10px;
+    }
+
+    .printing-quantity-selector {
+        grid-template-columns:
+            38px minmax(0, 1fr) 38px;
+    }
+
+    .printing-quantity-selector button {
+        width: 38px;
+        font-size: 17px;
+    }
+
+    .printing-quantity-selector input {
+        font-size: 12px;
+    }
 }

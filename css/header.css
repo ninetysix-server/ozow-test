@@ -22,7 +22,7 @@
 }
 
 .offer-bar {
-    background: linear-gradient(135deg, #004370, #00609c);
+    background: #004370;
     color: white;
     padding: 12px 20px;
     display: flex;
@@ -32,6 +32,8 @@
     flex-wrap: wrap;
     gap: 15px;
     position: relative;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .offer-content {
@@ -108,12 +110,12 @@
 
 .social-icon:hover {
     border-color: #ffffff;
-    background: #004370;
+    background: #00437000;
     color: #ffffff;
 }
 
 .close-offer {
-    display: inline-flex;
+    display: none;
     align-items: center;
     justify-content: center;
 
@@ -121,10 +123,10 @@
     height: 28px;
     padding: 0;
 
-    border: 1px solid #6b7280;
+    border: 2px solid #ccccccb2;
     border-radius: 50%;
 
-    background: #000000;
+    background: #00000000;
     color: #ffffff;
 
     font-size: 11px;
@@ -139,7 +141,7 @@
 
 .close-offer:hover {
     border-color: #ffffff;
-    background: #171717;
+    background: #00000000;
     transform: rotate(90deg);
 }
 
