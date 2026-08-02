@@ -1,11 +1,99 @@
 .cart-popup-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); display:none; justify-content:flex-end; z-index:3500; backdrop-filter:blur(5px); }
 .cart-popup-overlay.active { display:flex; }
 .cart-popup-container { width:100%; max-width:450px; height:100vh; background:white; display:flex; flex-direction:column; animation:slideInRight 0.3s ease; }
-.cart-header { padding:25px; background:linear-gradient(135deg,#004370,#00609c); color:white; position:relative; }
-.close-cart { position:absolute; right:20px; top:20px; background:rgba(255,255,255,0.2); border:none; color:white; width:40px; height:40px; border-radius:50%; cursor:pointer; font-size:18px; }
-.cart-body { flex:1; padding:20px; overflow-y:auto; background:#f8fafc; }
+.cart-header {
+        padding: 25px;
+        background: linear-gradient(135deg, #004370, #00609c);
+        color: white;
+        position: relative;
+    }
+
+    .cart-header h2 {
+        font-size: 22px;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .cart-header p {
+        opacity: 0.9;
+        font-size: 14px;
+    }
+
+    .close-cart {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 18px;
+        transition: background 0.3s;
+    }
+
+    .close-cart:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }.cart-body { flex:1; padding:20px; overflow-y:auto; background:#f8fafc; }
 .cart-empty { text-align:center; padding:60px 20px; color:#64748b; }
 .cart-empty i { font-size:48px; margin-bottom:20px; color:#cbd5e1; }
+.cart-empty {
+        text-align: center;
+        padding: 60px 20px;
+        color: #64748b;
+    }
+
+    .cart-empty i {
+        font-size: 48px;
+        margin-bottom: 20px;
+        color: #cbd5e1;
+    }
+
+    .cart-empty h3 {
+        font-size: 20px;
+        color: #334155;
+        margin-bottom: 10px;
+    }
+
+    .cart-empty p {
+        font-size: 14px;
+        margin-bottom: 25px;
+    }
+
+    .cart-empty .design-btn {
+        max-width: 200px;
+        margin: 0 auto;
+    }
+.design-btn {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #009B5B, #007a48);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        margin-top: auto;
+    }
+
+    .design-btn:hover {
+        background: linear-gradient(135deg, #00824c, #00693d);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 155, 91, 0.3);
+    }
 .cart-items-container { display:none; }
 .cart-items-list { list-style:none; padding:0; }
 .cart-item { background:white; border-radius:12px; padding:20px; margin-bottom:15px; border:1px solid #e2e8f0; }
@@ -30,7 +118,7 @@
 .cart-footer { padding:20px; background:white; border-top:1px solid #e2e8f0; }
 .cart-btn { width:100%; padding:16px; border:none; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; }
 .cart-btn.primary { background:linear-gradient(135deg,#009B5B,#007a48); color:white; }
-.cart-btn.secondary { background:#f8fafc; color:#475569; border:2px solid #e2e8f0; }
+.cart-btn.secondary { background:#f8fafc; color:#475569; border:2px solid #e2e8f0; margin-bottom: 20px; }
 
 .confirmation-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); display:none; justify-content:center; align-items:center; z-index:4000; padding:20px; backdrop-filter:blur(5px); }
 .confirmation-overlay.active { display:flex; }
