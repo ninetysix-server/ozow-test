@@ -29,40 +29,95 @@
     <!-- HEADER -->
     <header id="header">
         <div class="header-container">
-            <!-- Offer Bar -->
-            <div class="offer-bar" id="offerBar" hidden>
-                <div class="offer-content">
-                    <span class="offer-tag">SALE</span>
-                    <span class="offer-text" id="saleTitle"></span>
-                    <div class="countdown">
-                        <span class="time-unit" id="saleDays">00d</span>
-                        <span class="time-unit" id="saleHours">00h</span>
-                        <span class="time-unit" id="saleMinutes">00m</span>
-                        <span class="time-unit" id="saleSeconds">00s</span>
-                    </div>
+            
+            <!-- DYNAMIC SALE BAR -->
+<div
+    class="offer-bar"
+    id="offerBar"
+    hidden
+>
+    <div class="offer-content">
+        <span class="offer-tag">SALE</span>
+
+        <span
+            class="offer-text"
+            id="saleTitle"
+        ></span>
+
+        <div class="countdown">
+            <span class="time-unit" id="saleDays">00d</span>
+            <span class="time-unit" id="saleHours">00h</span>
+            <span class="time-unit" id="saleMinutes">00m</span>
+            <span class="time-unit" id="saleSeconds">00s</span>
+        </div>
+    </div>
+
+    <div class="social-icons desktop-social">
+        <a href="#" class="social-icon">
+            <i class="fab fa-instagram"></i>
+        </a>
+
+        <a href="#" class="social-icon">
+            <i class="fab fa-facebook-f"></i>
+        </a>
+
+        <a href="#" class="social-icon">
+            <i class="fab fa-tiktok"></i>
+        </a>
+
+        <button
+            type="button"
+            class="close-offer"
+            id="closeOfferDesktop"
+        >
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</div>
+
+
+<!-- MOBILE AND TABLET INFORMATION STRIP -->
+<div class="mobile-info-strip">
+
+    <div class="mobile-info-message">
+        Get 10% Off on designs over R500.
+        Delivery within 2–5 working days.
+    </div>
+
+    <div class="mobile-info-row">
+
+        <div class="mobile-info-contact">
+            <div class="phone-icon">
+                <i class="fas fa-phone-alt"></i>
+            </div>
+
+            <div>
+                <div class="mobile-info-help">
+                    Need help?
                 </div>
-                <div class="mobile-contact-offer">
-                    <div class="mobile-contact-info">
-                        <div class="phone-icon"><i class="fas fa-phone-alt"></i></div>
-                        <div class="mobile-contact-text">
-                            <div>Need help?</div>
-                            <div class="phone-number">+27 (81) 792-5033</div>
-                        </div>
-                    </div>
-                    <div class="social-icons">
-                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="social-icon"><i class="fab fa-tiktok"></i></a>
-                        <button class="close-offer" id="closeOffer"><i class="fas fa-times"></i></button>
-                    </div>
-                </div>
-                <div class="social-icons desktop-social">
-                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social-icon"><i class="fab fa-tiktok"></i></a>
-                    <button class="close-offer" id="closeOfferDesktop"><i class="fas fa-times"></i></button>
+
+                <div class="mobile-info-phone">
+                    +27 (81) 792-5033
                 </div>
             </div>
+        </div>
+
+        <div class="mobile-info-socials">
+            <a href="#" aria-label="Instagram">
+                <i class="fab fa-instagram"></i>
+            </a>
+
+            <a href="#" aria-label="Facebook">
+                <i class="fab fa-facebook-f"></i>
+            </a>
+
+            <a href="#" aria-label="TikTok">
+                <i class="fab fa-tiktok"></i>
+            </a>
+        </div>
+
+    </div>
+</div>
 
             <!-- Main Header -->
             <div class="main-header">
@@ -692,20 +747,173 @@
         </div>
     </header>
 
-    <!-- MOBILE MENU -->
-    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
-    <div class="mobile-menu" id="mobileMenu">
-        <div class="mobile-menu-header">
-            <div class="mobile-logo"><img src="assets/images/logo.svg" alt="96 Studios Logo" class="mobile-logo-img" /></div>
-            <button class="close-offer" id="closeMobileMenu"><i class="fas fa-times"></i></button>
+<!-- MOBILE MENU -->
+<div
+    class="mobile-menu-overlay"
+    id="mobileMenuOverlay"
+></div>
+
+<aside
+    class="mobile-menu"
+    id="mobileMenu"
+    aria-hidden="true"
+>
+    <div class="mobile-menu-header">
+        <div class="mobile-logo">
+            <img
+                src="assets/images/logo.svg"
+                alt="96 Studios Logo"
+                class="mobile-logo-img"
+            >
         </div>
-        <ul class="mobile-menu-items">
-            <li class="mobile-menu-item"><a href="#" id="mobile-services"><i class="fas fa-paint-brush"></i> Services</a></li>
-            <li class="mobile-menu-item"><a href="#" id="mobile-branding"><i class="fas fa-tag"></i> Branding</a></li>
-            <li class="mobile-menu-item"><a href="#" id="mobile-pricing"><i class="fas fa-tags"></i> Pricing</a></li>
-            <li class="mobile-menu-item"><a href="#footer"><i class="fas fa-headset"></i> Support</a></li>
-        </ul>
+
+        <button
+            type="button"
+            class="mobile-menu-close"
+            id="closeMobileMenu"
+            aria-label="Close menu"
+        >
+            <i class="fas fa-times"></i>
+        </button>
     </div>
+
+    <nav class="mobile-menu-navigation">
+
+        <a
+            href="#services"
+            class="mobile-menu-link"
+            id="mobile-pricing"
+        >
+
+            <span>
+                <strong>Pricing</strong>
+                <small>
+                    Starter, Premium and Pro packages
+                </small>
+            </span>
+
+            <i class="fas fa-chevron-right"></i>
+        </a>
+
+        <a
+            href="#topDesignsSection"
+            class="mobile-menu-link"
+        >
+
+            <span>
+                <strong>Top Designs</strong>
+                <small>
+                    View selected design work
+                </small>
+            </span>
+
+            <i class="fas fa-chevron-right"></i>
+        </a>
+
+        <div class="mobile-menu-extra-services">
+
+    <a
+        href="#"
+        class="mobile-extra-service"
+        id="mobile-photography"
+        style="
+            --service-image:
+            url('/assets/images/mob-s/camera.jpg');
+        "
+    >
+        <span class="mobile-extra-service-content">
+            <strong>Photography</strong>
+
+            <small>
+                Product, event and business photography.
+            </small>
+        </span>
+
+        <i class="fas fa-arrow-right"></i>
+    </a>
+
+    <a
+        href="#"
+        class="mobile-extra-service"
+        id="mobile-maintenance"
+        style="
+            --service-image:
+            url('/assets/images/mob-s/computer.jpg');
+        "
+    >
+        <span class="mobile-extra-service-content">
+            <strong>
+                Computer &amp; Software Maintenance
+            </strong>
+
+            <small>
+                Repairs, installations and software support.
+            </small>
+        </span>
+
+        <i class="fas fa-arrow-right"></i>
+    </a>
+
+    <a
+        href="#"
+        class="mobile-extra-service"
+        id="mobile-wallart"
+        style="
+            --service-image:
+            url('/assets/images/mob-s/art.jpg');
+        "
+    >
+        <span class="mobile-extra-service-content">
+            <strong>Wall Art &amp; Décor</strong>
+
+            <small>
+                Custom wall artwork and decorative pieces.
+            </small>
+        </span>
+
+        <i class="fas fa-arrow-right"></i>
+    </a>
+
+</div>
+    </nav>
+
+    <div class="mobile-menu-actions">
+        <button
+            type="button"
+            class="mobile-menu-search-btn"
+            id="mobileMenuSearchBtn"
+        >
+            <i class="fas fa-search"></i>
+            Search Services
+        </button>
+
+        
+    </div>
+
+    <div class="mobile-menu-intro">
+
+     
+
+        <p>
+            Explore our services, request a quotation or contact
+            our team for assistance.
+        </p>
+    </div>
+
+    <div class="mobile-menu-footer">
+        <a href="#footer">
+            Support
+        </a>
+
+        <a href="privacy-policy.html">
+            Privacy
+        </a>
+
+        <a href="terms-of-service.html">
+            Terms
+        </a>
+    </div>
+</aside>
 
     <!-- MOBILE BOTTOM NAV -->
     <nav class="mobile-bottom-nav">
@@ -717,6 +925,85 @@
             <li><div class="nav-item-mobile" id="mobileProfileBtn"><div class="nav-icon-mobile"><i class="fas fa-user"></i></div><span>Account</span></div></li>
         </ul>
     </nav>
+
+    <!-- MOBILE AND TABLET SEARCH -->
+<div
+    class="mobile-search-overlay"
+    id="mobileSearchModal"
+    aria-hidden="true"
+>
+    <div
+        class="mobile-search-container"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="mobileSearchTitle"
+    >
+        <div class="mobile-search-top">
+            <div>
+                <h2 id="mobileSearchTitle">
+                    What do you need designed?
+                </h2>
+            </div>
+
+            <button
+                type="button"
+                class="close-mobile-search"
+                id="closeMobileSearch"
+                aria-label="Close search"
+            >
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="mobile-search-field">
+    <input
+        type="search"
+        class="mobile-search-input"
+        id="mobileSearchInput"
+        placeholder="What are you looking for?"
+        autocomplete="off"
+    >
+
+    <button
+        type="button"
+        class="mobile-search-submit"
+        id="mobileSearchSubmit"
+        aria-label="Search services"
+    >
+        <i class="fas fa-search"></i>
+    </button>
+</div>
+
+        <div class="mobile-search-suggestions">
+            <span>Popular:</span>
+
+            <button type="button" data-mobile-search="Logo Design">
+                Logo
+            </button>
+
+            <button type="button" data-mobile-search="Poster Design">
+                Poster
+            </button>
+
+            <button type="button" data-mobile-search="Business Card">
+                Business Card
+            </button>
+
+            <button type="button" data-mobile-search="Website Design">
+                Website
+            </button>
+
+            <button type="button" data-mobile-search="Banner">
+                Banner
+            </button>
+        </div>
+
+        <div
+            class="mobile-search-results"
+            id="mobileSearchResults"
+        ></div>
+    </div>
+</div>
 
     <!-- HERO SECTION -->
 <section class="hero-section hero-is-loading" id="heroSection">
@@ -928,7 +1215,6 @@
             </div>
 
             <div class="printing-feature-content">
-                <span>Quality printing for every project</span>
 
                 <h3>
                     Bring your brand to life with professional
@@ -1001,7 +1287,12 @@
                         almost anything you can imagine.
                     </p>
 
-                    <a href="#services" class="promotion-action">
+                    <a
+                        href="https://wa.me/27817925033?text=Hi%2096%20Studios%2C%20I%20would%20like%20to%20request%20a%20DesignMore%20service.%20The%20design%20I%20need%20is%3A%20"
+                        class="promotion-action"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
                         <span>Design Anything</span>
                         <span class="promotion-arrow">→</span>
                     </a>
@@ -1123,6 +1414,7 @@
                         <ul>
                             <li><a href="#" id="openWishlistModal">Wishlist</a></li>
                             <li><a href="#" id="footer-portal">My Orders</a></li>
+                            <li><a href="refunds.html" id="footer-portal">Refunds</a></li>
                         </ul>
                     </div>
                     <div class="footer-column">
@@ -1138,7 +1430,7 @@
                         <ul>
                             <li><i class="fas fa-phone"></i> +27 (81) 792-5033</li>
                             <li><i class="fas fa-envelope"></i> Support@96studios.co.za</li>
-                            <li><i class="fas fa-map-marker-alt"></i> 462 Sebayeng unit d, Limpopo, Polokwane</li>
+                            <li><i class="fas fa-map-marker-alt"></i>&nbsp;Limpopo, Polokwane</li>
                         </ul>
                     </div>
                 </div>
@@ -1452,7 +1744,44 @@
                     <button class="cart-btn primary" id="proceedToConfirmation" disabled><i class="fas fa-check-circle"></i> Proceed to Confirmation</button>
                 </div>
             </div>
+
+            <!-- DESIGNMORE CARD -->
+            <article class="promotion-card designmore-promotion" style="border-radius: 0px;">
+                <div class="promotion-card-decoration"></div>
+
+                <div class="promotion-card-content">
+
+                    <span class="promotion-eyebrow">
+                        More Creative Possibilities
+                    </span>
+
+                    <h3>DesignMore</h3>
+
+                    <p>
+                        Need a design that is not listed in our pricing?
+                        DesignMore gives you a smarter way to request
+                        almost anything you can imagine.
+                    </p>
+
+                    <a
+                        href="https://wa.me/27817925033?text=Hi%2096%20Studios%2C%20I%20would%20like%20to%20request%20a%20DesignMore%20service.%20The%20design%20I%20need%20is%3A%20"
+                        class="promotion-action"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <span>Design Anything</span>
+                        <span class="promotion-arrow">→</span>
+                    </a>
+                </div>
+
+                <img
+                    src="assets/images/cart-title-image.png"
+                    alt="DesignMore"
+                    class="designmore-card-image"
+                >
+            </article>
         </div>
+        
     </div>
 
     <!-- CONFIRMATION POPUP -->
@@ -1464,8 +1793,8 @@
                     <div class="confirmation-header-desktop">
                         <img src="assets/images/cart-title-image.png" alt="Special Offer" class="confirmation-advert-image" />
                         <div class="confirmation-header-text">
-                            <div class="confirmation-deals-message">Unlimited Time Special Deals!</div>
-                            <div class="confirmation-discount-text">Unlock up to 30% discount on your designs!</div>
+                            <div style="margin-top: 15px;" class="confirmation-deals-message">Unlimited Time Special Deals!</div>
+                            <div class="confirmation-discount-text">Unlock up to 50% discounts on your designs!</div>
                         </div>
                     </div>
                 </div>
