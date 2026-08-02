@@ -1,4 +1,5 @@
 import {
+    supabase,
     getCurrentUser,
     getOrCreateClientId,
     getCustomerProfile,
