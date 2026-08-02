@@ -34,8 +34,7 @@
       padding: 30px;
       border-radius: 22px;
       color: white;
-      background: linear-gradient(135deg, var(--navy), var(--navy-2));
-      box-shadow: 0 18px 45px rgba(0, 67, 112, .18);
+      background: #004370;
     }
     .portal-header::after {
       content: "";
@@ -57,7 +56,6 @@
     }
     .back-button { width: 42px; height: 42px; border-radius: 50%; }
     .logout-button { border-radius: 999px; padding: 10px 15px; display: inline-flex; gap: 8px; align-items: center; }
-    .back-button:hover, .logout-button:hover { background: rgba(255,255,255,.25); transform: translateY(-1px); }
     .heading { position: relative; z-index: 1; text-align: center; margin: 18px auto 22px; }
     .heading h1 { font-size: clamp(26px, 4vw, 36px); margin-bottom: 8px; }
     .heading p { opacity: .88; }
@@ -80,12 +78,11 @@
       gap: 14px;
       margin-bottom: 24px;
     }
-    .summary-card { background: white; border: 1px solid var(--line); border-radius: 16px; padding: 18px; box-shadow: 0 8px 22px rgba(15,23,42,.05); }
+    .summary-card { background: white; border: 1px solid var(--line); border-radius: 16px; padding: 18px; }
     .summary-card span { display: block; color: var(--muted); font-size: 13px; margin-bottom: 8px; }
     .summary-card strong { font-size: 24px; color: var(--navy); }
     .orders-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; }
-    .order-card { background: white; border: 1px solid var(--line); border-radius: 18px; padding: 22px; box-shadow: 0 10px 28px rgba(15,23,42,.06); transition: transform .2s ease, box-shadow .2s ease; }
-    .order-card:hover { transform: translateY(-3px); box-shadow: 0 16px 36px rgba(15,23,42,.1); }
+    .order-card { background: white; border: 1px solid var(--line); border-radius: 18px; padding: 22px; transition: transform .2s ease, box-shadow .2s ease; }
     .order-header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid #edf2f7; }
     .order-id { color: var(--navy); font-weight: 800; font-size: 18px; }
     .order-date { color: var(--muted); font-size: 12px; text-align: right; }
@@ -108,10 +105,9 @@
     .total-row .detail-value { color:var(--green); }
     .order-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px; }
     .view-details-btn, .payment-button { min-height:44px; border-radius:10px; padding:10px 14px; font-weight:800; cursor:pointer; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px; transition:.2s ease; }
-    .view-details-btn { border:0; color:white; background:linear-gradient(135deg,var(--navy),var(--navy-2)); }
-    .payment-button { border:0; color:white; background:linear-gradient(135deg,var(--green),#007a48); }
-    .view-details-btn:hover, .payment-button:hover { transform:translateY(-1px); filter:brightness(.96); }
-    .paid-note { grid-column:1 / -1; display:flex; justify-content:center; gap:8px; color:#166534; background:#ecfdf5; border:1px solid #bbf7d0; border-radius:10px; padding:11px; font-weight:800; font-size:13px; }
+    .view-details-btn { border:0; color:white; background: #004370; }
+    .payment-button { border:0; color:white; background: #009b5b; }
+    .paid-note { grid-column:1 / -1; display:flex; justify-content:center; gap:8px; color:#009b5b; background:#ecfdf5; border:1px solid #bbf7d0; border-radius:10px; padding:11px; font-weight:800; font-size:13px; }
     .loading-spinner, .no-orders, .error-message { background:white; border:1px solid var(--line); border-radius:18px; padding:54px 22px; text-align:center; }
     .spinner { width:48px; height:48px; margin:0 auto 16px; border:4px solid #e2e8f0; border-top-color:var(--green); border-radius:50%; animation:spin 1s linear infinite; }
     @keyframes spin { to { transform:rotate(360deg); } }
@@ -128,7 +124,7 @@
     .timeline-step.done:not(:last-child)::after{background:var(--green)}
     .timeline-dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#e8eef4;color:#8291a1;z-index:1}
     .timeline-step.done .timeline-dot{background:#d9f7e8;color:var(--green)}
-    .timeline-step.active .timeline-dot{background:#e0f1ff;color:var(--navy);box-shadow:0 0 0 5px rgba(0,67,112,.08)}
+    .timeline-step.active .timeline-dot{background:#e0f1ff;color:var(--navy);}
     .timeline-copy strong{display:block;font-size:14px}
     .timeline-copy span{font-size:12px;color:var(--muted)}
     .customer-update{margin-top:16px;padding:14px;border-left:4px solid var(--navy);background:#eff7fc;border-radius:10px;color:#29465d}
@@ -147,7 +143,7 @@
     .delivery-box small{display:block;color:var(--muted);margin-bottom:5px}
     @media(max-width:560px){.delivery-meta{grid-template-columns:1fr}}
     .modal-overlay { position:fixed; inset:0; z-index:4000; display:none; align-items:center; justify-content:center; padding:18px; background:rgba(2,12,27,.72); backdrop-filter:blur(5px); }
-    .modal { width:min(640px,100%); max-height:86vh; overflow:auto; background:white; border-radius:20px; box-shadow:0 24px 70px rgba(0,0,0,.28); }
+    .modal { width:min(640px,100%); max-height:86vh; overflow:auto; background:white; border-radius:20px;}
     .modal-header { position:sticky; top:0; z-index:2; display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid var(--line); background:white; }
     .modal-header h3 { color:var(--navy); }
     .close-modal { width:38px; height:38px; border:0; border-radius:50%; cursor:pointer; color:var(--muted); background:#f1f5f9; }
@@ -178,7 +174,7 @@
         <button class="logout-button" id="logoutButton"><i class="fas fa-right-from-bracket"></i><span>Sign out</span></button>
       </div>
       <div class="heading">
-        <h1><i class="fas fa-clipboard-list"></i> My Orders</h1>
+        <h1></i> My Orders</h1>
         <p>View payments, order details, and design progress.</p>
       </div>
       <div class="client-info">

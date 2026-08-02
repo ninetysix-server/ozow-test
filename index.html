@@ -23,6 +23,88 @@
     <link rel="stylesheet" href="css/wishlist.css" />
     <link rel="stylesheet" href="css/toast.css" />
     <link rel="stylesheet" href="css/responsive.css" />
+    <link rel="stylesheet" href="css/advertiser.css" />
+    <link rel="stylesheet" href="css/gallery.css" />
+    <link rel="stylesheet" href="css/designer.css" />
+
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "@id": "https://96studios.co.za/#business",
+  "name": "96 Studios",
+  "url": "https://96studios.co.za/",
+  "logo": "https://96studios.co.za/assets/images/logo.svg",
+  "image": "https://96studios.co.za/assets/images/your-business-image.jpg",
+  "description": "Professional graphic design studio offering branding, logo design, website design, printing and marketing visuals.",
+  "telephone": "+27-81-792-5033",
+  "email": "support@96studios.co.za",
+  "priceRange": "R100-R3000",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "462 Sebayeng Unit D",
+    "addressLocality": "Polokwane",
+    "addressRegion": "Limpopo",
+    "postalCode": "0752",
+    "addressCountry": "ZA"
+  },
+  "openingHoursSpecification": {
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday"
+    ],
+    "opens": "09:00",
+    "closes": "16:00"
+  },
+  "sameAs": [
+    "https://www.instagram.com/96studioss/",
+    "https://www.facebook.com/ninetysixgraphics",
+    "https://www.tiktok.com/@96.studios6"
+  ],
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Design Services",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Logo Design",
+          "url": "https://96studios.co.za/#services"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Poster Design",
+          "url": "https://96studios.co.za/#services"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Business Card Design",
+          "url": "https://96studios.co.za/#services"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Board Design",
+          "url": "https://96studios.co.za/#services"
+        }
+      }
+    ]
+  }
+}
+</script>
 </head>
 <body oncontextmenu="return false;">
 
@@ -53,17 +135,6 @@
     </div>
 
     <div class="social-icons desktop-social">
-        <a href="#" class="social-icon">
-            <i class="fab fa-instagram"></i>
-        </a>
-
-        <a href="#" class="social-icon">
-            <i class="fab fa-facebook-f"></i>
-        </a>
-
-        <a href="#" class="social-icon">
-            <i class="fab fa-tiktok"></i>
-        </a>
 
         <button
             type="button"
@@ -517,7 +588,6 @@
                     <span>
                         <strong>
                             Premium
-                            <em>Popular</em>
                         </strong>
 
                         <small>
@@ -582,9 +652,6 @@
     >
         <div class="support-menu-content">
             <div class="support-contact-panel">
-                <span class="header-menu-eyebrow">
-                    We are here to help
-                </span>
 
                 <h2>Need assistance?</h2>
 
@@ -723,6 +790,9 @@
         </div>
     </div>
 </li>
+    <a href="#" class="nav-link show-advertiser-portal" id="show-advertiser-portal" >Become an Advertiser</a>
+    <li class="nav-item"><a href="#" class="nav-link">FAQ</a></li>
+
                 </ul>
                 <div class="nav-icons">
                     <button class="get-quote-btn" id="desktopQuoteBtn"><i class="fas fa-file-alt"></i> Get Quote</button>
@@ -813,7 +883,7 @@
         <div class="mobile-menu-extra-services">
 
     <a
-        href="#"
+        href="coming-soon.html"
         class="mobile-extra-service"
         id="mobile-photography"
         style="
@@ -833,7 +903,7 @@
     </a>
 
     <a
-        href="#"
+        href="https://onclick.96studios.co.za/"
         class="mobile-extra-service"
         id="mobile-maintenance"
         style="
@@ -855,7 +925,7 @@
     </a>
 
     <a
-        href="#"
+        href="coming-soon.html"
         class="mobile-extra-service"
         id="mobile-wallart"
         style="
@@ -1021,7 +1091,7 @@
             <div class="swiper-slide">
                 <div class="slide-image-container">
                     <img
-                        src="assets/images/slide-01.png"
+                        src="assets/images/he-b/slide-01.png"
                         alt="Slide 1"
                         class="slide-image"
                     >
@@ -1049,7 +1119,7 @@
             <div class="swiper-slide">
                 <div class="slide-image-container">
                     <img
-                        src="assets/images/slide-03.png"
+                        src="assets/images/he-b/slide-03.png"
                         alt="Slide 2"
                         class="slide-image"
                     >
@@ -1074,6 +1144,30 @@
                 </div>
             </div>
 
+        <div class="swiper-slide">
+            <div class="slide-image-container">
+                <video autoplay muted loop playsinline class="hero-video">
+                    <source src="assets/images/he-b/vd-main.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+
+                <div class="vd-overlay"></div>
+
+                <div class="vd-hero-content">
+
+                    <h1 style="color: white; opacity: 40%;">Premium tools for your work</h1>
+                    <p class="subtitle">
+                    Tools built to help you get your work done
+                    </p>
+
+                    <div class="search-tags">
+                        <span>Style</span>
+                        <span>Colour</span>
+                        <span>Creative</span>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <div class="swiper-pagination"></div>
@@ -1087,6 +1181,71 @@
         <img src="assets/icons/whatsapp.png" alt="WhatsApp" class="icon" />
         <span id="wishlistCounter" class="wishlist-counter">0</span>
     </a>
+
+    <section class="gallery-section">
+        <div class="gallery-container">
+            <div class="gallery-header">
+            </div>
+            
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <div class="image-card" tabindex="0">
+                        <div class="image-wrapper">
+                            <img src="assets/images/gl-r/br_vehicle-magnet.png" alt="vehicle sticker magnet design">
+                            <div class="image-overlay"></div>
+                            <div class="image-info">
+                                <div class="info-title">Vehicle Magnet Design</div>
+                                <p class="info-description">Designs for magnetic signs that can be applied to vehicles.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="gallery-item">
+                    <div class="image-card" tabindex="0">
+                        <div class="image-wrapper">
+                            <img src="assets/images/gl-r/br_banner.png" alt="Banner design">
+                            <div class="image-overlay"></div>
+                            <div class="image-info">
+                                <div class="info-title">Banner Design</div>
+                                <p class="info-description">Designs for banners used in events, displays, or promotions.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="gallery-item">
+                    <div class="image-card" tabindex="0">
+                        <div class="image-wrapper">
+                            <img src="assets/images/gl-r/br_store-vivyl.png" alt="Window vinyl branding">
+                            <div class="image-overlay"></div>
+                            <div class="image-info">
+                                <div class="info-title">Vinyl Branding</div>
+                                <p class="info-description">Designs created on vinyl material for signage, walls, or storefronts.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="gallery-item">
+                    <div class="image-card" tabindex="0">
+                        <div class="image-wrapper">
+                            <img src="assets/images/gl-r/br_tshirt-design.png" alt="Tshirt design">
+                            <div class="image-overlay"></div>
+                            <div class="image-info">
+                                <div class="info-title">T-Shirt Design</div>
+                                <p class="info-description">Designs intended for printing on t-shirts and other apparel.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="gallery-footer">
+                <p class="gallery-tagline"></p>
+            </div>
+        </div>
+    </section>
 
     <!-- SERVICES SECTION -->
 <section class="services-section" id="services">
@@ -1156,6 +1315,7 @@
 
 </section>
 
+
 <!-- TOP DESIGNS SECTION -->
 <section class="top-designs-section" id="topDesignsSection">
     <div class="container">
@@ -1188,6 +1348,21 @@
     </div>
 </section>
 
+    <section class="printing-advert-section">
+        <div class="printing-container">
+            <div class="printing-content">
+                <div class="printing-text">
+                    <span class="quality-tag">Premium Quality</span>
+                    <h2 class="printing-title">High-quality prints, delivered on time.</h2>
+                    <p class="printing-tagline">We can design and print for you. We kindly know what's best.</p>
+                </div>
+                <div class="printing-image">
+                    <img src="assets/images/pri-s/printer-image.png" alt="Printer image">
+                </div>
+            </div>
+        </div>
+    </section>
+
 <!-- PRINTING SERVICES SECTION -->
 <section class="printing-section" id="printingServices">
     <div class="container">
@@ -1209,7 +1384,7 @@
         <div class="printing-feature-message">
             <div class="printing-feature-icon">
                 <img
-                    src="assets/images/slide-02.png"
+                    src="assets/images/pri-s/slide-02.png"
                     alt="Printing Consultant"
                 >
             </div>
@@ -1247,6 +1422,41 @@
             </div>
 
     </div>
+</section>
+
+<section class="spaces-section">
+  <div class="spaces-container">
+    
+    <!-- Left Content -->
+    <div class="spaces-text">
+        <!-- Profile Image -->
+<div class="spaces-profile">
+  <img src="assets/images/kg-c/profile.png" alt="Profile Image">
+</div>
+      <h1>Hi' I'm Kaygdesigner</h1>
+      <p>
+        Let me share my designing journey, crafted with attention to colour, layout, and visual hierarchy.
+      </p>
+      <button class="spaces-btn" onclick="window.location.href='https://kaygdesigner.96studios.co.za/'">
+         My Portfolio →
+    </button>
+    </div>
+
+    <!-- Right Visual -->
+    <div class="spaces-media">
+      <div class="media-card">
+  <video autoplay muted loop playsinline class="bg-video">
+    <source src="/assets/images/kg-c/vd2.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <div class="video-overlay">
+    <span>Live</span>
+  </div>
+</div>
+    </div>
+
+  </div>
 </section>
 
 <!-- PROMOTIONS AND DEALS SECTION -->
@@ -1331,7 +1541,7 @@
 
                 <div class="ozow-card-logo">
                     <img
-                        src="assets/images/ozow-image.png"
+                        src="assets/images/ft-a/ozow-image.png"
                         alt="Ozow secure payments"
                     >
                 </div>
@@ -1440,7 +1650,7 @@
                 <div class="payment-logos">
     <div class="payment-logo-wrapper">
         <img
-            src="assets/images/ozow-image.png"
+            src="assets/images/ft-a/ozow-image.png"
             alt="Ozow Payment"
             class="payment-logo"
         />
@@ -1448,7 +1658,7 @@
 
     <div class="payment-logo-wrapper">
         <img
-            src="assets/images/MasterCard.png"
+            src="assets/images/ft-a/MasterCard.png"
             alt="Payment method"
             class="payment-logo"
         />
@@ -1456,7 +1666,7 @@
 
     <div class="payment-logo-wrapper">
         <img
-            src="assets/images/Visa.png"
+            src="assets/images/ft-a/Visa.png"
             alt="Payment method"
             class="payment-logo"
         />
@@ -2304,6 +2514,36 @@
         </div>
     </div>
 
+    <!-- SMALL VALIDATION MESSAGE -->
+<div
+    class="validation-message"
+    id="validationMessage"
+    aria-hidden="true"
+>
+    <div class="validation-message-icon">
+        <i class="fas fa-exclamation"></i>
+    </div>
+
+    <div class="validation-message-content">
+        <strong>Information required</strong>
+        <span id="validationMessageText"></span>
+    </div>
+
+    <button
+        type="button"
+        class="validation-message-close"
+        id="closeValidationMessage"
+        aria-label="Close message"
+    >
+        <i class="fas fa-times"></i>
+    </button>
+</div>
+
+<div class="advertiser-embed-container" id="advertiserEmbed">
+    <button class="close-btn" id="advertiserCloseBtn">×</button>
+    <iframe class="advertiser-iframe" src="https://myad-portal.netlify.app/"></iframe>
+</div>
+
     <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script type="module" src="js/supabase.js"></script>
@@ -2315,5 +2555,6 @@
     <script type="module" src="js/search.js"></script>
     <script type="module" src="js/main.js"></script>
     <script type="module" src="js/header.js"></script>
+    <script type="module" src="js/advertiser.js"></script>
 </body>
 </html>
