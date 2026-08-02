@@ -2567,3 +2567,12 @@ saleNav.addEventListener("click", async e => {
     await loadSaleCampaign();
 
 });
+
+const saleForm = $("saleForm");
+
+if (saleForm) {
+    saleForm.addEventListener(
+        "submit",
+        saveSaleCampaign
+    );
+}
