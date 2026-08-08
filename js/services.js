@@ -1382,7 +1382,11 @@ const savingPercentage = isOnSale
         const isInWishlist = wishlistItems.some(item => item.id === service.id);
         
         return `
-            <div class="product-card" data-service="${service.id}">
+            <div
+                    class="product-card"
+                    data-service="${service.id}"
+                    onclick="openServicePage(event, '${service.id}')"
+                >
                 <div class="card-top">
                     <div class="card-top-right">
                         ${isOnSale ? `<span class="sale-badge">-${savingPercentage}%</span>` : ''}
@@ -1391,7 +1395,13 @@ const savingPercentage = isOnSale
                         </button>
                     </div>
                 </div>
-                <div class="product-image"><i class="fas fa-paint-brush"></i></div>
+                <div class="product-image">
+                    <img
+                        src="${service.image_url || 'assets/images/cart-title-image.png'}"
+                        alt="${escapeTopDesignValue(service.title)}"
+                        loading="lazy"
+                    >
+                </div>
                 <div class="product-brand">${service.category || 'Design'}</div>
                 <div class="product-name">${service.title}</div>
                 <div class="product-desc">${desc}</div>
@@ -2622,6 +2632,25 @@ window.addEventListener('resize', () => {
 
     updateTopDesignAutoplay();
 });
+
+window.openServicePage = function(
+    event,
+    serviceId
+) {
+    const interactiveElement =
+        event.target.closest(
+            'button, input, select, label, a'
+        );
+
+    if (interactiveElement) {
+        return;
+    }
+
+    window.location.href =
+        `service.html?id=${
+            encodeURIComponent(serviceId)
+        }`;
+};
 
 
 // Make functions globally available
