@@ -1,0 +1,47 @@
+ing
+Uploading asset (create-ozow-payment): supabase/functions/create-ozow-payment/deno.json
+Uploading asset (create-ozow-payment): supabase/functions/create-ozow-payment/index.ts
+Deployed Functions on project pebkryplphawjlmvcfma: create-ozow-payment
+You can inspect your deployment in the Dashboard: https://supabase.com/dashboard/project/pebkryplphawjlmvcfma/functions
+
+KAGISO@DESKTOP-0SDTSP3 MINGW64 ~/Downloads/main-main (2)/main-main
+$ supabase functions new ozow-notify
+Created new Function at supabase\functions\ozow-notify
+
+KAGISO@DESKTOP-0SDTSP3 MINGW64 ~/Downloads/main-main (2)/main-main
+$ supabase functions deploy ozow-notify
+ProjectConfigParseError
+Try rerunning the command with --debug to troubleshoot the error.
+
+KAGISO@DESKTOP-0SDTSP3 MINGW64 ~/Downloads/main-main (2)/main-main
+$ supabase functions deploy ozow-notify
+ProjectConfigParseError
+Try rerunning the command with --debug to troubleshoot the error.
+
+KAGISO@DESKTOP-0SDTSP3 MINGW64 ~/Downloads/main-main (2)/main-main
+$ supabase functions deploy ozow-notify --no-verify-jwt
+ProjectConfigParseError
+Try rerunning the command with --debug to troubleshoot the error.
+
+KAGISO@DESKTOP-0SDTSP3 MINGW64 ~/Downloads/main-main (2)/main-main
+$ supabase functions deploy ozow-notify --no-verify-jwt
+WARNING: Docker is not running
+Uploading asset (ozow-notify): supabase/functions/ozow-notify/deno.json
+Uploading asset (ozow-notify): supabase/functions/ozow-notify/index.ts
+Deployed Functions on project pebkryplphawjlmvcfma: ozow-notify
+You can inspect your deployment in the Dashboard: https://supabase.com/dashboard/project/pebkryplphawjlmvcfma/functions
+
+KAGISO@DESKTOP-0SDTSP3 MINGW64 ~/Downloads/main-main (2)/main-main
+$ supabase functions deploy ozow-notify --no-verify-jwt
+WARNING: Docker is not running
+Uploading asset (ozow-notify): supabase/functions/ozow-notify/deno.json
+Uploading asset (ozow-notify): supabase/functions/ozow-notify/index.ts
+Deployed Functions on project pebkryplphawjlmvcfma: ozow-notify
+You can inspect your deployment in the Dashboard: https://supabase.com/dashboard/project/pebkryplphawjlmvcfma/functions
+
+KAGISO@DESKTOP-0SDTSP3 MINGW64 ~/Downloads/main-main (2)/main-main
+$ supabase functions new send-new-order-email
+Created new Function at supabase\functions\send-new-order-email
+
+KAGISO@DESKTOP-0SDTSP3 MINGW64 ~/Downloads/main-main (2)/main-main
+$ 

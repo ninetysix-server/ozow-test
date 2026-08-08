@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="css/advertiser.css" />
     <link rel="stylesheet" href="css/gallery.css" />
     <link rel="stylesheet" href="css/designer.css" />
+    <link rel="stylesheet" href="css/bottom-popups.css" />
 
     <script type="application/ld+json">
 {
@@ -312,8 +313,14 @@
                     Branding Services
                 </a>
 
-                <a href="#printingServices">
-                    Printing Quotations
+                <a href="coming-soon.html">
+                    Photography
+                </a>
+                <a href="coming-soon.html">
+                    Wall Art & deco
+                </a>
+                <a href="https://onclick.96studios.co.za/">
+                    Computer & Software Maintenance
                 </a>
 
                 <a href="#footer">
@@ -1435,9 +1442,9 @@
 </div>
       <h1>Hi' I'm Kaygdesigner</h1>
       <p>
-        Let me share my designing journey, crafted with attention to colour, layout, and visual hierarchy.
+        Explore our designing journey, crafted with attention to colour, layout, and visual hierarchy.
       </p>
-      <button class="spaces-btn" onclick="window.location.href='https://kaygdesigner.96studios.co.za/'">
+      <button class="spaces-btn" onclick="window.location.href='our-work.html'">
          My Portfolio →
     </button>
     </div>
@@ -1957,7 +1964,7 @@
 
             <!-- DESIGNMORE CARD -->
             <article class="promotion-card designmore-promotion" style="border-radius: 0px;">
-                <div class="promotion-card-decoration"></div>
+                <div class="promotion-card-decoration2"></div>
 
                 <div class="promotion-card-content">
 
@@ -2544,6 +2551,98 @@
     <iframe class="advertiser-iframe" src="https://myad-portal.netlify.app/"></iframe>
 </div>
 
+<div class="cookies-popup" id="cookiesPopup">
+    <div class="cookies-content">
+        <h3>We Use Cookies</h3>
+        <p>We use cookies to enhance your browsing experience, serve personalized content, and analyze our traffic. 
+           By clicking "Accept All", you consent to our use of cookies. 
+           <a href="privacy-policy.html" target="_blank">Privacy Policy</a>
+        </p>
+    </div>
+    <div class="cookies-buttons">
+        <button class="cookies-btn decline" id="declineCookies">Decline</button>
+        <button class="cookies-btn settings" id="cookieSettings">Settings</button>
+        <button class="cookies-btn accept" id="acceptCookies">Accept All</button>
+    </div>
+</div>
+
+<div class="cookies-modal-overlay" id="cookiesModal">
+    <div class="cookies-modal">
+        <button class="close-cookies-modal" id="closeCookiesModal">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="cookies-modal-header">
+            <h3>Cookie Preferences</h3>
+            <p>Manage your cookie settings. You can enable or disable different types of cookies below.</p>
+        </div>
+        <div class="cookies-modal-body">
+            <div class="cookies-option">
+                <div class="option-info">
+                    <h4>Essential Cookies</h4>
+                    <p>Required for the website to function properly. Cannot be disabled.</p>
+                </div>
+                <label class="cookies-toggle">
+                    <input type="checkbox" checked disabled>
+                    <span class="cookies-toggle-slider"></span>
+                </label>
+            </div>
+            <div class="cookies-option">
+                <div class="option-info">
+                    <h4>Analytics Cookies</h4>
+                    <p>Help us understand how visitors interact with our website.</p>
+                </div>
+                <label class="cookies-toggle">
+                    <input type="checkbox" id="analyticsCookies" checked>
+                    <span class="cookies-toggle-slider"></span>
+                </label>
+            </div>
+            <div class="cookies-option">
+                <div class="option-info">
+                    <h4>Marketing Cookies</h4>
+                    <p>Used to track visitors across websites to display relevant advertisements.</p>
+                </div>
+                <label class="cookies-toggle">
+                    <input type="checkbox" id="marketingCookies">
+                    <span class="cookies-toggle-slider"></span>
+                </label>
+            </div>
+            <div class="cookies-option">
+                <div class="option-info">
+                    <h4>Preference Cookies</h4>
+                    <p>Allow the website to remember information that changes its behavior.</p>
+                </div>
+                <label class="cookies-toggle">
+                    <input type="checkbox" id="preferenceCookies" checked>
+                    <span class="cookies-toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+        <div class="cookies-modal-footer">
+            <button class="cookies-btn decline" id="saveCookieSettings">Save Preferences</button>
+        </div>
+    </div>
+</div>
+
+<div class="bottom-ozow-advert" id="bottomOzowAdvert">
+    <div class="bottom-ozow-content">
+        <div class="ozow-left">
+            <img src="assets/images/ft-a/ozow-image.png" alt="Ozow Payment" class="ozow-bottom-logo">
+        </div>
+        <div class="ozow-right">
+            <h3>Secure Payments with Ozow</h3>
+            <p>Fast, secure, and reliable payment processing</p>
+            <div class="ozow-bottom-features">
+                <span><i class="fas fa-shield-alt"></i> Bank-level Security</span>
+                <span><i class="fas fa-bolt"></i> Instant Processing</span>
+            </div>
+        </div>
+        <button class="close-bottom-ozow" id="closeBottomOzow">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+</div>
+
+
     <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script type="module" src="js/supabase.js"></script>
@@ -2556,5 +2655,8 @@
     <script type="module" src="js/main.js"></script>
     <script type="module" src="js/header.js"></script>
     <script type="module" src="js/advertiser.js"></script>
+    <script type="module" src="js/cookies.js"></script>
+    <script type="module" src="js/ozow-bottom.js"></script>
+
 </body>
 </html>
