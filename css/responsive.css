@@ -2841,7 +2841,7 @@ iframe {
 .mobile-search-submit {
     position: absolute;
     top: 50%;
-    right: 5px;
+    right: 4px;
 
     display: flex;
     align-items: center;
